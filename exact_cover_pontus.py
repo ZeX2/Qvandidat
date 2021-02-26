@@ -51,6 +51,3 @@ def expectation_value(gamma, beta, repetitions=50):
         C += cost_function(result[0], result[1])
 
     return C/len(results.measurements['1,2'])
-
-
-print(expectation_value(0, 0, 50))
