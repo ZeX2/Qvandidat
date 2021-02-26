@@ -2,30 +2,37 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import cm 
 import random as rnd
-from exact_cover_pontus import expectation_value
+from exact_cover_pontus import expectation_value as expectation_value_cirq
+from exact_cover_pontus_qiskit import expectation_value as expectation_value_qiskit
 
 
-fig = plt.figure()
+def plot_expectation_value(resolution_steps, repetitions, expectation_value_impl):
+    fig = plt.figure()
 
-ax = fig.add_subplot(111, projection='3d')
-betas = np.linspace(0,np.pi,100)
-gammas = np.linspace(0,np.pi,100)
+    ax = fig.add_subplot(111, projection='3d')
+    betas = np.linspace(0,np.pi,resolution_steps)
+    gammas = np.linspace(0,np.pi,resolution_steps)
 
-data=np.zeros((len(betas),len(gammas)))
+    data=np.zeros((len(betas),len(gammas)))
 
-X, Y = np.meshgrid(betas, gammas)
+    X, Y = np.meshgrid(betas, gammas)
 
-for i in range(len(betas)):
-    for j in range(len(gammas)):
-        beta = betas[i]
-        gamma = gammas[j]
+    for i in range(len(betas)):
+        for j in range(len(gammas)):
+            beta = betas[i]
+            gamma = gammas[j]
 
-        data[i][j] = expectation_value(gamma, beta, 10)
-        print(str(i) + ':' + str(j)) # debug
+            data[i][j] = expectation_value_impl(gamma, beta, repetitions)
+            print(str(i) + ':' + str(j)) # debug
 
-print(np.shape(X))
-print(np.shape(Y))
-print(np.shape(data))
-ax.plot_surface(X, Y, data, cmap=cm.coolwarm)
-plt.show()
-    
+    ax.plot_surface(X, Y, data, cmap=cm.coolwarm)
+    ax.invert_yaxis()
+    plt.show()
+
+    fig, ax = plt.subplots()
+    ax.contour(X, Y, data)
+    plt.show()
+
+#plot_expectation_value(10, 10, expectation_value_cirq)
+plot_expectation_value(100, 100, expectation_value_qiskit)
+
