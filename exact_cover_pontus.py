@@ -51,3 +51,6 @@ def expectation_value(gamma, beta, repetitions=50):
         C += cost_function(result[0], result[1])
 
     return C/len(results.measurements['1,2'])
+
+
+# cmd + shift + p -> Select Interpreter, Python...
