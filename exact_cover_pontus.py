@@ -40,17 +40,22 @@ def expectation_value(gamma, beta, repetitions=50):
         rx2b(q2),
         dn1(q2),
         cirq.measure(q1, q2),
+        cirq.measure(q1, q2, key='zz'),
     )
 
     simulator = Simulator()
 
     results = simulator.run(circuit, repetitions=repetitions)
 
-    C = 0
-    for result in results.measurements['1,2']:
-        C += cost_function(result[0], result[1])
+    count_results = results.histogram(key='zz')
 
-    return C/len(results.measurements['1,2'])
+    C = 0
+    for key in count_results:
+        value = count_results[key]
+        # Note: q1 is the leftmost bit
+        C += value * cost_function((key & 0b10) >> 1, key & 0b01)
+
+    return C/repetitions
 
 
 # cmd + shift + p -> Select Interpreter, Python...

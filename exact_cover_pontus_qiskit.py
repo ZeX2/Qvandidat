@@ -19,15 +19,9 @@ def expectation_value(gamma, beta, repetitions=50):
     p1 = calculate_probability(0.99, 2)
     p2 = calculate_probability(0.99, 4)
 
+    (q1, q2) = (0, 1)
+
     circuit = QuantumCircuit(2, 2)
-    circuit.h(0)
-    circuit.rx(gamma, 1)
-    circuit.cz(0, 1)
-    circuit.rz(gamma, 0)
-    circuit.rx(2*beta, 0)
-    circuit.h(1)
-    circuit.rx(2*beta, 1)
-    circuit.measure([0, 1], [0, 1])
 
     noise_model = NoiseModel()
 
@@ -37,15 +31,24 @@ def expectation_value(gamma, beta, repetitions=50):
     noise_model.add_all_qubit_quantum_error(depo_error_2, ['cz'])
 
     noisy_simulator = QasmSimulator(noise_model=noise_model)
+    circuit.h(q1)
+    circuit.rx(gamma, q2)
+    circuit.cz(q1, q2)
+    circuit.rz(gamma, q1)
+    circuit.h(q2)
+    circuit.rx(2*beta, q1)
+    circuit.rx(2*beta, q2)
+    circuit.measure([q1, q2], [0, 1])
     job = execute(circuit, noisy_simulator, shots=repetitions)
 
     results = job.result()
-    count_results = results.get_counts(0)
+    count_results = results.get_counts()
 
     C = 0
     for key in count_results:
-        value = count_results
-        C += value[key]*cost_function(int(key[0]), int(key[1]))
+        value = count_results[key]
+        # Note: q1 is the leftmost bit
+        C += value*cost_function(int(key[1]), int(key[0]))
 
     return C/repetitions
 
