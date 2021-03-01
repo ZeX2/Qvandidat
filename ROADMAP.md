@@ -6,14 +6,15 @@
   - [ ] Generate data
     - [ ] using depolarization noise models with varying probabilities
     - [ ] using phase flip and phase damp noise models with varying probabilities
-- [ ] Solve the Even subset problem (mock problem)
+- [ ] Solve the equal size partition problem (mock problem)
   - [ ] Using cirq
-  - [ ] Using qiskit
+  - [x] Using qiskit
   - [ ] Generate data
     - [ ] using depolarization noise models with varying probabilities
     - [ ] using phase flip and phase damp noise models with varying probabilities
 - [ ] Present results and ask questions
 - [ ] Compare the noise with and without `circuit-group's` custom gates
+- [ ] Implement an interface for a classical optimizer
 
 
 ## Plan
@@ -47,6 +48,8 @@ Change the probability p in an interval, eg. change `fidelity` from 0.5 to 1 wit
 Measure difference in noise by comparing how much the energy landscape changed compared to simulations without noise.
 
 Run QAOA and see if we still reach the same angles. Does the optimizer take the same path?
+
+The approximation ratio Pontus used in his Matlab code as an measurement of error.
 
 
 ### Questions to ask
