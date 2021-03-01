@@ -4,20 +4,17 @@ from qiskit import(
     execute,
     Aer)
 import numpy as np
-from exact_cover_pontus_cost_function import cost_function
-from exact_cover_pontus_probability import calculate_probability
+from cost_function import cost_function
+from depolarizing_probability import depolarizing_probability
 from qiskit.providers.aer import QasmSimulator
 from qiskit.providers.aer.noise import NoiseModel
 from qiskit.providers.aer.noise import pauli_error, depolarizing_error
 
 
-simulator = Aer.get_backend('qasm_simulator')
-
-
 def expectation_value(gamma, beta, repetitions=50):
 
-    p1 = calculate_probability(0.99, 2)
-    p2 = calculate_probability(0.99, 4)
+    p1 = depolarizing_probability(0.99, 2)
+    p2 = depolarizing_probability(0.99, 4)
 
     (q1, q2) = (0, 1)
 
@@ -39,6 +36,9 @@ def expectation_value(gamma, beta, repetitions=50):
     circuit.rx(2*beta, q1)
     circuit.rx(2*beta, q2)
     circuit.measure([q1, q2], [0, 1])
+
+    print(circuit.qasm())
+    
     job = execute(circuit, noisy_simulator, shots=repetitions)
 
     results = job.result()

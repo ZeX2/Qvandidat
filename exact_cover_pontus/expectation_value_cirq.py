@@ -1,6 +1,6 @@
 import cirq
-from exact_cover_pontus_probability import calculate_probability
-from exact_cover_pontus_cost_function import cost_function
+from depolarizing_probability import depolarizing_probability
+from cost_function import cost_function
 from cirq import Simulator
 
 # TODO
@@ -17,8 +17,8 @@ def expectation_value(gamma, beta, repetitions=50):
     rzg = cirq.rz(gamma)
     rx2b = cirq.rx(2*beta)
 
-    p1 = calculate_probability(0.99, 2)
-    p2 = calculate_probability(0.99, 4)
+    p1 = depolarizing_probability(0.99, 2)
+    p2 = depolarizing_probability(0.99, 4)
 
     dn1 = cirq.depolarize(p1)
     dn2 = cirq.depolarize(p2)
@@ -42,6 +42,8 @@ def expectation_value(gamma, beta, repetitions=50):
         cirq.measure(q1, q2),
         cirq.measure(q1, q2, key='zz'),
     )
+
+    print(circuit.qasm())
 
     simulator = Simulator()
 
