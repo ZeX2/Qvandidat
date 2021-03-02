@@ -10,4 +10,4 @@ def get_ising_model(S):
     J = A+B*SS
     h = 0
 
-    return (J, h)
+    return (J, h, (0,2 *np.pi))
