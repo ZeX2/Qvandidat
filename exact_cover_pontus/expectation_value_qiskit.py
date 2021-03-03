@@ -4,7 +4,6 @@ from qiskit import(
     execute,
     Aer)
 import numpy as np
-from cost_function import cost_function
 from depolarizing_probability import depolarizing_probability
 from qiskit.providers.aer import QasmSimulator
 from qiskit.providers.aer.noise import NoiseModel
@@ -37,8 +36,6 @@ def expectation_value(gamma, beta, repetitions=50):
     circuit.rx(2*beta, q2)
     circuit.measure([q1, q2], [0, 1])
 
-    print(circuit.qasm())
-    
     job = execute(circuit, noisy_simulator, shots=repetitions)
 
     results = job.result()
@@ -51,6 +48,15 @@ def expectation_value(gamma, beta, repetitions=50):
         C += value*cost_function(int(key[1]), int(key[0]))
 
     return C/repetitions
+
+
+def cost_function(x1, x2):
+    j_12 = 1/2
+    h_1 = 1/2
+    s1 = 1 - 2*x1
+    s2 = 1 - 2*x2
+
+    return j_12*s1*s2 + h_1*s1 + 1
 
 
 # cmd + shift + p -> Select Interpreter, pyton (noise)
