@@ -25,6 +25,7 @@ def get_circuit(gammas, betas, J, h):
 
         qc.rx(2*beta, range(N))
 
+    qc.measure(range(N),range(N))
 
     return qc
 
