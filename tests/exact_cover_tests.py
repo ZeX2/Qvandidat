@@ -15,18 +15,17 @@ def get_objective():
         beta = x[1]
 
         exp_val = expectation_value_exact_cover(gamma,
-                beta, repetitions=1000)
+                                                beta, repetitions=1000)
 
         return exp_val
 
-    return objective()
+    return objective
 
 
 def run_all_tests():
     objective = get_objective()
-
     r = bruteforce(objective, [(0, np.pi/2), (0, np.pi/2)],
-               max_evaluations=10000, plot=True)
+                   max_evaluations=10000, plot=True)
 
 
-
+run_all_tests()
