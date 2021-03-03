@@ -6,13 +6,21 @@ import pickle
 import scipy.io
 
 
-def differential_evolution(objective, bounds):
+def differential_evolution(objective, bounds, save_file=None):
     result = optimize.differential_evolution(objective, bounds)
+
+    if save_file:
+        scipy.io.savemat(save_file + '.mat', result)
+
     return (result.x, result.fun, result)
 
 
-def shgo(objective, bounds):
+def shgo(objective, bounds, save_file=None):
     result = optimize.shgo(objective, bounds)
+
+    if save_file:
+        scipy.io.savemat(save_file + '.mat', result)
+
     return (result.x, result.fun, result)
 
 
