@@ -65,7 +65,7 @@ x0 = np.concatenate([gamma_0, beta_0])
 
 # r = differential_evolution(objective, [bound, bound])
 r = bruteforce(objective, [(0, np.pi/2), (0, np.pi/2)],
-               max_evaluations=10000, plot=True)
+               max_evaluations=1000, plot=False, save_file='hej')
 # (a, b) = decode_solution(r[0])
 # print(a, b, sum(a))
 
