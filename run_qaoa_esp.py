@@ -46,10 +46,9 @@ beta_0 = np.array([.7, .6])
 
 x0 = np.concatenate([gamma_0, beta_0])
 
-r = differential_evolution(objective, [bound, bound])
-
-(a,b) = decode_solution(r[0])
-
+#r = differential_evolution(objective, [bound, bound])
+r = bruteforce(objective, [bound, bound], plot=True)
+(a, b) = decode_solution(r[0])
 print(a, b, sum(a))
 
 print('Things are working!')
