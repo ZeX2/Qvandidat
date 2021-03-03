@@ -2,7 +2,8 @@ import numpy as np
 from classical_optimizers.global_search_algorithms import shgo
 from classical_optimizers.global_search_algorithms import bruteforce
 from classical_optimizers.global_search_algorithms import differential_evolution
-from exact_cover_pontus.expectation_value_qiskit import expectation_value as expectation_value_exact_cover
+from exact_cover_pontus.exact_cover_pontus import get_circuit, cost_function
+from expectation_value import expectation_value_depolarizing, expectation_value_no_noise
 
 
 def get_objective():
@@ -14,8 +15,7 @@ def get_objective():
         gamma = x[0]
         beta = x[1]
 
-        exp_val = expectation_value_exact_cover(gamma,
-                                                beta, repetitions=1000)
+        exp_val = expectation_value_depolarizing(repetitions=1000)
 
         return exp_val
 
