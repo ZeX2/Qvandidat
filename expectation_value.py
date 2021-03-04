@@ -15,25 +15,27 @@ def expectation_value_job(job, cost_function):
     results = job.result()
     count_results = results.get_counts()
 
-    expval = 0
+    total_cost = 0
+    total_counts = 0
     cost = 0
     cost_best = -1
     z_best = []
 
     for key in count_results:
         value = count_results[key]
+        total_counts += value
         # Note: q1 is the leftmost bit
 
         spins = [1 if s == '1' else -1 for s in key]
 
         cost = cost_function(spins)
-        expval += value*cost/repetitions
+        total_cost += value*cost
 
         if cost < cost_best or cost_best == -1:
             cost_best = cost
             z_best = spins
 
-    return expval, z_best
+    return (total_cost/total_counts, z_best)
 
 
 def expectation_value_bitflip(probability, circuit, cost_function, repetitions=50):

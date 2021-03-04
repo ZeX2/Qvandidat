@@ -40,11 +40,11 @@ def get_circuit(gammas, betas):
     return circuit
 
 
-def cost_function(x1, x2):
+def cost_function(x):
     j_12 = 1/2
     h_1 = 1/2
-    s1 = 1 - 2*x1
-    s2 = 1 - 2*x2
+    s1 = 1 - 2*x[0]
+    s2 = 1 - 2*x[1]
 
     return j_12*s1*s2 + h_1*s1 + 1
 
