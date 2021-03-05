@@ -9,7 +9,7 @@ from classical_optimizers.global_search_algorithms import bruteforce
 from classical_optimizers.global_search_algorithms import differential_evolution
 from expectation_value import expectation_value_depolarizing, expectation_value_no_noise
 from get_chalmers_circuit import get_chalmers_circuit
-
+from equal_size_partition.gen_equal_size_partition_data import decode_file
 
 def get_objecvtive(S):
 
@@ -36,10 +36,21 @@ def get_objecvtive(S):
 
 def run_all_tests():
 
+    decoded_file = decode_file('example_data_q4_q20')
+    #print(decoded_file.tolist())
+    
+    for i,(arr, sol) in enumerate(decoded_file):
+        S = np.array(arr)
+        print(S)
+        (objective, bound) = get_objecvtive(S)
+        bounds = [(0, np.pi / 4), (0, np.pi)]
+
+        bruteforce(objective, bounds, max_evaluations=4000,
+                   save_file=prefix+'bruteforce_q'+str(i + 4), plot=True)
+
+def inital_tests():
     dataset = [np.array([1, 2, 4, 3])]
 
-    prefix = os.path.join('tests', 'data', 'equal_size_partition', '')
-    os.makedirs(prefix, exist_ok=True)
 
     for i, S in enumerate(dataset):
         (objective, bound) = get_objecvtive(S)
@@ -68,5 +79,7 @@ def shgo_p(objective, bound, p, save_file=None):
 def differential_evolution_p(objective, bound, p, save_file=None):
     return differential_evolution(objective, [bound] * p * 2, save_file)
 
+prefix = os.path.join('tests', 'data', 'equal_size_partition', '')
+os.makedirs(prefix, exist_ok=True)
 
 run_all_tests()
