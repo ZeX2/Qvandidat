@@ -22,6 +22,9 @@ def gen_data(low = 1, high = 10, num_qubits = 4, max_tries = 100):
         if sx > sy: y[0] += sx - sy
         else:       x[0] += sy - sx
 
+        if x[0] >= high or x[0] < low or y[0] >= high or y[0] < low:
+            continue
+
         arr = np.concatenate((x, y))
 
         return_data.add(encode_data(arr, max(sx, sy)))
@@ -44,18 +47,47 @@ def decode_data(s):
     sol = int(parts[1])
     return (arr, sol)
 
+def gen_q4_q20():
+
+    data_one_of_each_q = []
+
+    for i in range(4, 21):
+        data = gen_data(1, 11, i, 10000)
+        #print(data)
+        print('Data generated for q = ' + str(i))
+
+        save_data(data, 'example_data_q' + str(i))
+
+        data_one_of_each_q.append(np.random.choice(data.split(os.linesep)))
+    return_string = ''
+    for data in data_one_of_each_q: return_string += data + os.linesep
+
+    save_data(return_string.strip(), 'example_data_q4_q20')
+
+def save_data(data, file_name):
+    script_dir = os.path.dirname(__file__)
+    example_file = os.path.join(script_dir,'data', file_name)
+
+    f = open(example_file, 'w')
+    f.write(data)
+    f.close()
+        
+def decode_file(file_name):
+    script_dir = os.path.dirname(__file__)
+    example_file = os.path.join(script_dir,'data', file_name)
+
+    f = open(example_file, 'r')
+    file_lines = f.readlines()
+    f.close()
+
+    for line in file_lines: 
+        yield decode_data(line)
 
 def example():
     data = gen_data(1, 11, 4, 10000)
     #print(data)
 
-    # apparently this is good practice
-    script_dir = os.path.dirname(__file__)
-    example_file = os.path.join(script_dir,'data', 'example_data')
-
-    f = open(example_file, 'w')
-    f.write(data)
-    f.close()
+    save_data(data, 'example_data')
     
     f = open(example_file, 'r')
     file_lines = f.readlines()
@@ -77,3 +109,4 @@ def example():
     print('Everything seem fine!')
     
 
+#gen_q4_q20()
