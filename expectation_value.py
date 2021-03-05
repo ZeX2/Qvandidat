@@ -44,16 +44,44 @@ def expectation_value_bitflip(probability, circuit, cost_function, repetitions=5
 
     noise_model = NoiseModel()
 
-    depo_error_1 = pauli_error(p1, 1)
-    depo_error_2 = pauli_error(p2, 2)
-    noise_model.add_all_qubit_quantum_error(depo_error_1, ['h', 'rx', 'rz'])
-    noise_model.add_all_qubit_quantum_error(depo_error_2, ['cz'])
+    bitflip_error_1 = pauli_error([('X', p1), ('I', 1 - p1)])
+    bitflip_error_2 = pauli_error([('X', p2), ('I', 1 - p2)])
+    noise_model.add_all_qubit_quantum_error(bitflip_error_1, ['h', 'rx', 'rz'])
+    noise_model.add_all_qubit_quantum_error(bitflip_error_2, ['cz'])
 
     noisy_simulator = QasmSimulator(noise_model=noise_model)
 
     job = execute(circuit, noisy_simulator, shots=repetitions)
 
     return expectation_value_job(job, cost_function)
+
+
+def expectation_value_phaseflip(probability, circuit, cost_functionm, repetitions=50):
+    p1 = depolarizing_probability(probability, 2)
+    p2 = depolarizing_probability(probability, 4)
+
+    noise_model = NoiseModel()
+
+    phaseflip_error_1 = pauli_error([('Z', p1), ('I', 1 - p1)])
+    phaseflip_error_2 = pauli_error([('Z', p2), ('I', 1 - p2)])
+    noise_model.add_all_qubit_quantum_error(
+        phaseflip_error_1, ['h', 'rx', 'rz'])
+    noise_model.add_all_qubit_quantum_error(phaseflip_error_2, ['cz'])
+
+    noisy_simulator = QasmSimulator(noise_model=noise_model)
+
+    job = execute(circuit, noisy_simulator, shots=repetitions)
+
+    return expectation_value_job(job, cost_function)
+
+
+def epectation_value_ampdamp:
+    p1 = depolarizing_probability(probability, 2)
+    p2 = depolarizing_probability(probability, 4)
+
+    noise_model = NoiseModel()
+
+    # ampdamp_error1 = amplitude_damping_error(....)
 
 
 def expectation_value_depolarizing(probability, circuit, cost_function, repetitions=50):
