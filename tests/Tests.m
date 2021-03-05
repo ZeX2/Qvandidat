@@ -1,27 +1,66 @@
 close all
 
-data_bruteforce = load("data/bruteforce_0.mat")
+%********* Exact cover *********%
+bruteforce = logical(true);
+diff = logical(true);
+shgo = logical(true);
 
-data_diff_p1 = load("data/differential_evolution_p1_0.mat")
-data_shgo_p1 = load("data/shgo_p1_0.mat")
-data_shgo_p2 = load("data/shgo_p2_0.mat")
-data_shgo_p3 = load("data/shgo_p3_0.mat")
-data_shgo_p4 = load("data/shgo_p4_0.mat")
+plot_exact_cover(bruteforce, diff, shgo)
+%*******************************%
 
 
-gammas = data_bruteforce.gammas;
-betas = data_bruteforce.betas;
-results = data_bruteforce.results;
+%********* Equal Size Partition *****%
 
-surf(gammas, betas,results)
-hold on
 
-plot3(data_diff_p1.x(1), data_diff_p1.x(2), data_diff_p1.fun, 'or')
-plot3(data_shgo_p1.x(1), data_shgo_p1.x(2), data_shgo_p1.fun, 'or')
 
-xlim([4,5])
-ylim([2,3])
+%*******************************%
 
-figure 
 
-plot(data_shgo_p4.x(4:8))
+
+
+
+function plot_exact_cover(bruteforce, diff, shgo)
+
+if bruteforce    
+    data_bruteforce = load("data/exact_cover/bruteforce.mat")
+    
+    gammas = data_bruteforce.gammas;
+    betas = data_bruteforce.betas;
+    results = data_bruteforce.results;
+
+    surf(gammas, betas,results)
+end
+if diff
+    hold on
+    data_diff_p1 = load("data/exact_cover/differential_evolution_p1.mat")
+    plot3(data_diff_p1.x(2), data_diff_p1.x(1), data_diff_p1.fun, 'or')
+    
+end
+if shgo
+    hold on
+    data_shgo_p1 = load("data/exact_cover/shgo_p1.mat")
+    data_shgo_p2 = load("data/exact_cover/shgo_p2.mat")
+    data_shgo_p3 = load("data/exact_cover/shgo_p3.mat")
+    data_shgo_p4 = load("data/exact_cover/shgo_p4.mat")
+    
+    plot3(data_shgo_p1.x(2), data_shgo_p1.x(1), data_shgo_p1.fun, 'xb')
+  
+end
+end
+
+
+
+function plot_equal_size_partition(bruteforce, diff, shgo)
+
+if bruteforce    
+  
+end
+if diff
+
+end
+if shgo
+    
+end
+end
+
+

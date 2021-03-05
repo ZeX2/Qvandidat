@@ -19,9 +19,9 @@ def get_objective():
 
         circuit = get_circuit(gammas, betas)
         cqc = get_chalmers_circuit(circuit)
-        
+
         (exp_val, z_best) = expectation_value_depolarizing(0.99,
-                cqc, cost_function, repetitions=10000)
+                                                           cqc, cost_function, repetitions=10000)
 
         return exp_val
 
@@ -35,24 +35,23 @@ def run_all_tests():
     objective = get_objective()
     bound = (0, np.pi)
 
-    r = bruteforce(objective, [bound, bound],
-                   save_file=prefix+'bruteforce'
-                   max_evaluations=2000, plot=False)
+  #  r = bruteforce(objective, [bound, bound],
+  #                 save_file=prefix+'bruteforce', max_evaluations=2000, plot=False)
 
-
-    differential_evolution_p(
-        objective, bound, p=1, save_file=prefix+'differential_evolution_p1')
-    differential_evolution_p(
-        objective, bound, p=2, save_file=prefix+'differential_evolution_p2')
-    differential_evolution_p(
-        objective, bound, p=3, save_file=prefix+'differential_evolution_p3')
-    differential_evolution_p(
-        objective, bound, p=4, save_file=prefix+'differential_evolution_p4')
+  #  differential_evolution_p(
+  #      objective, bound, p=1, save_file=prefix+'differential_evolution_p1')
+  #  differential_evolution_p(
+  #      objective, bound, p=2, save_file=prefix+'differential_evolution_p2')
+  #  differential_evolution_p(
+  #      objective, bound, p=3, save_file=prefix+'differential_evolution_p3')
+  #  differential_evolution_p(
+  #      objective, bound, p=4, save_file=prefix+'differential_evolution_p4')
 
     shgo_p(objective, bound, p=1, save_file=prefix+'shgo_p1')
     shgo_p(objective, bound, p=2, save_file=prefix+'shgo_p2')
     shgo_p(objective, bound, p=3, save_file=prefix+'shgo_p3')
     shgo_p(objective, bound, p=4, save_file=prefix+'shgo_p4')
+
 
 def shgo_p(objective, bound, p, save_file=None):
     return shgo(objective, [bound] * p * 2, save_file)

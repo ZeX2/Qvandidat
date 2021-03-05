@@ -9,17 +9,17 @@ parser.add_argument('problem', metavar='PROBLEM',
 args = parser.parse_args()
 
 if args.problem == 'ec' or args.problem == 'exact' or \
-    args.problem == 'exact_cover' or args.problem == 'ex':
+        args.problem == 'exact_cover' or args.problem == 'ex':
 
     os.system('python -m unittest tests' +
-            os.path.sep + 'exact_cover_tests.py')
+              os.path.sep + 'exact_cover_tests.py')
 
 elif args.problem == 'eq' or args.problem == 'equal' or \
-    args.problem == 'equal_sise_partition' or args.problem == 'esp':
+        args.problem == 'equal_sise_partition' or args.problem == 'esp':
 
     os.system('python -m unittest tests' +
 
-            os.path.sep + 'equal_size_partition_tests.py')
+              os.path.sep + 'equal_size_partition_tests.py')
 else:
     parser.print_help()
     exit(0)

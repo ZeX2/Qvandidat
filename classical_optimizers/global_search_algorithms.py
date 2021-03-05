@@ -16,7 +16,7 @@ def differential_evolution(objective, bounds, save_file=None):
 
 
 def shgo(objective, bounds, save_file=None):
-    result = optimize.shgo(objective, bounds)
+    result = optimize.shgo(objective, bounds, iters=5)
 
     if save_file:
         scipy.io.savemat(save_file + '.mat', result)
