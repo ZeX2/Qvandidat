@@ -94,6 +94,12 @@ def expectation_value_phaseflip(probability, circuit, cost_functionm, repetition
 
     return job
 
+def epectation_value_ampdamp:
+    p1 = depolarizing_probability(probability, 2)
+    p2 = depolarizing_probability(probability, 4)
+
+    noise_model = NoiseModel()
+    # ampdamp_error1 = amplitude_damping_error(....)
 
 def expectation_value_depolarizing_job(fidelity, circuit, repetitions=50):
     p1 = depolarizing_probability(fidelity, 2)
