@@ -63,6 +63,7 @@ def run_all_tests():
 
 def run_depoalrizing_noise_tests(gamma, beta):
     prefix = os.path.join('tests', 'data', 'exact_cover', 'depo', '')
+    os.makedirs(prefix, exist_ok=True)
 
     # fidelity has to be grater than about .15 becaus
     for fidelity in np.linspace(.5, 1, 20):
@@ -84,6 +85,7 @@ def run_depoalrizing_noise_tests(gamma, beta):
 
 def run_bitflip_noise_tests(gamma, beta):
     prefix = os.path.join('tests', 'data', 'exact_cover', 'bitflip', '')
+    os.makedirs(prefix, exist_ok=True)
 
     # fidelity has to be grater than about .15 becaus
     for fidelity in np.linspace(.5, 1, 20):
@@ -104,6 +106,7 @@ def run_bitflip_noise_tests(gamma, beta):
 
 def run_phaseflip_noise_tests(gamma, beta):
     prefix = os.path.join('tests', 'data', 'exact_cover', 'phaseflip', '')
+    os.makedirs(prefix, exist_ok=True)
 
     # fidelity has to be grater than about .15 becaus
     for fidelity in np.linspace(.5, 1, 20):
@@ -124,6 +127,7 @@ def run_phaseflip_noise_tests(gamma, beta):
 
 def run_ampdamp_noise_tests(gamma, beta):
     prefix = os.path.join('tests', 'data', 'exact_cover', 'ampdamp', '')
+    os.makedirs(prefix, exist_ok=True)
 
     # fidelity has to be grater than about .15 becaus
     for fidelity in np.linspace(.5, 1, 20):
@@ -144,6 +148,7 @@ def run_ampdamp_noise_tests(gamma, beta):
 
 def run_phasedamp_noise_tests(gamma, beta):
     prefix = os.path.join('tests', 'data', 'exact_cover', 'phasedamp', '')
+    os.makedirs(prefix, exist_ok=True)
 
     # fidelity has to be grater than about .15 becaus
     for fidelity in np.linspace(.5, 1, 20):
