@@ -9,21 +9,41 @@ from qiskit.providers.aer import QasmSimulator
 from qiskit.providers.aer.noise import NoiseModel
 from qiskit.providers.aer.noise import pauli_error, depolarizing_error
 
+def probability_cost_distribution(job, cost_function):
 
-def expectation_value_job(job, cost_function):
+    results = job.result()
+    count_results = results.get_counts()
+
+    total_counts = sum(count_results.values())
+    total_cost = 0
+    prob_dist = {}
+
+    for key in count_results:
+        value = count_results[key]
+        # Note: q1 is the leftmost bit
+        spins = [1 if s == '1' else -1 for s in key]
+
+        cost = cost_function(spins)
+        total_cost += value*cost
+        
+        prob_dist[cost] = prob_dist.get(cost, 0) + value/total_counts
+
+
+    return (prob_dist, total_cost/total_counts)
+
+
+def expectation_value(job, cost_function):
 
     results = job.result()
     count_results = results.get_counts()
 
     total_cost = 0
-    total_counts = 0
-    cost = 0
+    total_counts = sum(count_results.values())
     cost_best = -1
     z_best = []
 
     for key in count_results:
         value = count_results[key]
-        total_counts += value
         # Note: q1 is the leftmost bit
 
         spins = [1 if s == '1' else -1 for s in key]
@@ -38,9 +58,9 @@ def expectation_value_job(job, cost_function):
     return (total_cost/total_counts, z_best)
 
 
-def expectation_value_bitflip(probability, circuit, cost_function, repetitions=50):
-    p1 = depolarizing_probability(probability, 2)
-    p2 = depolarizing_probability(probability, 4)
+def expectation_value_bitflip_job(fidelity, circuit, repetitions=50):
+    p1 = depolarizing_probability(fidelity, 2)
+    p2 = depolarizing_probability(fidelity, 4)
 
     noise_model = NoiseModel()
 
@@ -53,13 +73,12 @@ def expectation_value_bitflip(probability, circuit, cost_function, repetitions=5
 
     job = execute(circuit, noisy_simulator, shots=repetitions)
 
-    return expectation_value_job(job, cost_function)
+    return job
 
 
-def expectation_value_depolarizing(probability, circuit, cost_function, repetitions=50):
-    p1 = depolarizing_probability(probability, 2)
-    p2 = depolarizing_probability(probability, 4)
-
+def expectation_value_depolarizing_job(fidelity, circuit, repetitions=50):
+    p1 = depolarizing_probability(fidelity, 2)
+    p2 = depolarizing_probability(fidelity, 4)
     noise_model = NoiseModel()
 
     depo_error_1 = depolarizing_error(p1, 1)
@@ -71,13 +90,14 @@ def expectation_value_depolarizing(probability, circuit, cost_function, repetiti
 
     job = execute(circuit, noisy_simulator, shots=repetitions)
 
-    return expectation_value_job(job, cost_function)
+    return job
 
 
-def expectation_value_no_noise(circuit, cost_function, repetitions):
-    simulator = Aer.get_backend('qasm_simulator')
+def expectation_value_no_noise_job(circuit, repetitions=50):
+    simulator = QasmSimulator()
+    #simulator = Aer.get_backend('qasm_simulator')
     job = execute(circuit, simulator, shots=repetitions)
 
-    return expectation_value_job(job, cost_function)
+    return job
 
 # cmd + shift + p -> Select Interpreter, pyton (noise)

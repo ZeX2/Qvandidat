@@ -7,9 +7,11 @@ from equal_size_partition.get_cost_function import get_cost_function
 from classical_optimizers.global_search_algorithms import shgo
 from classical_optimizers.global_search_algorithms import bruteforce
 from classical_optimizers.global_search_algorithms import differential_evolution
-from expectation_value import expectation_value_depolarizing, expectation_value_no_noise
+from expectation_value import expectation_value_depolarizing_job, expectation_value_no_noise_job
+from expectation_value import expectation_value, probability_cost_distribution
 from get_chalmers_circuit import get_chalmers_circuit
 from equal_size_partition.gen_equal_size_partition_data import decode_file
+
 
 def get_objecvtive(S):
 
@@ -27,8 +29,8 @@ def get_objecvtive(S):
         qc = get_circuit(gammas, betas, J, h)
         cqc = get_chalmers_circuit(qc)
 
-        (exp_val, z_best) = expectation_value_depolarizing(0.99, cqc,
-                 cost_function, repetitions=10000)
+        job = expectation_value_depolarizing_job(0.99, cqc, repetitions=10000)
+        (exp_val, z_best) = expectation_value(job, cost_function)
 
         return exp_val
     return (objective, bound)
@@ -46,7 +48,7 @@ def run_all_tests():
         bounds = [(0, np.pi / 4), (0, np.pi)]
 
         bruteforce(objective, bounds, max_evaluations=4000,
-                   save_file=prefix+'bruteforce_q'+str(i + 4), plot=True)
+                   save_file=prefix+'bruteforce_q'+str(i + 4))
 
 def inital_tests():
     dataset = [np.array([1, 2, 4, 3])]
