@@ -7,7 +7,7 @@
     - [ ] using depolarization noise models with varying probabilities
     - [ ] using phase flip and phase damp noise models with varying probabilities
 - [ ] Solve the equal size partition problem (mock problem)
-  - [ ] Using cirq
+  - [-] Using cirq
   - [x] Using qiskit
   - [ ] Generate data
     - [ ] using depolarization noise models with varying probabilities
@@ -27,8 +27,28 @@
 * Generate data for the mock prblem
 * Present results
 
+## Questions
+
+* How do you calculate the Approximation Ratio? I don't really understand Pontus licenciate.
+
 
 ## Notes
+
+### This document lack sources
+
+Please add sources such that it becomes easier to write the main report later on.
+
+### On evaluating performance
+
+First of all we shoud draw the probability cost distribution for finding the correct solution at gamma and beta optimal. Then we should draw the same distribution when there is noise. 
+
+There is also a measurement called Approximation Ratio which could be used, altough I still don't really understand how. [some paper simulating exact cover](https://arxiv.org/abs/2006.04831v2)
+
+
+### When to stop the classical optimizers
+
+The classical optimizer can run forever if they'd like, but we should limit them to some high number of function evaluations such that the results could be verified. nfev - number of function evaluations
+
 
 ### Cirq is slow
 
