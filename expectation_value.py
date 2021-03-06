@@ -7,7 +7,8 @@ import numpy as np
 from depolarizing_probability import depolarizing_probability
 from qiskit.providers.aer import QasmSimulator
 from qiskit.providers.aer.noise import NoiseModel
-from qiskit.providers.aer.noise import pauli_error, depolarizing_error
+from qiskit.providers.aer.noise import pauli_error, depolarizing_error, amplitude_damping_error, phase_damping_error
+
 
 def probability_cost_distribution(job, cost_function):
 
@@ -25,9 +26,8 @@ def probability_cost_distribution(job, cost_function):
 
         cost = cost_function(spins)
         total_cost += value*cost
-        
-        prob_dist[cost] = prob_dist.get(cost, 0) + value/total_counts
 
+        prob_dist[cost] = prob_dist.get(cost, 0) + value/total_counts
 
     return (prob_dist, total_cost/total_counts)
 
@@ -65,7 +65,8 @@ def expectation_value_bitflip_job(fidelity, circuit, repetitions=50):
     noise_model = NoiseModel()
 
     bitflip_error_1 = pauli_error([('X', p1), ('I', 1 - p1)])
-    bitflip_error_2 = pauli_error([('X', p2), ('I', 1 - p2)])
+    bitflip_error_2 = bitflip_error_1.tensor(bitflip_error_1)
+
     noise_model.add_all_qubit_quantum_error(bitflip_error_1, ['h', 'rx', 'rz'])
     noise_model.add_all_qubit_quantum_error(bitflip_error_2, ['cz'])
 
@@ -73,17 +74,18 @@ def expectation_value_bitflip_job(fidelity, circuit, repetitions=50):
 
     job = execute(circuit, noisy_simulator, shots=repetitions)
 
-    return expectation_value_job(job, cost_function)
+    return job
 
 
-def expectation_value_phaseflip(probability, circuit, cost_functionm, repetitions=50):
-    p1 = depolarizing_probability(probability, 2)
-    p2 = depolarizing_probability(probability, 4)
+def expectation_value_phaseflip_job(fidelity, circuit, repetitions=50):
+    p1 = depolarizing_probability(fidelity, 2)
+    p2 = depolarizing_probability(fidelity, 4)
 
     noise_model = NoiseModel()
 
     phaseflip_error_1 = pauli_error([('Z', p1), ('I', 1 - p1)])
-    phaseflip_error_2 = pauli_error([('Z', p2), ('I', 1 - p2)])
+    phaseflip_error_2 = phaseflip_error_1.tensor(phaseflip_error_1)
+
     noise_model.add_all_qubit_quantum_error(
         phaseflip_error_1, ['h', 'rx', 'rz'])
     noise_model.add_all_qubit_quantum_error(phaseflip_error_2, ['cz'])
@@ -94,12 +96,47 @@ def expectation_value_phaseflip(probability, circuit, cost_functionm, repetition
 
     return job
 
-def epectation_value_ampdamp:
-    p1 = depolarizing_probability(probability, 2)
-    p2 = depolarizing_probability(probability, 4)
+
+def expectation_value_ampdamp_job(fidelity, circuit, repetitions=50):
+    p1 = depolarizing_probability(fidelity, 2)
+    p2 = depolarizing_probability(fidelity, 4)
 
     noise_model = NoiseModel()
-    # ampdamp_error1 = amplitude_damping_error(....)
+
+    ampdamp_error_1 = amplitude_damping_error(p1, 1)
+    #ampdamp_error_2 = amplitude_damping_error(p2, 2)
+    ampdamp_error_2 = ampdamp_error_1.tensor(ampdamp_error_1)
+
+    noise_model.add_all_qubit_quantum_error(ampdamp_error_1, ['h', 'rx', 'rz'])
+    noise_model.add_all_qubit_quantum_error(ampdamp_error_2, ['cz'])
+
+    noisy_simulator = QasmSimulator(noise_model=noise_model)
+
+    job = execute(circuit, noisy_simulator, shots=repetitions)
+
+    return job
+
+
+def expectation_value_phasedamp_job(fidelity, circuit, repetitions=50):
+    p1 = depolarizing_probability(fidelity, 2)
+    p2 = depolarizing_probability(fidelity, 4)
+
+    noise_model = NoiseModel()
+
+    phasedamp_error_1 = phase_damping_error(p1, 1)
+    #phasedamp_error_2 = phase_damping_error(p2, 2)
+    phasedamp_error_2 = phasedamp_error_1.tensor(phasedamp_error_1)
+
+    noise_model.add_all_qubit_quantum_error(
+        phasedamp_error_1, ['h', 'rx', 'rz'])
+    noise_model.add_all_qubit_quantum_error(phasedamp_error_2, ['cz'])
+
+    noisy_simulator = QasmSimulator(noise_model=noise_model)
+
+    job = execute(circuit, noisy_simulator, shots=repetitions)
+
+    return job
+
 
 def expectation_value_depolarizing_job(fidelity, circuit, repetitions=50):
     p1 = depolarizing_probability(fidelity, 2)
