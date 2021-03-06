@@ -15,7 +15,7 @@ function plot_exact_cover_depo()
         bar(data_depo.dist_keys, data_depo.dist_values)
         alpha 0.7
         hold on
-        % Well, it looked beautiful in mu mind!
+        % Well, it looked beautiful in my mind!
         xline(data_depo.mean)
     end
 	legend(string(1:length(files)))
