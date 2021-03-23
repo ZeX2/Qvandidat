@@ -18,9 +18,11 @@ function plot_brutforce_q4_to_q20()
 
             subplot(3, 4, i)
             surf(gammas, betas, results)
-            xlabel('gammas')
-            ylabel('betas')
+            xlabel('gamma')
+            ylabel('beta')
+            zlabel('Expected value')
             title('q = ' + string(i + 3))
+            axis tight
             view(v')
         end
     end
