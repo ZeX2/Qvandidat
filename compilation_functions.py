@@ -133,6 +133,15 @@ def qc_UR(circuit, qubit_map, operations):
     qubit_map = swapPositions(qubit_map, N-1, 0)
     return circuit 
 
+def qc_UL_UR(circuit, qubit_path, qubit_grid, operations):
+    num_qubits = len(qubit_path)
+    for i in range(int(num_qubits/4)):
+        qc_UL_swap(circuit, qubit_path)
+        logical_qubit_grid = get_logical_grid(qubit_path, qubit_grid)
+        do_all_ops(circuit, qubit_path, logical_qubit_grid, qubit_grid, operations)
+        qc_UR_swap(circuit, qubit_path)
+        logical_qubit_grid = get_logical_grid(qubit_path, qubit_grid)
+        do_all_ops(circuit, qubit_path, logical_qubit_grid, qubit_grid, operations)
 
 def qc_color_sep(circuit, qubit_grid): #
     m,n = qubit_grid.shape

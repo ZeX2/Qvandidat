@@ -46,7 +46,7 @@ def color_swap_array():
 
 
 def test_swap_network():
-    S = np.array([1,2,3,4])
+    S = np.array(range(16))
     B = 1
     A = B*max(S)^2 + 1
     gamma = 1.3
@@ -78,5 +78,23 @@ def test_grids():
     qc_color_sep(circuit, qubit_grid)
     print(qubit_grid)
     print(seperate_grid(qubit_grid))
-    
-test_grids()
+
+def test_get_logical_grid():
+    n = 8
+
+    q_grid = get_qubit_grid(n)
+    print(q_grid)
+    q_path = get_qubit_path(q_grid)
+    print(q_path)
+
+    l_grid = get_logical_grid(q_path, q_grid)
+    print(l_grid)
+
+def native_gate_set():
+    circuit = QuantumCircuit(2)
+    circuit.swap(0,1)
+    print(circuit.draw())
+    bases = ['u1','u2','u3','cx', 'iswap']
+    new_circ = change_bases(circuit, bases)
+    print(new_circ.draw())
+#native_gate_set()
