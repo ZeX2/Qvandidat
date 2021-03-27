@@ -1,8 +1,9 @@
 from qiskit import QuantumCircuit
-
 import numpy as np
 import matplotlib
-from compilation_functions import *
+from swap_network import *
+from compare_routing_techniques import *
+
 
 def decomposing_circuit():
     circuit = QuantumCircuit(7)
@@ -22,9 +23,9 @@ def UR_and_UL_for_array():
     print(List)
     N = len(List)
     for i in range(0,int(N/2),1):
-        UL(List)
+        UL_swap(List)
         print(List)
-        UR(List)
+        UR_swap(List)
         print(List)
 
 
@@ -46,7 +47,7 @@ def color_swap_array():
 
 
 def test_swap_network():
-    S = np.array(range(16))
+    S = np.array(range(4))
     B = 1
     A = B*max(S)^2 + 1
     gamma = 1.3
@@ -54,9 +55,21 @@ def test_swap_network():
 
     J = A+B*S.reshape(-1,1)*S
     circuit = swap_network(J, gamma, beta)
-
     circuit.draw(output='mpl', filename='Fully_working_SN')
+#test_swap_network()
 
+def test_routing():
+    S = np.array([1, 2, 3, 4])
+    B = 1
+    A = B*max(S)^2 + 1
+    gamma = 1.3
+    beta = 2.7
+
+    J = A+B*S.reshape(-1,1)*S
+    coupling =  [[0,1], [0,2], [1,3], [2,3]]
+    compare_circuit_depth(J, gamma, beta, coupling)
+
+test_routing()
 
 def test_grid_to_path():
     grid = np.array(range(0,16,1)).reshape(4,4)
@@ -68,7 +81,6 @@ def test_seperate_grid():
     print(grid)
     print(seperate_grid(grid))
 
-test_swap_network()
 
 def test_grids():
     qubit_grid = np.array(range(8)).reshape(2,4)
@@ -89,12 +101,3 @@ def test_get_logical_grid():
 
     l_grid = get_logical_grid(q_path, q_grid)
     print(l_grid)
-
-def native_gate_set():
-    circuit = QuantumCircuit(2)
-    circuit.swap(0,1)
-    print(circuit.draw())
-    bases = ['u1','u2','u3','cx', 'iswap']
-    new_circ = change_bases(circuit, bases)
-    print(new_circ.draw())
-#native_gate_set()
