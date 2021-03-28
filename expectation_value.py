@@ -8,6 +8,7 @@ from depolarizing_probability import depolarizing_probability
 from qiskit.providers.aer import QasmSimulator
 from qiskit.providers.aer.noise import NoiseModel
 from qiskit.providers.aer.noise import pauli_error, depolarizing_error, amplitude_damping_error, phase_damping_error
+from get_probability import get_probability_amp_damp, get_probability_phase_damp
 
 
 def probability_cost_distribution(job, cost_function):
@@ -98,14 +99,18 @@ def expectation_value_phaseflip_job(fidelity, circuit, repetitions=50):
 
 
 def expectation_value_ampdamp_job(fidelity, circuit, repetitions=50):
-    p1 = depolarizing_probability(fidelity, 2)
-    p2 = depolarizing_probability(fidelity, 4)
+    #p1 = depolarizing_probability(fidelity, 2)
+    #p2 = depolarizing_probability(fidelity, 4)
 
     noise_model = NoiseModel()
 
-    ampdamp_error_1 = amplitude_damping_error(p1, 1)
-    #ampdamp_error_2 = amplitude_damping_error(p2, 2)
-    ampdamp_error_2 = ampdamp_error_1.tensor(ampdamp_error_1)
+    p1 = get_probability_amp_damp(1)
+    p2 = get_probability_amp_damp(2)
+
+    ampdamp_error_1 = amplitude_damping_error(p1, 0)
+
+    ampdamp_error_2 = amplitude_damping_error(p2, 0)
+    ampdamp_error_2 = ampdamp_error_2.tensor(ampdamp_error_2)
 
     noise_model.add_all_qubit_quantum_error(ampdamp_error_1, ['h', 'rx', 'rz'])
     noise_model.add_all_qubit_quantum_error(ampdamp_error_2, ['cz'])
@@ -118,14 +123,21 @@ def expectation_value_ampdamp_job(fidelity, circuit, repetitions=50):
 
 
 def expectation_value_phasedamp_job(fidelity, circuit, repetitions=50):
-    p1 = depolarizing_probability(fidelity, 2)
-    p2 = depolarizing_probability(fidelity, 4)
+    #p1 = depolarizing_probability(fidelity, 2)
+    #p2 = depolarizing_probability(fidelity, 4)
+
+    #gamma = 1 - (2*p1 - 1)**2
+    #gamma2 = 1 - (2*p2 - 1)**2
+
+    gamma1 = get_probability_phase_damp(1)
+    gamma2 = get_probability_phase_damp(2)
 
     noise_model = NoiseModel()
 
-    phasedamp_error_1 = phase_damping_error(p1, 1)
-    #phasedamp_error_2 = phase_damping_error(p2, 2)
-    phasedamp_error_2 = phasedamp_error_1.tensor(phasedamp_error_1)
+    phasedamp_error_1 = phase_damping_error(gamma1)
+
+    phasedamp_error_2 = phase_damping_error(gamma2)
+    phasedamp_error_2 = phasedamp_error_2.tensor(phasedamp_error_2)
 
     noise_model.add_all_qubit_quantum_error(
         phasedamp_error_1, ['h', 'rx', 'rz'])

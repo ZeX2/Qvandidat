@@ -50,6 +50,52 @@ def get_depolarizing_objective(prob=0.99):
     return objective
 
 
+def get_phase_damp_objective():
+    def objective(x):
+
+        p = int(len(x)/2)
+        print(x)
+
+        gammas = x[0:p]
+        betas = x[p:2*p]
+
+        circuit = get_circuit(gammas, betas)
+        cqc = get_chalmers_circuit(circuit)
+
+        job = expectation_value_phasedamp_job(0, cqc, repetitions=10000)
+        (exp_val, z_best) = expectation_value(job, cost_function)
+
+        return exp_val
+
+    return objective
+
+
+def get_amp_damp_objective():
+    def objective(x):
+
+        p = int(len(x)/2)
+        print(x)
+
+        gammas = x[0:p]
+        betas = x[p:2*p]
+
+        circuit = get_circuit(gammas, betas)
+        cqc = get_chalmers_circuit(circuit)
+
+        job = expectation_value_ampdamp_job(0, cqc, repetitions=10000)
+        (exp_val, z_best) = expectation_value(job, cost_function)
+
+        return exp_val
+
+    return objective
+
+
+def run_probability_test():
+    run_no_noise_tests()
+    run_phase_damp_probability_test()
+    run_amp_amp_probability_test()
+
+
 def run_all_tests():
 
     #(gamma, beta) = run_no_noise_tests()
@@ -167,6 +213,32 @@ def run_phasedamp_noise_tests(gamma, beta):
     print('phase damp test done')
 
 
+def run_phase_damp_probability_test():
+    prefix = os.path.join('tests', 'data', 'exact_cover',
+                          'phasedamp_probability', '')
+    os.makedirs(prefix, exist_ok=True)
+
+    objective = get_phase_damp_objective()
+    bound = (0, np.pi)
+
+    run_bruteforce(objective, bound, prefix)
+
+    print('phase damp porbability test done')
+
+
+def run_amp_amp_probability_test():
+    prefix = os.path.join('tests', 'data', 'exact_cover',
+                          'ampdamp_probability', '')
+    os.makedirs(prefix, exist_ok=True)
+
+    objective = get_amp_damp_objective()
+    bound = (0, np.pi)
+
+    run_bruteforce(objective, bound, prefix)
+
+    print('amplitude damp probability test done')
+
+
 def run_no_noise_tests():
     prefix = os.path.join('tests', 'data', 'exact_cover', 'nonoise', '')
     os.makedirs(prefix, exist_ok=True)
@@ -174,20 +246,20 @@ def run_no_noise_tests():
     objective = get_no_noise_objective()
     bound = (0, np.pi)
 
-    #run_bruteforce(objective, bound, prefix)
+    run_bruteforce(objective, bound, prefix)
     #run_all_differential_evolution(objective, bound, 3, prefix)
 
     # Shgo won't complete for p=3, ran for 2h.
     #run_all_shgo(objective, bound, 3, prefix)
 
-    result = run_single_differential_evolution(objective, bound, 1, prefix)
-    print(result)
-    return (result[0][0], result[0][1])
+    #result = run_single_differential_evolution(objective, bound, 1, prefix)
+    # print(result)
+    # return (result[0][0], result[0][1])
 
 
 def run_bruteforce(objective, bound, prefix):
     bruteforce(objective, [bound, bound],
-               save_file=prefix+'bruteforce', max_evaluations=2000, plot=False)
+               save_file=prefix+'bruteforce_ny', max_evaluations=2000, plot=False)
 
 
 def run_single_shgo(objective, bound, p, prefix):
@@ -217,4 +289,4 @@ def differential_evolution_p(objective, bound, p, save_file=None):
     return differential_evolution(objective, [bound] * p * 2, save_file)
 
 
-run_all_tests()
+run_probability_test()

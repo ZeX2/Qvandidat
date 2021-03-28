@@ -2,8 +2,8 @@ close all
 
 %********* Exact cover *********%
 bruteforce = logical(true);
-diff = logical(true);
-shgo = logical(true);
+diff = logical(false);
+shgo = logical(false);
 
 plot_exact_cover(bruteforce, diff, shgo)
 %*******************************%
@@ -22,7 +22,33 @@ plot_exact_cover(bruteforce, diff, shgo)
 function plot_exact_cover(bruteforce, diff, shgo)
 
     if bruteforce    
-        data_bruteforce = load("data/exact_cover/nonoise/bruteforce.mat")
+        data_bruteforce = load("data/exact_cover/nonoise/bruteforce_ny.mat")
+
+        gammas = data_bruteforce.gammas;
+        betas = data_bruteforce.betas;
+        results = data_bruteforce.results;
+
+        surf(gammas, betas,results)
+        xlabel('gamma')
+        ylabel('beta')
+        zlabel('Expected value')
+        
+        figure('Name', 'phasedamp')
+        
+        data_bruteforce = load("data/exact_cover/phasedamp_probability/bruteforce_ny.mat")
+
+        gammas = data_bruteforce.gammas;
+        betas = data_bruteforce.betas;
+        results = data_bruteforce.results;
+
+        surf(gammas, betas,results)
+        xlabel('gamma')
+        ylabel('beta')
+        zlabel('Expected value')
+        
+        figure('Name', 'ampdamp')
+        
+        data_bruteforce = load("data/exact_cover/ampdamp_probability/bruteforce_ny.mat")
 
         gammas = data_bruteforce.gammas;
         betas = data_bruteforce.betas;
