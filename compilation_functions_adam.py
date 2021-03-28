@@ -256,22 +256,22 @@ def qc_UL_UR(input_circuit, logical_qubit_grid, qubit_grid, operations):
 
     return zz_circuit
 
-def qc_color_sep(circuit, qubit_grid): 
+def qc_color_sep(circuit, logical_qubit_grid, qubit_grid): 
     m,n = qubit_grid.shape
     if m > n:
-        qubit_grid = qubit_grid.T
         for k in range(n):
             for i in range((k+1)%2,int(m/2),1):
                 for j in range(i,m-i-1,2):
-                    qubit_grid = swapPositions(qubit_grid, (k,j),(k,j+1))
-                    circuit.swap(k + j * n, k + 1 + j * n)
-        qubit_grid = qubit_grid.T
+                    logical_qubit_grid = swapPositions(logical_qubit_grid, (j,k),(j+1,k))
+                    #circuit.swap(k + j * n, k + 1 + j * n)
+                    circuit.swap(qubit_grid[j, k], qubit_grid[j + 1, k])   
     else: 
         for k in range(m):
             for i in range((k+1)%2,int(n/2),1):
                 for j in range(i,n-i-1,2):
-                    qubit_grid = swapPositions(qubit_grid, (k,j),(k,j+1))
-                    circuit.swap(j + k * n, j + 1 + k * n)   
+                    logical_qubit_grid = swapPositions(logical_qubit_grid, (k,j),(k,j+1))
+                    #circuit.swap(j + k * n, j + 1 + k * n)   
+                    circuit.swap(qubit_grid[k, j], qubit_grid[k, j + 1])   
 
 def get_qubit_grid(num_qubits): #
     vec = np.array(range(num_qubits))
@@ -390,7 +390,7 @@ def swap_network(qaoa_circuit, qubit_grid=None):
         # us took keep track of logical_qubit_grid globally
         #qubit_grid_color_separated = logical_qubit_grid.copy()
         qubit_grid_color_separated = logical_qubit_grid
-        qc_color_sep(circuit, qubit_grid_color_separated)
+        qc_color_sep(circuit, qubit_grid_color_separated, qubit_grid)
 
         logical_grid1, logical_grid2 = seperate_grid(qubit_grid_color_separated)
         grid1, grid2 = seperate_grid(qubit_grid)
