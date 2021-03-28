@@ -417,8 +417,11 @@ def swap_network(qaoa_circuit, qubit_grid=None):
     for q, theta in enumerate(rx_ops):
         qq = logical_qubit_grid[int(np.floor(q / c)), q % c]
         circuit.rx(theta, qq)
-        circuit.measure(qq, q)
         print('QQQ', qq, q, q%c, int(np.floor(q / c)))
+
+    for q, theta in enumerate(rx_ops):
+        qq = logical_qubit_grid[int(np.floor(q / c)), q % c]
+        circuit.measure(q, qq)
 
     print(operations)
 
