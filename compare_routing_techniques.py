@@ -28,10 +28,14 @@ def compare_circuit_depth(J, gamma, beta, coupling):
     
     qc.barrier()
     qc.rx(2*beta, range(N))
+    qqc = qc.copy()
+
     for i in range(3):
         swap_update(qc, coupling, i)
-    qc_swap_network = swap_network(J, gamma, beta)
+
+    qc_swap_network = swap_network(qqc)
     qc_swap_network.draw(output='mpl', filename='SWAP network')
+
     print(qc_swap_network.depth())
     
 

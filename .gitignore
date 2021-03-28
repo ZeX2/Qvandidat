@@ -140,3 +140,4 @@ cython_debug/
 *.mat
 *.m~
 .vscode/settings.json
+output/
