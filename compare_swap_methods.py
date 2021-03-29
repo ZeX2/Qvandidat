@@ -1,7 +1,6 @@
 import numpy as np
-from compilation_functions_adam import swap_network
-from compilation_functions_adam import swap_update
-from compilation_functions_adam import get_qubit_grid
+from swap_network import swap_network, get_qubit_grid
+from qiskit_transpiler import swap_update
 from equal_size_partition.gen_equal_size_partition_data import decode_file
 from equal_size_partition.decode_state import decode_state
 from equal_size_partition.get_circuit import get_circuit
@@ -9,9 +8,6 @@ from equal_size_partition.get_ising_model import get_ising_model
 from qiskit.transpiler import CouplingMap
 from qiskit.providers.aer import QasmSimulator
 from qiskit import QuantumCircuit, execute
-#swap_network(qaoa_circuit, qubit_grid=None)
-#swap_update(circuit, coupling, int)
-
 
 def run_circuit(circuit):
     ideal_simulator = QasmSimulator()
@@ -22,7 +18,6 @@ def run_circuit(circuit):
 
 
 decoded_file = decode_file('example_data_q4_q20')
-# print(decoded_file.tolist())
 
 for i, (arr, sol) in enumerate(decoded_file):
     
@@ -33,7 +28,6 @@ for i, (arr, sol) in enumerate(decoded_file):
         continue # only 2**k numbers of qubits allowed
         # 4, 8, 16 out of q4_to_q20
 
-    print(arr, len(arr), [2**k for k in range(10)])
     S = np.array(arr)
     gamma = np.random.rand() * np.pi
     beta = np.random.rand() * np.pi
@@ -49,22 +43,18 @@ for i, (arr, sol) in enumerate(decoded_file):
     rows, cols = qubit_grid.shape
     grid_coupling = coupling.from_grid(rows, cols)
 
-    print(qubit_grid)
-    print(grid_coupling)
-    print(type(grid_coupling))
-
     swap_network_circuit = swap_network(qaoa_circuit, qubit_grid)
-    basic_swap_circuit = swap_update(qaoa_circuit, grid_coupling, 1)
-    lookahead_swap_circuit = swap_update(qaoa_circuit, grid_coupling, 2)
-    stochastic_swap_circuit = swap_update(qaoa_circuit, grid_coupling, 3)
-    sabre_swap_circuit = swap_update(qaoa_circuit, grid_coupling, 4) # Why is this not working???
+    basic_swap_circuit = swap_update(qaoa_circuit, grid_coupling, 0)
+    lookahead_swap_circuit = swap_update(qaoa_circuit, grid_coupling, 1)
+    stochastic_swap_circuit = swap_update(qaoa_circuit, grid_coupling, 2)
+    sabre_swap_circuit = swap_update(qaoa_circuit, grid_coupling, 3) # Why is this not working???
     
     sim_ref = run_circuit(qaoa_circuit)
     sim_swap = run_circuit(swap_network_circuit)
-    #sim_basic = run_circuit(basic_swap_circuit)
-    #sim_look = run_circuit(lookahead_swap_circuit)
-    #sim_stoch = run_circuit(stochastic_swap_circuit)
-    #sim_sabre = run_circuit(sabre_swap_circuit)
+    sim_basic = run_circuit(basic_swap_circuit)
+    sim_look = run_circuit(lookahead_swap_circuit)
+    sim_stoch = run_circuit(stochastic_swap_circuit)
+    sim_sabre = run_circuit(sabre_swap_circuit)
 
     #results = [];
     #for (key, val) in sim_ref.items():
@@ -83,10 +73,10 @@ for i, (arr, sol) in enumerate(decoded_file):
     
     
     #print(qaoa_circuit)
-    print(swap_network_circuit)
+    #print(swap_network_circuit)
     #print(basic_swap_circuit)
     #print(lookahead_swap_circuit)
-    print(stochastic_swap_circuit)
+    #print(stochastic_swap_circuit)
     #print(sabre_swap_circuit)
 
     print('swap network %d, basic swap %d, lookahead swap %d, stochastic swap %d, sabre swap %d' % \
