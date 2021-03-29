@@ -8,12 +8,13 @@ from equal_size_partition.get_ising_model import get_ising_model
 from qiskit.transpiler import CouplingMap
 from qiskit.providers.aer import QasmSimulator
 from qiskit import QuantumCircuit, execute
+from linear_swap import (linear_swap_method, linear_swap_method_outdated)
 
 def run_circuit(circuit):
     ideal_simulator = QasmSimulator()
 
     # Execute and get counts
-    result = execute(circuit, ideal_simulator, shots=50000).result()
+    result = execute(circuit, ideal_simulator, shots=1000000).result()
     return result.get_counts(circuit)
 
 
@@ -44,18 +45,19 @@ for i, (arr, sol) in enumerate(decoded_file):
     grid_coupling = coupling.from_grid(rows, cols)
 
     swap_network_circuit = swap_network(qaoa_circuit, qubit_grid)
-    basic_swap_circuit = swap_update(qaoa_circuit, grid_coupling, 0)
-    lookahead_swap_circuit = swap_update(qaoa_circuit, grid_coupling, 1)
-    stochastic_swap_circuit = swap_update(qaoa_circuit, grid_coupling, 2)
-    sabre_swap_circuit = swap_update(qaoa_circuit, grid_coupling, 3) # Why is this not working???
-    
+    #basic_swap_circuit = swap_update(qaoa_circuit, grid_coupling, 0)
+    #lookahead_swap_circuit = swap_update(qaoa_circuit, grid_coupling, 1)
+    #stochastic_swap_circuit = swap_update(qaoa_circuit, grid_coupling, 2)
+    #sabre_swap_circuit = swap_update(qaoa_circuit, grid_coupling, 3) # Why is this not working???
+    linear_connectivity_circuit = linear_swap_method(qaoa_circuit, qubit_line=None)
+
     sim_ref = run_circuit(qaoa_circuit)
     sim_swap = run_circuit(swap_network_circuit)
-    sim_basic = run_circuit(basic_swap_circuit)
-    sim_look = run_circuit(lookahead_swap_circuit)
-    sim_stoch = run_circuit(stochastic_swap_circuit)
-    sim_sabre = run_circuit(sabre_swap_circuit)
-
+    #sim_basic = run_circuit(basic_swap_circuit)
+    #sim_look = run_circuit(lookahead_swap_circuit)
+    #sim_stoch = run_circuit(stochastic_swap_circuit)
+    #sim_sabre = run_circuit(sabre_swap_circuit)
+    sim_linear = run_circuit(linear_connectivity_circuit)
     #results = [];
     #for (key, val) in sim_ref.items():
     #    
@@ -66,23 +68,24 @@ for i, (arr, sol) in enumerate(decoded_file):
     #results = np.asarray(results)
     #print([np.sum(np.abs(results),axis=0)])
 
-    #for (key, val) in sim_ref.items():
+    for (key, val) in sim_ref.items():
 
-    #    print("{: <10} {: <10} {: <10}".format(val, sim_swap.get(key, 0),\
-    #        int(abs(sim_swap.get(key, 0)-val) * 100 / val)))
+        print("{: <10} {: <10} {: <10}".format(val, sim_linear.get(key, 0),\
+            int(abs(sim_linear.get(key, 0)-val) * 100 / val)))
     
     
-    #print(qaoa_circuit)
+    print(qaoa_circuit)
     #print(swap_network_circuit)
     #print(basic_swap_circuit)
     #print(lookahead_swap_circuit)
     #print(stochastic_swap_circuit)
     #print(sabre_swap_circuit)
-
-    print('swap network %d, basic swap %d, lookahead swap %d, stochastic swap %d, sabre swap %d' % \
-        (swap_network_circuit.depth(), basic_swap_circuit.depth(), lookahead_swap_circuit.depth(), \
-         stochastic_swap_circuit.depth(), sabre_swap_circuit.depth()))
-
+    print(linear_connectivity_circuit)
+    #print('swap network %d, basic swap %d, lookahead swap %d, stochastic swap %d, sabre swap %d, linear swap %d' % \
+        #(swap_network_circuit.depth(), basic_swap_circuit.depth(), lookahead_swap_circuit.depth(), \
+         #stochastic_swap_circuit.depth(), sabre_swap_circuit.depth(), linear_connectivity_circuit.depth()))
+    print('Swap network depth',swap_network_circuit.depth())
+    print('Linnear connectivity depth',linear_connectivity_circuit.depth())
     input()
 
 
