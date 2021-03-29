@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib
 from swap_network import *
 from compare_routing_techniques import *
-
+from linear_swap import *
 
 def decomposing_circuit():
     circuit = QuantumCircuit(7)
@@ -19,7 +19,7 @@ def decomposing_circuit():
     print(circuit.decompose().draw())
 
 def UR_and_UL_for_array():
-    List = [23, 65, 19, 90, 14, 72] 
+    List = [1, 2, 3, 4, 5, 6] 
     print(List)
     N = len(List)
     for i in range(0,int(N/2),1):
@@ -27,6 +27,24 @@ def UR_and_UL_for_array():
         print(List)
         UR_swap(List)
         print(List)
+
+#UR_and_UL_for_array()
+
+def test_swap_pos():
+    List = [1, 2, 3, 4, 5, 6]
+    swap_all_pos(List)
+    print(List)
+
+def test_swap_pos_shifted():
+    List = [1, 2, 3, 4, 5, 6]
+    print(List)
+    N = len(List)
+    for i in range(0,N-1,2):
+        List = swapPositions(List, i, i+1)
+        print(List)
+
+
+#test_swap_pos_shifted()
 
 
 def color_swap_array():
@@ -47,7 +65,7 @@ def color_swap_array():
 
 
 def test_swap_network():
-    S = np.array(range(4))
+    S = np.array([1, 2, 3, 4])
     B = 1
     A = B*max(S)^2 + 1
     gamma = 1.3
@@ -69,7 +87,7 @@ def test_routing():
     coupling =  [[0,1], [0,2], [1,3], [2,3]]
     compare_circuit_depth(J, gamma, beta, coupling)
 
-test_routing()
+#test_routing()
 
 def test_grid_to_path():
     grid = np.array(range(0,16,1)).reshape(4,4)
@@ -101,3 +119,16 @@ def test_get_logical_grid():
 
     l_grid = get_logical_grid(q_path, q_grid)
     print(l_grid)
+    
+def test_linear_routing():
+    S = np.array([1, 2, 3, 4])
+    B = 1
+    A = B*max(S)^2 + 1
+    gamma = 1.3
+    beta = 2.7
+
+    J = A+B*S.reshape(-1,1)*S
+    circuit = linear_swap_method(J, gamma, beta)
+    circuit.draw(output='mpl', filename='SWAP_ladder')
+#test_swap_network()
+test_linear_routing()
