@@ -53,7 +53,7 @@ def swap_update(circuit, coupling_map, n, print_depth=True):
         pass_manager = PassManager(ss)
         sabre_circ = pass_manager.run(circuit)
         if print_depth: 
-            stochastic_circ.draw(output='mpl', filename='output/SabreSwap')
+            sabre_circ.draw(output='mpl', filename='output/SabreSwap')
             print('Sabre Swap circuit depth', sabre_circ.depth())
         return sabre_circ
 
