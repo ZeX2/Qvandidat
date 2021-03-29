@@ -1,6 +1,7 @@
 import numpy as np
 import math
 from qiskit import QuantumCircuit
+from qiskit.converters import circuit_to_dag
 
 def swapPositions(list, pos1, pos2):  
     list[pos1], list[pos2] = list[pos2], list[pos1] 
@@ -18,24 +19,24 @@ def UR_swap(array):
         array=swapPositions(array, i+1, i+2)
     return array 
 
-def do_all_ops(circuit, logical_qubit_path, qubit_path, operations):
+def do_all_ops(circuit, qubit_line, qubit_path, operations):
     didzz = False
-    M = len(logical_qubit_path)
+    M = len(qubit_line)
     # The order is to reduce circuit depth
     # so do not simplify the for loops because
     # 
     for i in range(0,M-1,2):
-        logical_q1 = logical_qubit_path[i]
-        logical_q2 = logical_qubit_path[i+1]
-        q1 = qubit_path[i]
-        q2 = qubit_path[i+1]
+        logical_q1 = qubit_path[i]
+        logical_q2 = qubit_path[i+1]
+        q1 = qubit_line[i]
+        q2 = qubit_line[i+1]
         didzz |= do_op_new(q1, q2, logical_q1, logical_q2, circuit, operations)
 
     for i in range(1,M-2,2):
-        logical_q1 = logical_qubit_path[i]
-        logical_q2 = logical_qubit_path[i+1]
-        q1 = qubit_path[i]
-        q2 = qubit_path[i+1]
+        logical_q1 = qubit_path[i]
+        logical_q2 = qubit_path[i+1]
+        q1 = qubit_line[i]
+        q2 = qubit_line[i+1]
         didzz |= do_op_new(q1, q2, logical_q1, logical_q2, circuit, operations)
     return didzz
 
@@ -68,35 +69,38 @@ def do_zz_op2(circuit, qubit1, qubit2, angle):
 
     print('zz \\w', qubit1, 'and', qubit2)
 
-def qc_UL_swap(circuit, qubit_path):
+def qc_UL_swap(circuit, qubit_path, qubit_line):
     N = len(qubit_path)
 
     for i in range(0,N-1,2):
         qubit_path = swapPositions(qubit_path, i, i+1)
-        circuit.swap(qubit_path[i], qubit_path[i+1])
+        circuit.swap(qubit_line[i], qubit_line[i+1])
     return circuit 
 
-def qc_UR_swap(circuit, qubit_path):
+def qc_UR_swap(circuit, qubit_path, qubit_line):
     N = len(qubit_path)
     for i in range(1,N-1,2):
         qubit_path = swapPositions(qubit_path, i, i+1)
-        circuit.swap(qubit_path[i], qubit_path[i+1])
+        circuit.swap(qubit_line[i], qubit_line[i+1])
     return circuit 
 
-def qc_UL_UR(input_circuit, qubit_path, operations):
+def qc_UL_UR(input_circuit, qubit_line, qubit_path, operations):
+
     circuit = input_circuit.copy()
     num_qubits = len(qubit_path)
 
     for i in range(int(num_qubits/2)):
-        qc_UL_swap(circuit, qubit_path)
-        logical_qubit_path = qubit_path.copy()
-        do_all_ops(circuit, logical_qubit_path, qubit_path, operations)
+        print('Operations UL', operations)
+        if np.any(operations):
+            qc_UL_swap(circuit, qubit_path, qubit_line)
+        do_all_ops(circuit, qubit_line, qubit_path, operations)
         print(qubit_path)
-        qc_UR_swap(circuit, qubit_path)
-        logical_qubit_path = qubit_path.copy()
-        print(logical_qubit_path)
+        print('Operations UR', operations)
+        if np.any(operations):
+            qc_UR_swap(circuit, qubit_path, qubit_line)
+        print(qubit_line)
         print(qubit_path)
-        do_all_ops(circuit, logical_qubit_path, qubit_path, operations)
+        do_all_ops(circuit, qubit_line, qubit_path, operations)
     return circuit
 
 
@@ -135,26 +139,53 @@ def decompose_qaoa_circuit(circuit):
 
 
 # J and qubit_path has to have 2**k qubits
-def linear_swap_method(J, gamma, beta):
+def linear_swap_method_outdated(J, gamma, beta, qubit_line = None):
     N = len(J)
     operations = get_operations(J, gamma)
     print(operations)
     circuit = QuantumCircuit(N)
     circuit.h(range(N))
     circuit.barrier()
-
-    qubit_path = np.array(range(N))
-    logical_qubit_path = qubit_path.copy()
     
+    
+    if qubit_line is None:
+        qubit_line = np.array(range(N))
+    qubit_path = qubit_line.copy()
 
-    do_all_ops(circuit, logical_qubit_path, qubit_path, operations)
-    new_circ = qc_UL_UR(circuit, qubit_path, operations)
+    do_all_ops(circuit, qubit_line, qubit_path, operations)
+    new_circ = qc_UL_UR(circuit, qubit_line, qubit_path, operations)
 
-    new_circ.barrier()
     new_circ.rx(2*beta, range(N))
     print(operations)
+    for i in range(N):
+        qq = qubit_path[i]
+        new_circ.measure(i, qq)
     return new_circ
 
+def linear_swap_method(qaoa_circuit, qubit_line=None):
+    N = qaoa_circuit.num_qubits
+
+    operations, rx_ops = decompose_qaoa_circuit(qaoa_circuit)
+    print(operations)
+    circuit = QuantumCircuit(N, N)
+    circuit.h(range(N))
+
+    if qubit_line is None:
+        qubit_line = np.array(range(N))
+    qubit_path = qubit_line.copy()
+
+    do_all_ops(circuit, qubit_line, qubit_path, operations)
+    new_circ = qc_UL_UR(circuit, qubit_line, qubit_path, operations)
+    
+    for q, theta in enumerate(rx_ops):
+        qq = qubit_path[q]
+        new_circ.rx(theta, qq)
+
+    for q, theta in enumerate(rx_ops):
+        qq = qubit_path[q]
+        new_circ.measure(q, qq)
+
+    return new_circ
 
 def simplify(circuit):
     return transpile(circuit, basis_gates=['cx', 'rz', 'rx', 'swap'], optimization_level=3)
