@@ -69,22 +69,21 @@ def run_simulation(J, TrJ, beta, gamma, shots=1000, output=True, draw=True):
     return avg_cost
 
 # Run simulation for one pair of (gamma, beta)
-S = np.array([1, 2, 3, 4, 7, 7])
+S = np.array([1, 2, 3, 4])
 #S = np.array([4, 5, 13, 8, 3, 6, 3, 25, 4, 10, 8, 12, 8, 9, 7, 5, 6, 7, 10, 11, 4, 2, 5, 3, 10, 9, 12, 13])
-S = np.array([4, 5, 13, 8, 3, 6, 3, 25, 4, 10, 8, 12, 8, 9, 7, 5, 6, 7, 10, 11, 4, 2, 5, 3, 10, 10])
+#S = np.array([4, 5, 13, 8, 3, 6, 3, 25, 4, 10, 8, 12, 8, 9, 7, 5, 6, 7, 10, 11, 4, 2, 5, 3, 10, 10])
 B = 1
 A = B*max(S)^2 + 1
 
-beta = 2.75
-gamma = 1.3
+beta = 0.7
+gamma = 2
 J = A+B*S.reshape(-1,1)*S
 TrJ = np.trace(J)
 
-run_simulation(J, TrJ, beta, gamma, shots=1, draw=False)
+run_simulation(J, TrJ, beta, gamma, shots=100)
 
-quit()
 # Run simulation for several (gamma, beta)
-s = 0.05; 
+s = 0.1; 
 gammas = np.arange(0, np.pi, s)
 betas = np.arange(0, np.pi, s)
 avg_costs = np.zeros((len(betas), len(gammas)))
@@ -92,9 +91,9 @@ avg_costs = np.zeros((len(betas), len(gammas)))
 print('Running simulations...')
 for i in range(len(betas)):
     for j in range(len(gammas)):
-        avg_costs[i,j] = run_simulation(J, TrJ, betas[i], gammas[j], shots=3, output=False)
+        avg_costs[i,j] = run_simulation(J, TrJ, betas[i], gammas[j], shots=100, output=False, draw=False)
 
-gammas_, betas_ = np.meshgrid(betas, gammas)
+betas_, gammas_ = np.meshgrid(betas, gammas)
 
 fig = plt.figure()
 ax  = fig.gca(projection='3d')
