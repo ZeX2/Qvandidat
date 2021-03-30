@@ -35,6 +35,10 @@ def get_probability_amp_damp(gate):
     return p
 
 
+def depolarizing_probability(fidelity, d=2):
+    return 3/4*(1 - (fidelity - 1/d)/(1 - 1/d))
+
+
 #print('Probability of phase damp, 1 qubit gate: ', get_probability_phase_damp(1))
 #print('Probability of phase damp, 2 qubit gate: ', get_probability_phase_damp(2))
 #print('Probability of amplitude damp, 1 qubit gate: ', get_probability_amp_damp(1))

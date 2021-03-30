@@ -8,7 +8,7 @@ from depolarizing_probability import depolarizing_probability
 from qiskit.providers.aer import QasmSimulator
 from qiskit.providers.aer.noise import NoiseModel
 from qiskit.providers.aer.noise import pauli_error, depolarizing_error, amplitude_damping_error, phase_damping_error
-from get_probability import get_probability_amp_damp, get_probability_phase_damp
+from get_probability import get_probability_amp_damp, get_probability_phase_damp, depolarizing_probability
 
 
 def probability_cost_distribution(job, cost_function):
