@@ -46,14 +46,52 @@ def integer_bin_packing(W, W_max, A = 2, B = 1):
         const += (A/4)*(2*b[j] - sum(S[j,i] for i in range(N)))**2
 
     return J, h, const
-
+def correct_solution(W, W_max, x,y):
+    trucks = len(y)
+    I = len(W)
+    s = 0
+    curr_weigh=0
+    for i in range(trucks):
+        for j in range(I):
+            s += y[i][j]   
+    if s <= 0:
+        print("no truck error")
+        return False
+    for i in range(I):
+        t = 0
+        for j in range(I):
+            if x[i][j]==1:
+                t+=W[curr_weigh]
+                curr_weigh+=1             
+        if t>W_max:
+            print("a truck is carrying to much weight error")
+            return False
+    return True
 def decode_integer_bin_packing(W, W_max, bits):
     I = len(W)
     bits = list(map(int, bits))
     y = bits[:W_max*I]
-    y = np.reshape(y, (-1, W_max))
+    result = ""
+    weightresult = ""
+    curr_weigh=0
+    y = np.reshape(y, (-1, I))
     x = bits[W_max*I:]
     x = np.reshape(x, (-1, I))
-    print(y)
-    print(x)
+    if not correct_solution(W, W_max, x, y):
+       print("The solution breakes the conditions of the problem")
+       return
+    trucks = len(y)
+    for i in range(trucks):
+        for j in range(I):
+            if y[i][j] == 1:
+                result = result +"Truck "+str(i+1)+ " carries " +str(j+1) +" weights" + "\n"
+    result+= "The rest of the trucks do not carry any weight."
+    for i in range(I):
+        for j in range(I):
+            if x[i][j] == 1:
+                weightresult += "weight " + str(curr_weigh+1) +", with value "+str(W[curr_weigh])+", is carried by truck " + str(i+1)  +"\n"
+                curr_weigh+=1
+    print(result)
+    print(weightresult)
+
     

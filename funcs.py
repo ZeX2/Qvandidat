@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from qiskit import QuantumCircuit, execute, Aer
 from qiskit.quantum_info import Statevector
 from qiskit.visualization import plot_histogram
-from qiskit_textbook.tools import array_to_latex
+#from qiskit_textbook.tools import array_to_latex
 
 BACKEND = Aer.get_backend('unitary_simulator')
 SIMULATOR = Aer.get_backend('qasm_simulator')

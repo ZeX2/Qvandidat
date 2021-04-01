@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 from qiskit import QuantumCircuit, execute, Aer, assemble
 from qiskit.visualization import plot_histogram
-from qiskit_textbook.tools import array_to_latex
+#from qiskit_textbook.tools import array_to_latex
 
 from tqdm import tqdm
 
@@ -158,8 +158,16 @@ expected_cost(J, h, const, TrJ, [2.4, 5], [0.4, 1], costs, histogram=True)
 run_simulation(J, h, const, TrJ, [2.4, 5], [0.4, 1], shots=1000000, histogram=True)
 
 #%% 
-bits = '00010011'
-bits = '01001100'
+W = [1,5]
+bits = '00001100'
+decode_integer_bin_packing(W, W_max, bits)
+print('\n')
+W = [1,5,1]
+bits = '100100100011000'
+decode_integer_bin_packing(W, W_max, bits)
+print('\n')
+W = [1,1,1]
+bits = '100100100011000'
 decode_integer_bin_packing(W, W_max, bits)
 
 
