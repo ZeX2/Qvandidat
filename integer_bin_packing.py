@@ -46,3 +46,14 @@ def integer_bin_packing(W, W_max, A = 2, B = 1):
         const += (A/4)*(2*b[j] - sum(S[j,i] for i in range(N)))**2
 
     return J, h, const
+
+def decode_integer_bin_packing(W, W_max, bits):
+    I = len(W)
+    bits = list(map(int, bits))
+    y = bits[:W_max*I]
+    y = np.reshape(y, (-1, W_max))
+    x = bits[W_max*I:]
+    x = np.reshape(x, (-1, I))
+    print(y)
+    print(x)
+    

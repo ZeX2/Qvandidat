@@ -45,7 +45,10 @@ def qaoa_ising_circuit(J, h, gamma, beta, draw_circuit=False, measure=True):
     return qc
 
 def bits_to_spins(bits):
-    return [1 if bit == '1' else -1 for bit in bits]
+    if isinstance(bits, str):
+        return [1 if bit == '1' else -1 for bit in bits]
+    else:
+        return [1 if bit == 1 else -1 for bit in bits]
 
 def get_bits_list(n):
     return [''.join(i) for i in itertools.product('01', repeat=n)]
@@ -81,19 +84,19 @@ def run_simulation(J, h, const, TrJ, gamma, beta, shots=1000, draw_circuit=False
     avg_cost = sum(count*cost for cost, count in costs.items())/shots
     return avg_cost
 
+# Remove const and TrJ as input variables, not used
 def expected_cost(J, h, const, TrJ, gamma, beta, costs, histogram=False):
     qc = qaoa_ising_circuit(J, h, gamma, beta, measure=False)
     job = execute(qc, SVSIM)
     sv = job.result().get_statevector()
     sv = Statevector(sv)
     prob_dict = sv.probabilities_dict()
-    
 
     if histogram:
         costs_freq = dict()
         for bits, prob in prob_dict.items():
             cost = costs[bits]
-            if cost not in costs:
+            if cost not in costs_freq:
                 costs_freq[cost] = prob
             else:
                 costs_freq[cost] += prob

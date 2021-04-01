@@ -11,8 +11,8 @@ from qiskit_textbook.tools import array_to_latex
 
 from tqdm import tqdm
 
-from integer_bin_packing import integer_bin_packing
-from equal_size_partition import equal_size_partition
+from integer_bin_packing import *
+from equal_size_partition import *
 from funcs import *
 
 #%% Bin packing
@@ -32,13 +32,13 @@ TrJ = np.trace(J)
 
 
 #%% Run simulation for several (gamma, beta) where p = 1
-s = 0.05; 
-gammas = np.arange(0, np.pi, s)
+s = 0.1; 
+gammas = np.arange(0, 2*np.pi, s)
 betas = np.arange(0, np.pi, s)
 avg_costs = np.zeros((len(gammas), len(betas)))
 
 print('Running simulations...')
-for i in range(len(gammas)):
+for i in tqdm(range(len(gammas))):
     for j in range(len(betas)):
         avg_costs[i,j] = run_simulation(J, h, const, TrJ, gammas[i], betas[j], shots=1000)
 
@@ -96,7 +96,7 @@ exp_costs = np.zeros((len(gammas), len(betas)))
 
 print('Running simulations...')
 for i in tqdm(range(len(gammas)), desc='Loop i', position=0):
-    for j in range(len(betas)): 
+    for j in range(len(betas)):
         exp_costs[i,j] = expected_cost(J, h, const, TrJ, gammas[i], betas[j], costs)
 
 betas_, gammas_ = np.meshgrid(betas, gammas)
@@ -116,8 +116,13 @@ i, j = i[0], j[0]
 print(f'Best angles: ({gammas[i]}, {betas[j]})')
 print('Minimum average cost for best angels:', min_cost)
 
-expected_cost(J, h, const, TrJ, 5.9, 0.4, costs, histogram=True)
+#Optimal value for [1 1] and 1
+expected_cost(J, h, const, TrJ, 4, 0.8, costs, histogram=True)
+run_simulation(J, h, const, TrJ, 4, 0.8, shots=1000000, histogram=True)
 
+#Optimal value for [1 1] and 2
+expected_cost(J, h, const, TrJ, 0.8, 2.2, costs, histogram=True)
+run_simulation(J, h, const, TrJ, 0.8, 2.2, shots=1000000, histogram=True)
 #%% Expected costs  for p = 2
 bits_list = get_bits_list(len(J))
 costs = {bits: cost_function(bits, J, h, const) for bits in bits_list}
@@ -138,10 +143,30 @@ for i in tqdm(range(len(gammas_1)), desc="Loop i", position=0):
                 beta = [betas_1[j], betas_2[l]]
                 exp_costs[i,j,k,l] = expected_cost(J, h, const, TrJ, gamma, beta, costs)
 
-min_cost = np.amin(avg_costs)
-i, j, k, l = np.where(avg_costs == min_cost)
+min_cost = np.amin(exp_costs)
+i, j, k, l = np.where(exp_costs == min_cost)
 i, j, k, l = i[0], j[0], k[0], l[0]
-print(f'Best angles: ([{gammas_1[i]}, {gammas_2[ik]}], [{betas_1[j]}, {betas_2[l]}])')
+print(f'Best angles: ([{gammas_1[i]}, {gammas_2[k]}], [{betas_1[j]}, {betas_2[l]}])')
 print('Minimum average cost for best angels:', min_cost)
 
-#expected_cost(J, h, const, TrJ, 5.9, 0.4, costs, histogram=True)
+
+#Optimal value for [1 1] and 2
+expected_cost(J, h, const, TrJ, [2.8, 3.4], [1.8, 2.4], costs, histogram=True)
+run_simulation(J, h, const, TrJ, [2.8, 3.4], [1.8, 2.4], shots=1000000, histogram=True)
+
+expected_cost(J, h, const, TrJ, [2.4, 5], [0.4, 1], costs, histogram=True)
+run_simulation(J, h, const, TrJ, [2.4, 5], [0.4, 1], shots=1000000, histogram=True)
+
+#%% 
+bits = '00010011'
+bits = '01001100'
+decode_integer_bin_packing(W, W_max, bits)
+
+
+#%% Minimum Eigen Optimizer
+n = 6
+for b in range(2**n):
+    x = "".join(reversed(list(bin(b)[2:].zfill(n))))
+    print(x)
+
+get_bits_list(n)
