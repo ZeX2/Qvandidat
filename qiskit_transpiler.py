@@ -5,14 +5,10 @@ from qiskit import QuantumCircuit
 from qiskit.compiler import transpile
 from qiskit.transpiler import PassManager, passes, CouplingMap, Layout
 from qiskit.transpiler.passes import(
-    Unroller, 
     BasicSwap, 
     LookaheadSwap, 
     StochasticSwap, 
-    SabreSwap,
-    TrivialLayout,
-    DenseLayout,
-    NoiseAdaptiveLayout) 
+    SabreSwap) 
 
 def swap_update(circuit, coupling_map, n, print_depth=True):
     if n not in range(0, 4):
@@ -57,20 +53,3 @@ def swap_update(circuit, coupling_map, n, print_depth=True):
             print('Sabre Swap circuit depth', sabre_circ.depth())
         return sabre_circ
 
-def optimize_mapping(circuit, coupling_map, n):
-    if (n != 1 and n != 2):
-        return print('Gate mapping performance not defined')
-
-    if type(coupling_map) is not CouplingMap:
-        coupling_map = CouplingMap(couplinglist=coupling_map)
-
-    if n == 1:
-        tl = TrivialLayout(coupling_map=coupling_map)
-        pass_manager = PassManager(tl)
-        trivial_circ = pass_manager.run(circuit)
-        return trivial_circ
-    elif n == 2:
-        dl = DenseLayout(coupling_map=coupling_map)
-        pass_manager = PassManager(dl)
-        dense_circ = pass_manager.run(circuit)
-        return dense_circ
