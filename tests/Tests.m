@@ -16,14 +16,18 @@ plot_exact_cover(bruteforce, diff, shgo)
 %*******************************%
 
 
-
+%d = 2;
+%p = 0.00351329440734538;
+%F = (1-1/d)*(1-4*p/3)+1/d
 
 
 function plot_exact_cover(bruteforce, diff, shgo)
 
     if bruteforce    
+        
+        title('No noise')
         data_bruteforce = load("data/exact_cover/nonoise/bruteforce_ny.mat")
-
+        
         gammas = data_bruteforce.gammas;
         betas = data_bruteforce.betas;
         results = data_bruteforce.results;
@@ -58,6 +62,35 @@ function plot_exact_cover(bruteforce, diff, shgo)
         xlabel('gamma')
         ylabel('beta')
         zlabel('Expected value')
+        
+        figure('Name', 'phasedamp p=0.8')
+        
+        data_bruteforce = load("data/exact_cover/phasedamp_probability/bruteforce_ny_p_80.mat")
+
+        gammas = data_bruteforce.gammas;
+        betas = data_bruteforce.betas;
+        results = data_bruteforce.results;
+
+        surf(gammas, betas,results)
+        xlabel('gamma')
+        ylabel('beta')
+        zlabel('Expected value')
+        
+        
+        figure('Name', 'ampdamp p=0.8')
+        
+        data_bruteforce = load("data/exact_cover/ampdamp_probability/bruteforce_ny_p_80.mat")
+
+        gammas = data_bruteforce.gammas;
+        betas = data_bruteforce.betas;
+        results = data_bruteforce.results;
+
+        surf(gammas, betas,results)
+        xlabel('gamma')
+        ylabel('beta')
+        zlabel('Expected value')
+        
+      
     end
     
     if diff
@@ -88,5 +121,6 @@ function plot_equal_size_partition(bruteforce, diff, shgo)
 
     end
 end
+
 
 
