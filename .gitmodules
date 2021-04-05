@@ -1,0 +1,8 @@
+[submodule "circuit-group"]
+	path = circuit-group
+	url = ./
+	branch = circuit-group
+[submodule "problem-group"]
+	path = problem-group
+	url = ./
+	branch = problem-group
