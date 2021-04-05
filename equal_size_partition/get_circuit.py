@@ -18,7 +18,7 @@ def get_circuit(gammas, betas, J, h):
         beta = betas[k]
 
         for i in range(N):
-            for j in range(i-1):
+            for j in range(i):
                 qc.cx(i, j)
                 qc.rz(2*gamma*J[i,j], j)
                 qc.cx(i, j)
