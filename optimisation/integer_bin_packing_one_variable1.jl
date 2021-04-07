@@ -1,9 +1,9 @@
 using JuMP, Gurobi
 
 # Weights
-W = [3, 3, 3]
+W = [3, 5, 6, 7, 2]
 # Max weight
-W_max = 8
+W_max = 10
 I = length(W)
 
 b = [zeros(I); ones(I)]
