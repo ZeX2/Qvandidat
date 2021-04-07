@@ -33,6 +33,13 @@ def probability_cost_distribution(job, cost_function):
     return (prob_dist, total_cost/total_counts)
 
 
+def approximation_ratio(expectation_value, cost_best, cost_max):
+
+    r = (cost_best + cost_max)/(expectation_value + cost_max)
+
+    return r
+
+
 def expectation_value(job, cost_function):
 
     results = job.result()
@@ -40,7 +47,8 @@ def expectation_value(job, cost_function):
 
     total_cost = 0
     total_counts = sum(count_results.values())
-    cost_best = -1
+    cost_best = 1000000000000
+    cost_max = -1
     z_best = []
 
     for key in count_results:
@@ -52,11 +60,13 @@ def expectation_value(job, cost_function):
         cost = cost_function(spins)
         total_cost += value*cost
 
-        if cost < cost_best or cost_best == -1:
+        if cost < cost_best:
             cost_best = cost
             z_best = spins
+        if cost > cost_max:
+            cost_max = cost
 
-    return (total_cost/total_counts, z_best)
+    return (total_cost/total_counts, cost_best, cost_max)
 
 
 def expectation_value_bitflip_job(fidelity, circuit, repetitions=50):
@@ -142,6 +152,39 @@ def expectation_value_phasedamp_job(fidelity, circuit, repetitions=50):
     noise_model.add_all_qubit_quantum_error(
         phasedamp_error_1, ['h', 'rx', 'rz'])
     noise_model.add_all_qubit_quantum_error(phasedamp_error_2, ['cz'])
+
+    noisy_simulator = QasmSimulator(noise_model=noise_model)
+
+    job = execute(circuit, noisy_simulator, shots=repetitions)
+
+    return job
+
+
+def expectation_value_amp_phase_damp_job(circuit, repetitions=50):
+    #p1 = depolarizing_probability(fidelity, 2)
+    #p2 = depolarizing_probability(fidelity, 4)
+
+    noise_model = NoiseModel()
+
+    gamma1 = get_probability_phase_damp(1)
+    gamma2 = get_probability_phase_damp(2)
+
+    phasedamp_error_1 = phase_damping_error(gamma1)
+    phasedamp_error_2 = phase_damping_error(gamma2)
+    phasedamp_error_2 = phasedamp_error_2.tensor(phasedamp_error_2)
+
+    p1 = get_probability_amp_damp(1)
+    p2 = get_probability_amp_damp(2)
+
+    ampdamp_error_1 = amplitude_damping_error(p1, 0)
+    ampdamp_error_2 = amplitude_damping_error(p2, 0)
+    ampdamp_error_2 = ampdamp_error_2.tensor(ampdamp_error_2)
+
+    error_1 = phasedamp_error_1.compose(ampdamp_error_1)
+    error_2 = phasedamp_error_2.compose(ampdamp_error_2)
+
+    noise_model.add_all_qubit_quantum_error(error_1, ['h', 'rx', 'rz'])
+    noise_model.add_all_qubit_quantum_error(error_2, ['cz'])
 
     noisy_simulator = QasmSimulator(noise_model=noise_model)
 
