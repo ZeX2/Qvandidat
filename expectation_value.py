@@ -35,7 +35,7 @@ def probability_cost_distribution(job, cost_function):
 
 def approximation_ratio(expectation_value, cost_best, cost_max):
 
-    r = (cost_best + cost_max)/(expectation_value + cost_max)
+    r = (expectation_value - cost_max)/(cost_best - cost_max)
 
     return r
 
