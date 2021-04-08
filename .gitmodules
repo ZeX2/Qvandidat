@@ -1,8 +1,8 @@
 [submodule "circuit-group"]
 	path = circuit-group
-	url = ./
+	url = https://github.com/ZeX2/Qvandidat
 	branch = circuit-group
 [submodule "problem-group"]
 	path = problem-group
-	url = ./
+	url = https://github.com/ZeX2/Qvandidat
 	branch = problem-group
