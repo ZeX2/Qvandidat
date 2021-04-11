@@ -1,9 +1,11 @@
 from operator import itemgetter
 
+import time
 import numpy as np
 from matplotlib import cm
 import matplotlib.pyplot as plt
-%matplotlib agg
+import scipy.optimize as opt
+#%matplotlib agg
 
 from qiskit import QuantumCircuit, execute, Aer, assemble
 from qiskit.visualization import plot_histogram
@@ -14,6 +16,9 @@ from tqdm import tqdm
 from integer_bin_packing import *
 from equal_size_partition import *
 from funcs import *
+
+
+
 
 #%% Bin packing
 # Item weights
@@ -32,6 +37,7 @@ TrJ = np.trace(J)
 
 
 #%% Run simulation for several (gamma, beta) where p = 1
+plt.switch_backend("TkAgg")
 s = 0.1; 
 gammas = np.arange(0, 2*np.pi, s)
 betas = np.arange(0, np.pi, s)
@@ -58,6 +64,16 @@ i, j = np.where(avg_costs == min_cost)
 i, j = i[0], j[0]
 print(f'Best angles: ({gammas[i]}, {betas[j]})')
 print('Minimum average cost for best angels:', min_cost)
+#%% Optimization
+
+# A problem instnace has to be run previously, 
+#so that J,h,const and TrJ exists as variables
+
+p = 3 #Sets the p-level.
+out = True #Set this to True to have continous update on the optimization
+angels, cost = optimize_angles(p,J,h,const,TrJ,out=out)
+print(angels)
+print(cost)
 
 #%% Run simulation for several (gamma, beta) where p = 2
 s = 0.1; 
@@ -167,7 +183,7 @@ bits = '100100100011000'
 decode_integer_bin_packing(W, W_max, bits)
 print('\n')
 W = [1,1,1]
-bits = '100100100011000'
+bits = '100010100011000'
 decode_integer_bin_packing(W, W_max, bits)
 
 
