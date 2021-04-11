@@ -6,15 +6,13 @@ from qiskit import(
 import numpy as np
 from depolarizing_probability import depolarizing_probability
 from qiskit.providers.aer import QasmSimulator
+from qiskit.providers.aer import StatevectorSimulator
 from qiskit.providers.aer.noise import NoiseModel
 from qiskit.providers.aer.noise import pauli_error, depolarizing_error, amplitude_damping_error, phase_damping_error
 from get_probability import get_probability_amp_damp, get_probability_phase_damp, depolarizing_probability
+from qiskit.quantum_info import Statevector
 
-
-def probability_cost_distribution(job, cost_function):
-
-    results = job.result()
-    count_results = results.get_counts()
+def probability_cost_distribution(count_results, cost_function):
 
     total_counts = sum(count_results.values())
     total_cost = 0
@@ -33,21 +31,18 @@ def probability_cost_distribution(job, cost_function):
     return (prob_dist, total_cost/total_counts)
 
 
+# WARNING: This causes division by zero sometimes.
 def approximation_ratio(expectation_value, cost_best, cost_max):
-
-    r = (expectation_value - cost_max)/(cost_best - cost_max)
-
-    return r
+    return (expectation_value - cost_max)/(cost_best - cost_max)
 
 
-def expectation_value(job, cost_function):
-
-    results = job.result()
-    count_results = results.get_counts()
+def expectation_value(count_results, cost_function, sol_cost=None):
 
     total_cost = 0
+    total_sol_count = 0
     total_counts = sum(count_results.values())
-    cost_best = 1000000000000
+
+    cost_best = None
     cost_max = -1
     z_best = []
 
@@ -59,17 +54,30 @@ def expectation_value(job, cost_function):
 
         cost = cost_function(spins)
         total_cost += value*cost
+        
+        if sol_cost == cost:
+            total_sol_count += value
 
-        if cost < cost_best:
+        if cost_best == None or cost < cost_best:
             cost_best = cost
             z_best = spins
         if cost > cost_max:
             cost_max = cost
+    
+    if cost_best == None:
+        raise Exception('Invalid job, no costs found')
 
-    return (total_cost/total_counts, cost_best, cost_max)
+    exp_val = total_cost/total_counts
+    r = approximation_ratio(exp_val, cost_best, cost_max)
+    
+    if sol_cost == None:
+        return (exp_val, z_best, r)
 
+    # Please validate that this formula is correct
+    s = total_sol_count/total_counts
+    return (exp_val, z_best, r, s)
 
-def expectation_value_bitflip_job(fidelity, circuit, repetitions=50):
+def expectation_value_bitflip(fidelity, circuit, repetitions=50):
     p1 = depolarizing_probability(fidelity, 2)
     p2 = depolarizing_probability(fidelity, 4)
 
@@ -85,10 +93,10 @@ def expectation_value_bitflip_job(fidelity, circuit, repetitions=50):
 
     job = execute(circuit, noisy_simulator, shots=repetitions)
 
-    return job
+    return get_count_results_from_job(job)
 
 
-def expectation_value_phaseflip_job(fidelity, circuit, repetitions=50):
+def expectation_value_phaseflip(fidelity, circuit, repetitions=50):
     p1 = depolarizing_probability(fidelity, 2)
     p2 = depolarizing_probability(fidelity, 4)
 
@@ -105,10 +113,10 @@ def expectation_value_phaseflip_job(fidelity, circuit, repetitions=50):
 
     job = execute(circuit, noisy_simulator, shots=repetitions)
 
-    return job
+    return get_count_results_from_job(job)
 
 
-def expectation_value_ampdamp_job(fidelity, circuit, repetitions=50):
+def expectation_value_ampdamp(fidelity, circuit, repetitions=50):
     #p1 = depolarizing_probability(fidelity, 2)
     #p2 = depolarizing_probability(fidelity, 4)
 
@@ -129,10 +137,10 @@ def expectation_value_ampdamp_job(fidelity, circuit, repetitions=50):
 
     job = execute(circuit, noisy_simulator, shots=repetitions)
 
-    return job
+    return get_count_results_from_job(job)
 
 
-def expectation_value_phasedamp_job(fidelity, circuit, repetitions=50):
+def expectation_value_phasedamp(fidelity, circuit, repetitions=50):
     #p1 = depolarizing_probability(fidelity, 2)
     #p2 = depolarizing_probability(fidelity, 4)
 
@@ -157,10 +165,10 @@ def expectation_value_phasedamp_job(fidelity, circuit, repetitions=50):
 
     job = execute(circuit, noisy_simulator, shots=repetitions)
 
-    return job
+    return get_count_results_from_job(job)
 
 
-def expectation_value_amp_phase_damp_job(circuit, repetitions=50):
+def expectation_value_amp_phase_damp(circuit, repetitions=50):
     #p1 = depolarizing_probability(fidelity, 2)
     #p2 = depolarizing_probability(fidelity, 4)
 
@@ -190,10 +198,10 @@ def expectation_value_amp_phase_damp_job(circuit, repetitions=50):
 
     job = execute(circuit, noisy_simulator, shots=repetitions)
 
-    return job
+    return get_count_results_from_job(job)
 
 
-def expectation_value_depolarizing_job(fidelity, circuit, repetitions=50):
+def expectation_value_depolarizing(fidelity, circuit, repetitions=50):
     p1 = depolarizing_probability(fidelity, 2)
     p2 = depolarizing_probability(fidelity, 4)
     noise_model = NoiseModel()
@@ -207,14 +215,26 @@ def expectation_value_depolarizing_job(fidelity, circuit, repetitions=50):
 
     job = execute(circuit, noisy_simulator, shots=repetitions)
 
-    return job
+    return get_count_results_from_job(job)
 
 
-def expectation_value_no_noise_job(circuit, repetitions=50):
+def expectation_value_no_noise(circuit, repetitions=50):
     simulator = QasmSimulator()
-    #simulator = Aer.get_backend('qasm_simulator')
     job = execute(circuit, simulator, shots=repetitions)
 
-    return job
+    return get_count_results_from_job(job)
+
+
+def get_count_results_from_job(job):
+    results = job.result()
+    return results.get_counts()
+
+
+def expectation_value_no_noise_state_vector(circuit, repetitions=1000000):
+    simulator = StatevectorSimulator()
+    result = execute(circuit, simulator, shots=repetitions).result()
+    sv = Statevector(result.get_statevector())
+
+    return sv.probabilities_dict()
 
 # cmd + shift + p -> Select Interpreter, pyton (noise)

@@ -5,9 +5,9 @@ from classical_optimizers.global_search_algorithms import shgo
 from classical_optimizers.global_search_algorithms import bruteforce
 from classical_optimizers.global_search_algorithms import differential_evolution
 from exact_cover_pontus.exact_cover_pontus import get_circuit, cost_function
-from expectation_value import expectation_value_depolarizing_job, expectation_value_no_noise_job, expectation_value_bitflip_job, expectation_value_phaseflip_job, expectation_value_phasedamp_job, expectation_value_ampdamp_job, expectation_value_amp_phase_damp_job
+
+from expectation_value import expectation_value_depolarizing, expectation_value_no_noise, expectation_value_bitflip, expectation_value_phaseflip, expectation_value_phasedamp, expectation_value_ampdamp, expectation_value_amp_phase_damp
 from expectation_value import expectation_value, probability_cost_distribution, approximation_ratio
-from get_chalmers_circuit import get_chalmers_circuit
 
 
 def get_no_noise_objective():
@@ -20,12 +20,10 @@ def get_no_noise_objective():
         betas = x[p:2*p]
 
         circuit = get_circuit(gammas, betas)
-        cqc = get_chalmers_circuit(circuit)
 
-        job = expectation_value_no_noise_job(cqc, repetitions=10000)
-        (exp_val, cost_best, cost_max) = expectation_value(job, cost_function)
+        count_results = expectation_value_no_noise(circuit, repetitions=10000)
+        (exp_val, z_best, r) = expectation_value(count_results, cost_function)
 
-        r = approximation_ratio(exp_val, cost_best, cost_max)
         print('Approximation ratio, no noise: ', r)
 
         return exp_val
@@ -43,10 +41,9 @@ def get_depolarizing_objective(prob=0.99):
         betas = x[p:2*p]
 
         circuit = get_circuit(gammas, betas)
-        cqc = get_chalmers_circuit(circuit)
 
-        job = expectation_value_depolarizing_job(prob, cqc, repetitions=10000)
-        (exp_val, z_best) = expectation_value(job, cost_function)
+        count_results = expectation_value_depolarizing(prob, circuit, repetitions=10000)
+        (exp_val, z_best, r) = expectation_value(count_results, cost_function)
 
         return exp_val
 
@@ -63,12 +60,10 @@ def get_phase_damp_objective():
         betas = x[p:2*p]
 
         circuit = get_circuit(gammas, betas)
-        cqc = get_chalmers_circuit(circuit)
 
-        job = expectation_value_phasedamp_job(0, cqc, repetitions=10000)
-        (exp_val, cost_best, cost_max) = expectation_value(job, cost_function)
+        count_results = expectation_value_phasedamp(0, circuit, repetitions=10000)
+        (exp_val, z_best, r) = expectation_value(count_results, cost_function)
 
-        r = approximation_ratio(exp_val, cost_best, cost_max)
         print('Approximation ratio, phase damp: ', r)
 
         return exp_val
@@ -86,10 +81,9 @@ def get_amp_damp_objective():
         betas = x[p:2*p]
 
         circuit = get_circuit(gammas, betas)
-        cqc = get_chalmers_circuit(circuit)
 
-        job = expectation_value_ampdamp_job(0, cqc, repetitions=10000)
-        (exp_val, cost_best, cost_max) = expectation_value(job, cost_function)
+        count_results = expectation_value_ampdamp(0, circuit, repetitions=10000)
+        (exp_val, z_best, r) = expectation_value(count_results, cost_function)
 
         r = approximation_ratio(exp_val, cost_best, cost_max)
         print('Approximation ratio, amplitude damp: ', r)
@@ -109,14 +103,12 @@ def get_amp_phase_damp_objective():
         betas = x[p:2*p]
 
         circuit = get_circuit(gammas, betas)
-        cqc = get_chalmers_circuit(circuit)
 
-        job = expectation_value_amp_phase_damp_job(cqc, repetitions=10000)
+        count_results = expectation_value_amp_phase_damp(circuit, repetitions=10000)
 
-        (exp_val, cost_best, cost_max) = expectation_value(job, cost_function)
+        (exp_val, z_best, r) = expectation_value(count_results, cost_function)
 
-        r = approximation_ratio(exp_val, cost_best, cost_max)
-        #print('Approximation ratio, amplitude damp and phase damp: ', r)
+        print('Approximation ratio, amplitude damp and phase damp: ', r)
 
         return exp_val
 
@@ -151,10 +143,9 @@ def run_depoalrizing_noise_tests(gamma, beta):
             continue
 
         circuit = get_circuit(gamma, beta)
-        cqc = get_chalmers_circuit(circuit)
-        job = expectation_value_depolarizing_job(
-            fidelity, cqc, repetitions=10000)
-        (dist, mean) = probability_cost_distribution(job, cost_function)
+        count_results = expectation_value_depolarizing(
+            fidelity, circuit, repetitions=10000)
+        (dist, mean) = probability_cost_distribution(count_results, cost_function)
         # Yeah, I know it's ugly.
         v = {'dist_keys': list(dist.keys()), 'dist_values': list(
             dist.values()), 'mean': mean, 'fidelity': fidelity}
@@ -173,9 +164,8 @@ def run_bitflip_noise_tests(gamma, beta):
             continue
 
         circuit = get_circuit(gamma, beta)
-        cqc = get_chalmers_circuit(circuit)
-        job = expectation_value_bitflip_job(fidelity, cqc, repetitions=10000)
-        (dist, mean) = probability_cost_distribution(job, cost_function)
+        count_results = expectation_value_bitflip(fidelity, circuit, repetitions=10000)
+        (dist, mean) = probability_cost_distribution(count_results, cost_function)
         # Yeah, I know it's ugly.
         v = {'dist_keys': list(dist.keys()), 'dist_values': list(
             dist.values()), 'mean': mean, 'fidelity': fidelity}
@@ -194,9 +184,8 @@ def run_phaseflip_noise_tests(gamma, beta):
             continue
 
         circuit = get_circuit(gamma, beta)
-        cqc = get_chalmers_circuit(circuit)
-        job = expectation_value_phaseflip_job(fidelity, cqc, repetitions=10000)
-        (dist, mean) = probability_cost_distribution(job, cost_function)
+        count_results = expectation_value_phaseflip(fidelity, circuit, repetitions=10000)
+        (dist, mean) = probability_cost_distribution(count_results, cost_function)
         # Yeah, I know it's ugly.
         v = {'dist_keys': list(dist.keys()), 'dist_values': list(
             dist.values()), 'mean': mean, 'fidelity': fidelity}
@@ -215,9 +204,8 @@ def run_ampdamp_noise_tests(gamma, beta):
             continue
 
         circuit = get_circuit(gamma, beta)
-        cqc = get_chalmers_circuit(circuit)
-        job = expectation_value_ampdamp_job(fidelity, cqc, repetitions=10000)
-        (dist, mean) = probability_cost_distribution(job, cost_function)
+        count_results = expectation_value_ampdamp(fidelity, circuit, repetitions=10000)
+        (dist, mean) = probability_cost_distribution(count_results, cost_function)
         # Yeah, I know it's ugly.
         v = {'dist_keys': list(dist.keys()), 'dist_values': list(
             dist.values()), 'mean': mean, 'fidelity': fidelity}
@@ -236,9 +224,8 @@ def run_phasedamp_noise_tests(gamma, beta):
             continue
 
         circuit = get_circuit(gamma, beta)
-        cqc = get_chalmers_circuit(circuit)
-        job = expectation_value_phasedamp_job(fidelity, cqc, repetitions=10000)
-        (dist, mean) = probability_cost_distribution(job, cost_function)
+        count_results = expectation_value_phasedamp(fidelity, circuit, repetitions=10000)
+        (dist, mean) = probability_cost_distribution(count_results, cost_function)
         # Yeah, I know it's ugly.
         v = {'dist_keys': list(dist.keys()), 'dist_values': list(
             dist.values()), 'mean': mean, 'fidelity': fidelity}

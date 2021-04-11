@@ -20,6 +20,12 @@ elif args.problem == 'eq' or args.problem == 'equal' or \
     os.system('python -m unittest tests' +
 
               os.path.sep + 'equal_size_partition_tests.py')
+elif args.problem == 'bp' or args.problem == 'bin' or \
+        args.problem == 'bin_packing' or args.problem == 'binp':
+
+    os.system('python -m unittest tests' +
+
+              os.path.sep + 'bin_packing_tests.py')
 else:
     parser.print_help()
     exit(0)

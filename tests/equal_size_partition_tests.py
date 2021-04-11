@@ -1,23 +1,26 @@
 import os
 import numpy as np
 import scipy.io
+
 from equal_size_partition.decode_state import decode_state
 from equal_size_partition.get_ising_model import get_ising_model
-from equal_size_partition.get_circuit import get_circuit
-from equal_size_partition.get_cost_function import get_cost_function
+
+from get_circuit import get_circuit
+from get_cost_function import get_cost_function
+
 from classical_optimizers.global_search_algorithms import shgo
 from classical_optimizers.global_search_algorithms import bruteforce
 from classical_optimizers.global_search_algorithms import differential_evolution
-from expectation_value import expectation_value_depolarizing_job, expectation_value_no_noise_job, expectation_value_bitflip_job, expectation_value_phaseflip_job, expectation_value_phasedamp_job, expectation_value_ampdamp_job
+
+from expectation_value import expectation_value_depolarizing, expectation_value_no_noise, expectation_value_bitflip, expectation_value_phaseflip, expectation_value_phasedamp, expectation_value_ampdamp
 from expectation_value import expectation_value, probability_cost_distribution
-from get_chalmers_circuit import get_chalmers_circuit
 from equal_size_partition.gen_equal_size_partition_data import decode_file
 
 
 def get_objective(S):
 
     (J, h, bound) = get_ising_model(S)
-    cost_function = get_cost_function(J, h, S)
+    cost_function = get_cost_function(J, h)
 
     def objective(x):
         # if instnace of ndarray
@@ -28,10 +31,9 @@ def get_objective(S):
         betas = x[p:2*p]
 
         qc = get_circuit(gammas, betas, J, h)
-        cqc = get_chalmers_circuit(qc)
 
-        job = expectation_value_depolarizing_job(0.99, cqc, repetitions=10000)
-        (exp_val, z_best) = expectation_value(job, cost_function)
+        count_results = expectation_value_depolarizing(0.99, qc, repetitions=10000)
+        (exp_val, z_best, r) = expectation_value(count_results, cost_function)
 
         return exp_val
     return (objective, bound)
@@ -40,7 +42,7 @@ def get_objective(S):
 def get_no_noise_objective(S):
 
     (J, h, bound) = get_ising_model(S)
-    cost_function = get_cost_function(J, h, S)
+    cost_function = get_cost_function(J, h)
 
     def objective(x):
 
@@ -51,10 +53,9 @@ def get_no_noise_objective(S):
         betas = x[p:2*p]
 
         circuit = get_circuit(gammas, betas, J, h)
-        cqc = get_chalmers_circuit(circuit)
 
-        job = expectation_value_no_noise_job(cqc, repetitions=10000)
-        (exp_val, z_best) = expectation_value(job, cost_function)
+        count_results = expectation_value_no_noise(circuit, repetitions=10000)
+        (exp_val, z_best, r) = expectation_value(count_results, cost_function)
 
         return exp_val
 
@@ -117,7 +118,7 @@ def run_depoalrizing_noise_tests(gamma, beta, S):
     os.makedirs(prefix, exist_ok=True)
 
     (J, h, bound) = get_ising_model(S)
-    cost_function = get_cost_function(J, h, S)
+    cost_function = get_cost_function(J, h)
 
     # fidelity has to be grater than about .15 becaus
     for fidelity in np.linspace(.5, 1, 20):
@@ -125,10 +126,9 @@ def run_depoalrizing_noise_tests(gamma, beta, S):
             continue
 
         circuit = get_circuit(gamma, beta, J, h)
-        cqc = get_chalmers_circuit(circuit)
-        job = expectation_value_depolarizing_job(
-            fidelity, cqc, repetitions=10000)
-        (dist, mean) = probability_cost_distribution(job, cost_function)
+        count_results = expectation_value_depolarizing(
+            fidelity, circuit, repetitions=10000)
+        (dist, mean) = probability_cost_distribution(count_results, cost_function)
         # Yeah, I know it's ugly.
         v = {'dist_keys': list(dist.keys()), 'dist_values': list(
             dist.values()), 'mean': mean, 'fidelity': fidelity}
@@ -143,7 +143,7 @@ def run_bitflip_noise_tests(gamma, beta, S):
     os.makedirs(prefix, exist_ok=True)
 
     (J, h, bound) = get_ising_model(S)
-    cost_function = get_cost_function(J, h, S)
+    cost_function = get_cost_function(J, h)
 
     # fidelity has to be grater than about .15 becaus
     for fidelity in np.linspace(.5, 1, 20):
@@ -151,9 +151,8 @@ def run_bitflip_noise_tests(gamma, beta, S):
             continue
 
         circuit = get_circuit(gamma, beta, J, h)
-        cqc = get_chalmers_circuit(circuit)
-        job = expectation_value_bitflip_job(fidelity, cqc, repetitions=10000)
-        (dist, mean) = probability_cost_distribution(job, cost_function)
+        count_results = expectation_value_bitflip(fidelity, circuit, repetitions=10000)
+        (dist, mean) = probability_cost_distribution(count_results, cost_function)
         # Yeah, I know it's ugly.
         v = {'dist_keys': list(dist.keys()), 'dist_values': list(
             dist.values()), 'mean': mean, 'fidelity': fidelity}
@@ -168,7 +167,7 @@ def run_phaseflip_noise_tests(gamma, beta, S):
     os.makedirs(prefix, exist_ok=True)
 
     (J, h, bound) = get_ising_model(S)
-    cost_function = get_cost_function(J, h, S)
+    cost_function = get_cost_function(J, h)
 
     # fidelity has to be grater than about .15 becaus
     for fidelity in np.linspace(.5, 1, 20):
@@ -176,9 +175,8 @@ def run_phaseflip_noise_tests(gamma, beta, S):
             continue
 
         circuit = get_circuit(gamma, beta, J, h)
-        cqc = get_chalmers_circuit(circuit)
-        job = expectation_value_phaseflip_job(fidelity, cqc, repetitions=10000)
-        (dist, mean) = probability_cost_distribution(job, cost_function)
+        count_results = expectation_value_phaseflip(fidelity, circuit, repetitions=10000)
+        (dist, mean) = probability_cost_distribution(count_results, cost_function)
         # Yeah, I know it's ugly.
         v = {'dist_keys': list(dist.keys()), 'dist_values': list(
             dist.values()), 'mean': mean, 'fidelity': fidelity}
@@ -193,7 +191,7 @@ def run_ampdamp_noise_tests(gamma, beta, S):
     os.makedirs(prefix, exist_ok=True)
 
     (J, h, bound) = get_ising_model(S)
-    cost_function = get_cost_function(J, h, S)
+    cost_function = get_cost_function(J, h)
 
     # fidelity has to be grater than about .15 becaus
     for fidelity in np.linspace(.5, 1, 20):
@@ -201,9 +199,8 @@ def run_ampdamp_noise_tests(gamma, beta, S):
             continue
 
         circuit = get_circuit(gamma, beta, J, h)
-        cqc = get_chalmers_circuit(circuit)
-        job = expectation_value_ampdamp_job(fidelity, cqc, repetitions=10000)
-        (dist, mean) = probability_cost_distribution(job, cost_function)
+        count_results = expectation_value_ampdamp(fidelity, circuit, repetitions=10000)
+        (dist, mean) = probability_cost_distribution(count_results, cost_function)
         # Yeah, I know it's ugly.
         v = {'dist_keys': list(dist.keys()), 'dist_values': list(
             dist.values()), 'mean': mean, 'fidelity': fidelity}
@@ -218,7 +215,7 @@ def run_phasedamp_noise_tests(gamma, beta, S):
     os.makedirs(prefix, exist_ok=True)
 
     (J, h, bound) = get_ising_model(S)
-    cost_function = get_cost_function(J, h, S)
+    cost_function = get_cost_function(J, h)
 
     # fidelity has to be grater than about .15 becaus
     for fidelity in np.linspace(.5, 1, 20):
@@ -226,9 +223,8 @@ def run_phasedamp_noise_tests(gamma, beta, S):
             continue
 
         circuit = get_circuit(gamma, beta, J, h)
-        cqc = get_chalmers_circuit(circuit)
-        job = expectation_value_phasedamp_job(fidelity, cqc, repetitions=10000)
-        (dist, mean) = probability_cost_distribution(job, cost_function)
+        count_results = expectation_value_phasedamp(fidelity, circuit, repetitions=10000)
+        (dist, mean) = probability_cost_distribution(count_results, cost_function)
         # Yeah, I know it's ugly.
         v = {'dist_keys': list(dist.keys()), 'dist_values': list(
             dist.values()), 'mean': mean, 'fidelity': fidelity}

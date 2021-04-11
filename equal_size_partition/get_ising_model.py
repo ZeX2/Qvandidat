@@ -8,6 +8,6 @@ def get_ising_model(S):
     SS = S.reshape(-1,1)*S # S^T * S
 
     J = A+B*SS
-    h = 0
+    h = np.zeros(len(J))
 
     return (J, h, (0,2 *np.pi))
