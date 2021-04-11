@@ -3,18 +3,25 @@
 - [ ] Solve the Exact cover NP-problem presented in Pontus memo
   - [x] Using cirq
   - [x] Using qiskit
-  - [ ] Generate data
-    - [ ] using depolarization noise models with varying probabilities
-    - [ ] using phase flip and phase damp noise models with varying probabilities
+  - [x] Generate data
+    - [x] using depolarization noise models with varying probabilities
+    - [x] using phase flip and phase damp noise models with varying probabilities
 - [ ] Solve the equal size partition problem (mock problem)
   - [-] Using cirq
   - [x] Using qiskit
-  - [ ] Generate data
-    - [ ] using depolarization noise models with varying probabilities
-    - [ ] using phase flip and phase damp noise models with varying probabilities
+  - [x] Generate data
+    - [x] using depolarization noise models with varying probabilities
+    - [x] using phase flip and phase damp noise models with varying probabilities
 - [ ] Present results and ask questions
 - [ ] Compare the noise with and without `circuit-group's` custom gates
-- [ ] Implement an interface for a classical optimizer
+- [x] Implement an interface for a classical optimizer
+
+- [ ] Implement everything in cirq and compare with qiskit
+- [ ] Decide what kind of problems we want to investigate and gather some results
+
+- [ ] Add support for analytical calculation of expectaion values using StateVectors and DensityOperators
+  - [ ] Is it slower or faster?
+  - [ ] Why is noise simulated using a noise model and not using the DensityOperators?
 
 
 ## Plan
@@ -29,7 +36,6 @@
 
 ## Questions
 
-* How do you calculate the Approximation Ratio? I don't really understand Pontus licenciate.
 
 
 ## Notes
