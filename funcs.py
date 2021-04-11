@@ -1,12 +1,9 @@
 from collections.abc import Iterable
 import itertools
+import time
 
 import numpy as np
-from matplotlib import cm
-import matplotlib.pyplot as plt
 import scipy.optimize as opt
-import time
-#%matplotlib agg
 
 from qiskit import QuantumCircuit, execute, Aer
 from qiskit.quantum_info import Statevector
@@ -85,6 +82,7 @@ def run_simulation(J, h, const, TrJ, gamma, beta, shots=1000, draw_circuit=False
 
     avg_cost = sum(count*cost for cost, count in costs.items())/shots
     return avg_cost
+
 def expected_cost(J, h, const, TrJ, gamma, beta, costs, histogram=False):
     qc = qaoa_ising_circuit(J, h, gamma, beta, measure=False)
     job = execute(qc, SVSIM)
@@ -104,48 +102,30 @@ def expected_cost(J, h, const, TrJ, gamma, beta, costs, histogram=False):
         plot_histogram(costs_freq)
 
     return sum(prob*costs[bits] for bits, prob in prob_dict.items())
-def optimize_simulation(angles,*variables):
+
+def _optimize_simulation(angles, *variables):
     J, h, const, TrJ = variables
-    if len(angles)==2:
-        gamma,beta = angles
-    elif len(angles)==4:
-        gamma1,gamma2,beta1,beta2 = angles
-        gamma = [gamma1,gamma2]
-        beta = [beta1,beta2]
-    elif len(angles)==6:
-        gamma1,gamma2,gamma3,beta1,beta2,beta3 = angles
-        gamma = [gamma1,gamma2,gamma3]
-        beta = [beta1,beta2,beta3]
-    elif len(angles)==8:
-        gamma1,gamma2,gamma3,gamma4,beta1,beta2,beta3,beta4 = angles
-        gamma = [gamma1,gamma2,gamma3,gamma4]
-        beta = [beta1,beta2,beta3,beta4]
-    elif len(angles)==10:
-        gamma1,gamma2,gamma3,gamma4,gamma5,beta1,beta2,beta3,beta4,beta5 = angles
-        gamma = [gamma1,gamma2,gamma3,gamma4,gamma5]
-        beta = [beta1,beta2,beta3,beta4,beta5]
-    elif len(angles)==12:
-        gamma1,gamma2,gamma3,gamma4,gamma5,gamma6,beta1,beta2,beta3,beta4,beta5,beta6 = angles
-        gamma = [gamma1,gamma2,gamma3,gamma4,gamma5,gamma6]
-        beta = [beta1,beta2,beta3,beta4,beta5,beta6]
-    return run_simulation(J,h,const,TrJ,gamma,beta,shots = 1000)
-def optimize_angles(p,J,h,const,TrJ,iter_=1,out=False):
-    
-    bnd = opt.Bounds([0]*(2*p),[2*np.pi,np.pi]*p)
-    t0 =time.time()
-    list_angles=[]
-    list_cost=[]
-    args=(J,h,const,TrJ)
+    gamma = angles[:len(angles)//2]
+    beta = angles[len(angles)//2:]
+    return run_simulation(J, h, const, TrJ, gamma, beta, shots = 1000)
+
+def optimize_angles(p, J, h, const, TrJ, iter_=1, out=False):
+    bnd = opt.Bounds([0]*(2*p), [2*np.pi, np.pi]*p)
+    t0 = time.time()
+    angles = []
+    costs = []
+    args = (J, h, const, TrJ)
+
     for i in range(iter_): 
-        opt_angles=opt.differential_evolution(optimize_simulation,bounds = bnd,args = args,disp = out)
-        list_angles.append(opt_angles.x)
-        print(opt_angles.x)
-        list_cost.append(optimize_simulation(opt_angles.x,*args))
-        print(optimize_simulation(opt_angles.x,*args))
-        i+=1
-    t1=time.time()
+        opt_angles = opt.differential_evolution(_optimize_simulation, bounds=bnd, args=args, disp=out)
+        angles.append(opt_angles.x)
+        costs.append(_optimize_simulation(opt_angles.x, *args))
+        #print(opt_angles.x)
+        #print(optimize_simulation(opt_angles.x, *args))
+
+    t1 = time.time()
     time_opt = t1-t0
-    cost = min(list_cost)
-    angles = list_angles[list_cost.index(cost)]
-    print("run time for optimization of angles was "+str(time_opt))
+    cost = min(costs)
+    angles = angles[costs.index(costs)]
+    print("Run time for optimization of angles was " + time.strftime("%H:%M:%S", time.gmtime(time_opt)))
     return angles, cost

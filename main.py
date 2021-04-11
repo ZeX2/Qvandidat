@@ -1,24 +1,13 @@
-from operator import itemgetter
-
-import time
 import numpy as np
 from matplotlib import cm
 import matplotlib.pyplot as plt
-import scipy.optimize as opt
 #%matplotlib agg
-
-from qiskit import QuantumCircuit, execute, Aer, assemble
-from qiskit.visualization import plot_histogram
-#from qiskit_textbook.tools import array_to_latex
 
 from tqdm import tqdm
 
 from integer_bin_packing import *
 from equal_size_partition import *
 from funcs import *
-
-
-
 
 #%% Bin packing
 # Item weights
@@ -35,6 +24,12 @@ TrJ = np.trace(J)
 # J, h, const = equal_size_partition(S)
 # TrJ = np.trace(J)
 
+#%% Optimization
+p = 1 #Sets the p-level
+out = True #Set this to True to have continous update on the optimization
+angles, cost = optimize_angles(p, J, h, const, TrJ, out=out)
+print(angles)
+print(cost)
 
 #%% Run simulation for several (gamma, beta) where p = 1
 plt.switch_backend("TkAgg")
@@ -64,16 +59,6 @@ i, j = np.where(avg_costs == min_cost)
 i, j = i[0], j[0]
 print(f'Best angles: ({gammas[i]}, {betas[j]})')
 print('Minimum average cost for best angels:', min_cost)
-#%% Optimization
-
-# A problem instnace has to be run previously, 
-#so that J,h,const and TrJ exists as variables
-
-p = 3 #Sets the p-level.
-out = True #Set this to True to have continous update on the optimization
-angels, cost = optimize_angles(p,J,h,const,TrJ,out=out)
-print(angels)
-print(cost)
 
 #%% Run simulation for several (gamma, beta) where p = 2
 s = 0.1; 
@@ -97,9 +82,6 @@ i, j, k, l = np.where(avg_costs == min_cost)
 i, j, k, l = i[0], j[0], k[0], l[0]
 print(f'Best angles: ([{gammas_1[i]}, {gammas_2[ik]}], [{betas_1[j]}, {betas_2[l]}])')
 print('Minimum average cost for best angels:', min_cost)
-
-#%% Test circuit for one set of gamma and beta
-avg_cost = run_simulation(J, h, const, TrJ, 2.75, 0, shots=1000, histogram=True)
 
 #%% Expected costs  for p = 1
 bits_list = get_bits_list(len(J))
@@ -137,8 +119,9 @@ expected_cost(J, h, const, TrJ, 4, 0.8, costs, histogram=True)
 run_simulation(J, h, const, TrJ, 4, 0.8, shots=1000000, histogram=True)
 
 #Optimal value for [1 1] and 2
-expected_cost(J, h, const, TrJ, 0.8, 2.2, costs, histogram=True)
-run_simulation(J, h, const, TrJ, 0.8, 2.2, shots=1000000, histogram=True)
+expected_cost(J, h, const, TrJ, 5.9, 0.4, costs, histogram=True)
+run_simulation(J, h, const, TrJ, 5.9, 0.4, shots=1000000, histogram=True)
+
 #%% Expected costs  for p = 2
 bits_list = get_bits_list(len(J))
 costs = {bits: cost_function(bits, J, h, const) for bits in bits_list}
@@ -170,9 +153,6 @@ print('Minimum average cost for best angels:', min_cost)
 expected_cost(J, h, const, TrJ, [2.8, 3.4], [1.8, 2.4], costs, histogram=True)
 run_simulation(J, h, const, TrJ, [2.8, 3.4], [1.8, 2.4], shots=1000000, histogram=True)
 
-expected_cost(J, h, const, TrJ, [2.4, 5], [0.4, 1], costs, histogram=True)
-run_simulation(J, h, const, TrJ, [2.4, 5], [0.4, 1], shots=1000000, histogram=True)
-
 #%% Testing decode function for integer bin packing
 W_max = 2
 W = [1,5]
@@ -202,16 +182,4 @@ decode_integer_bin_packing(W, 10, bits)
 print('\n')
 W = [3, 5, 6, 7, 2]
 bits = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-<<<<<<< HEAD
-#bits = [-0.0, -0.0, -0.0, -0.0, -0.0, 1.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, 1.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, 1.0, -0.0, -0.0, -0.0, -0.0, -0.0, 0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, 0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, 1.0, -0.0, -0.0, 1.0, -0.0, -0.0, 1.0, -0.0, -0.0, 1.0, -0.0, -0.0, 1.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, 0.0, -0.0]
-=======
->>>>>>> 20d6bf4daba38672d3eeaee99a8313dd2a36d771
 decode_integer_bin_packing(W, 10, bits)
-
-#%% Minimum Eigen Optimizer
-n = 6
-for b in range(2**n):
-    x = "".join(reversed(list(bin(b)[2:].zfill(n))))
-    print(x)
-
-get_bits_list(n)
