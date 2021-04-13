@@ -19,15 +19,18 @@ B = 1
 J, h, const = integer_bin_packing(W, W_max, A, B)
 TrJ = np.trace(J)
 
+bits_list = get_bits_list(len(J))
+costs = {bits: cost_function(bits, J, h, const) for bits in bits_list}
+
 #%% Equal Size Partition
 # S = [1, 2, 3, 4]
 # J, h, const = equal_size_partition(S)
 # TrJ = np.trace(J)
 
 #%% Optimization
-p = 1 #Sets the p-level
+p = 3 #Sets the p-level
 out = True #Set this to True to have continous update on the optimization
-angles, cost = optimize_angles(p, J, h, const, TrJ, out=out)
+angles, cost = optimize_angles(p, J, h, const, TrJ, costs, out=out)
 print(angles)
 print(cost)
 
@@ -84,9 +87,6 @@ print(f'Best angles: ([{gammas_1[i]}, {gammas_2[ik]}], [{betas_1[j]}, {betas_2[l
 print('Minimum average cost for best angels:', min_cost)
 
 #%% Expected costs  for p = 1
-bits_list = get_bits_list(len(J))
-costs = {bits: cost_function(bits, J, h, const) for bits in bits_list}
-
 s = 0.1; 
 gammas = np.arange(0, 2*np.pi, s)
 betas = np.arange(0, np.pi, s)
@@ -123,9 +123,6 @@ expected_cost(J, h, const, TrJ, 5.9, 0.4, costs, histogram=True)
 run_simulation(J, h, const, TrJ, 5.9, 0.4, shots=1000000, histogram=True)
 
 #%% Expected costs  for p = 2
-bits_list = get_bits_list(len(J))
-costs = {bits: cost_function(bits, J, h, const) for bits in bits_list}
-
 s = 0.2; 
 gammas_1 = np.arange(0, 2*np.pi, s)
 betas_1 = np.arange(0, np.pi, s)
@@ -152,6 +149,20 @@ print('Minimum average cost for best angels:', min_cost)
 #Optimal value for [1 1] and 2
 expected_cost(J, h, const, TrJ, [2.8, 3.4], [1.8, 2.4], costs, histogram=True)
 run_simulation(J, h, const, TrJ, [2.8, 3.4], [1.8, 2.4], shots=1000000, histogram=True)
+
+#%% Optimal value for [1 1] and 2
+# p =3
+expected_cost(J, h, const, TrJ, [6.20358995, 1.95069714, 4.27392057], [0.99536017, 1.57003137, 0.91332342], costs, histogram=True)
+# p = 4
+expected_cost(J, h, const, TrJ, [6.20754935, 2.94608629, 2.65675541, 0.62451051], [5.82969887, 1.51901346, 4.71282655, 2.26889263], costs, histogram=True)
+# p = 5
+expected_cost(J, h, const, TrJ, [6.04825609, 0.21315933, 6.1468868,  0.46728835, 2.30754555], [1.47327328, 0.87128464, 1.32207716, 1.45209587, 1.74498705], costs, histogram=True)
+
+
+#%% Vinklar v2.0
+expected_cost(J, h, const, TrJ, 0.48960383, 2.48592809, costs, histogram=True)
+expected_cost(J, h, const, TrJ, 2.73634734, 2.7256908, costs, histogram=True)
+
 
 #%% Testing decode function for integer bin packing
 W_max = 2

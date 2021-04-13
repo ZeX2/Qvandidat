@@ -104,17 +104,17 @@ def expected_cost(J, h, const, TrJ, gamma, beta, costs, histogram=False):
     return sum(prob*costs[bits] for bits, prob in prob_dict.items())
 
 def _optimize_simulation(angles, *variables):
-    J, h, const, TrJ = variables
+    J, h, const, TrJ, costs = variables
     gamma = angles[:len(angles)//2]
     beta = angles[len(angles)//2:]
-    return run_simulation(J, h, const, TrJ, gamma, beta, shots = 1000)
+    return expected_cost(J, h, const, TrJ, gamma, beta, costs)
 
-def optimize_angles(p, J, h, const, TrJ, iter_=1, out=False):
+def optimize_angles(p, J, h, const, TrJ, all_costs, iter_=1, out=False):
     bnd = opt.Bounds([0]*(2*p), [2*np.pi, np.pi]*p)
     t0 = time.time()
     angles = []
     costs = []
-    args = (J, h, const, TrJ)
+    args = (J, h, const, TrJ, all_costs)
 
     for i in range(iter_): 
         opt_angles = opt.differential_evolution(_optimize_simulation, bounds=bnd, args=args, disp=out)
@@ -127,5 +127,6 @@ def optimize_angles(p, J, h, const, TrJ, iter_=1, out=False):
     time_opt = t1-t0
     cost = min(costs)
     angles = angles[costs.index(costs)]
+    angles = (angles[:len(angles)//2], angles[len(angles)//2:])
     print("Run time for optimization of angles was " + time.strftime("%H:%M:%S", time.gmtime(time_opt)))
     return angles, cost
