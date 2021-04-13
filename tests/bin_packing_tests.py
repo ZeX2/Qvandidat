@@ -67,7 +67,7 @@ def run_no_noise_test(S):
         result = run_single_differential_evolution(objective, bound, p, prefix)
         print(result)
         end_time = time.monotonic()
-        print('Time to find optimal angles:', timedelta(seconds=end_time - start_time),'Time now:', datetime.now(), 'Expected value:', objective(result[0]), 'p:', p, 'gammas', result[0][0:p], 'betas', result[0][p:p*2])
+        print('Time to find optimal angles:', timedelta(seconds=end_time - start_time),'Time now:', datetime.now(), 'Expected value:', objective(result[0]), 'p:', p, 'gammas', result[0][0:p], 'betas', result[0][p:p*2], str(S))
     
 def shgo_p(objective, bound, p, save_file=None):
     return shgo(objective, [bound] * p * 2, save_file)
@@ -88,6 +88,6 @@ def get_bin_packing_prefix(category, problem_str):
     os.makedirs(prefix, exist_ok=True)
     return prefix
 
-S = {'W': [1, 1], 'W_max': 2, 'A': 1, 'B': 3}
+S = {'W': [1, 1], 'W_max': 2, 'A': 2, 'B': 1}
 run_no_noise_test(S)
 
