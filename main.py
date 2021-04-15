@@ -14,13 +14,11 @@ from funcs import *
 W = [1, 1]
 # Max weight of bin
 W_max = 2
-A = 2
-B = 1
-J, h, const = integer_bin_packing(W, W_max, A, B)
+J, h, const, A, B = integer_bin_packing(W, W_max)
 TrJ = np.trace(J)
 
 bits_list = get_bits_list(len(J))
-costs = {bits: cost_function(bits, J, h, const) for bits in bits_list}
+costs = {bits: cost_function(bits, J, h, const, TrJ)/B for bits in bits_list}
 
 #%% Equal Size Partition
 # S = [1, 2, 3, 4]
@@ -28,11 +26,15 @@ costs = {bits: cost_function(bits, J, h, const) for bits in bits_list}
 # TrJ = np.trace(J)
 
 #%% Optimization
-p = 3 #Sets the p-level
+p = 2 #Sets the p-level
 out = True #Set this to True to have continous update on the optimization
 angles, cost = optimize_angles(p, J, h, const, TrJ, costs, out=out)
 print(angles)
 print(cost)
+
+expected_cost(J, h, const, TrJ, 5.71620769, 0.39746979, costs, histogram=True)/B
+expected_cost(J, h, const, TrJ, [6.06563229, 1.59990683], [4.64982907, 0.79812301], costs, histogram=True)/B
+expected_cost(J, h, const, TrJ, [2.17174197, 2.63865832], [4.79224862, 2.38503763], costs, histogram=True)/B
 
 #%% Run simulation for several (gamma, beta) where p = 1
 plt.switch_backend("TkAgg")
@@ -44,7 +46,7 @@ avg_costs = np.zeros((len(gammas), len(betas)))
 print('Running simulations...')
 for i in tqdm(range(len(gammas))):
     for j in range(len(betas)):
-        avg_costs[i,j] = run_simulation(J, h, const, TrJ, gammas[i], betas[j], shots=1000)
+        avg_costs[i,j] = run_simulation(J, h, const, TrJ, gammas[i], betas[j], shots=1000)/B
 
 betas_, gammas_ = np.meshgrid(betas, gammas)
 
@@ -78,7 +80,7 @@ for i in range(len(gammas_1)):
             for l in range(len(betas_2)):
                 gamma = [gammas_1[i], gammas_2[k]]
                 beta = [betas_1[j], betas_2[l]]
-                avg_costs[i,j,k,l] = run_simulation(J, h, const, TrJ, gamma, beta, shots=500)
+                avg_costs[i,j,k,l] = run_simulation(J, h, const, TrJ, gamma, beta, shots=500)/B
 
 min_cost = np.amin(avg_costs)
 i, j, k, l = np.where(avg_costs == min_cost)
@@ -95,7 +97,7 @@ exp_costs = np.zeros((len(gammas), len(betas)))
 print('Running simulations...')
 for i in tqdm(range(len(gammas)), desc='Loop i', position=0):
     for j in range(len(betas)):
-        exp_costs[i,j] = expected_cost(J, h, const, TrJ, gammas[i], betas[j], costs)
+        exp_costs[i,j] = expected_cost(J, h, const, TrJ, gammas[i], betas[j], costs)/B
 
 betas_, gammas_ = np.meshgrid(betas, gammas)
 
@@ -115,12 +117,12 @@ print(f'Best angles: ({gammas[i]}, {betas[j]})')
 print('Minimum average cost for best angels:', min_cost)
 
 #Optimal value for [1 1] and 1
-expected_cost(J, h, const, TrJ, 4, 0.8, costs, histogram=True)
-run_simulation(J, h, const, TrJ, 4, 0.8, shots=1000000, histogram=True)
+expected_cost(J, h, const, TrJ, 4, 0.8, costs, histogram=True)/B
+run_simulation(J, h, const, TrJ, 4, 0.8, shots=1000000, histogram=True)/B
 
 #Optimal value for [1 1] and 2
-expected_cost(J, h, const, TrJ, 5.9, 0.4, costs, histogram=True)
-run_simulation(J, h, const, TrJ, 5.9, 0.4, shots=1000000, histogram=True)
+expected_cost(J, h, const, TrJ, 5.9, 0.4, costs, histogram=True)/B
+run_simulation(J, h, const, TrJ, 5.9, 0.4, shots=1000000, histogram=True)/B
 
 #%% Expected costs  for p = 2
 s = 0.2; 
@@ -137,7 +139,7 @@ for i in tqdm(range(len(gammas_1)), desc="Loop i", position=0):
             for l in range(len(betas_2)):
                 gamma = [gammas_1[i], gammas_2[k]]
                 beta = [betas_1[j], betas_2[l]]
-                exp_costs[i,j,k,l] = expected_cost(J, h, const, TrJ, gamma, beta, costs)
+                exp_costs[i,j,k,l] = expected_cost(J, h, const, TrJ, gamma, beta, costs)/B
 
 min_cost = np.amin(exp_costs)
 i, j, k, l = np.where(exp_costs == min_cost)
@@ -147,50 +149,8 @@ print('Minimum average cost for best angels:', min_cost)
 
 
 #Optimal value for [1 1] and 2
-expected_cost(J, h, const, TrJ, [2.8, 3.4], [1.8, 2.4], costs, histogram=True)
-run_simulation(J, h, const, TrJ, [2.8, 3.4], [1.8, 2.4], shots=1000000, histogram=True)
-
-#%% Optimal value for [1 1] and 2
-# p =3
-expected_cost(J, h, const, TrJ, [6.20358995, 1.95069714, 4.27392057], [0.99536017, 1.57003137, 0.91332342], costs, histogram=True)
-# p = 4
-expected_cost(J, h, const, TrJ, [6.20754935, 2.94608629, 2.65675541, 0.62451051], [5.82969887, 1.51901346, 4.71282655, 2.26889263], costs, histogram=True)
-# p = 5
-expected_cost(J, h, const, TrJ, [6.04825609, 0.21315933, 6.1468868,  0.46728835, 2.30754555], [1.47327328, 0.87128464, 1.32207716, 1.45209587, 1.74498705], costs, histogram=True)
-
-
-#%% Vinklar v2.0
-expected_cost(J, h, const, TrJ, 0.48960383, 2.48592809, costs, histogram=True)
-expected_cost(J, h, const, TrJ, 2.73634734, 2.7256908, costs, histogram=True)
-
+expected_cost(J, h, const, TrJ, [2.8, 3.4], [1.8, 2.4], costs, histogram=True)/B
+run_simulation(J, h, const, B, TrJ, [2.8, 3.4], [1.8, 2.4], shots=1000000, histogram=True)/B
 
 #%% Testing decode function for integer bin packing
-W_max = 2
-W = [1,5]
-bits = '00001100'
-decode_integer_bin_packing(W, W_max, bits)
-
-print('\n')
-W = [1,5,1]
-bits = '100100100011000'
-decode_integer_bin_packing(W, W_max, bits)
-
-print('\n')
-W = [1,1,1]
-bits = '100010100011000'
-decode_integer_bin_packing(W, W_max, bits)
-
-print('\n')
-W = [3, 3, 3]
-bits = [-0.0, 0.0, -0.0, -0.0, -0.0, 1.0, 0.0, 0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, -0.0, 1.0, -0.0, -0.0, -0.0, -0.0, -0.0, 0.0, 1.0, 1.0, -0.0, -0.0, -0.0, 1.0, 0.0, -0.0]
-decode_integer_bin_packing(W, 8, bits)
-
-print('\n')
-W = [3, 3, 3]
-bits = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0]
-decode_integer_bin_packing(W, 10, bits)
-
-print('\n')
-W = [3, 5, 6, 7, 2]
-bits = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-decode_integer_bin_packing(W, 10, bits)
+decode_integer_bin_packing(W, W_max, '00000000')

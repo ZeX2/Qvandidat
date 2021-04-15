@@ -1,6 +1,6 @@
 import numpy as np
 
-def integer_bin_packing(W, W_max, A = 2, B = 1): 
+def integer_bin_packing(W, W_max, A = None, B = None): 
     # A > B
     I = len(W)
     N =  W_max*I+I*I
@@ -26,6 +26,12 @@ def integer_bin_packing(W, W_max, A = 2, B = 1):
         for i in range(W_max*(j-1)+1, W_max*j+1):
             c[j-1, i-1] = 1
 
+    if not (A or B):
+        C = sum(sum(max(c[j,i], 0) for i in range(N))**2 for j in range(N))
+        S_ = min(max(1, sum(abs(S[j,i]) for i in range(N))/2) for j in range(M))
+        B = 4
+        A = int(B*np.ceil(C/S_))
+
     J = np.zeros((N, N))
     for i in range(N):
         for j in range(N):
@@ -45,7 +51,7 @@ def integer_bin_packing(W, W_max, A = 2, B = 1):
     for j in range(M):
         const += (A/4)*(2*b[j] - sum(S[j,i] for i in range(N)))**2
 
-    return J, h, const
+    return J, h, const, A, B
 
 def correct_solution(W, W_max, bits):
     W = np.array(W)
