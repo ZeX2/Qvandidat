@@ -22,19 +22,21 @@ def qaoa_ising_circuit(J, h, gamma, beta, draw_circuit=False, measure=True):
     N = len(J)
     qc = QuantumCircuit(N, N)
     qc.h(range(N))
-    #qc.barrier()
     
     for gamma_k, beta_k in zip(gamma, beta):
-        for i in range(N):
-            for j in range(i):
-                qc.cx(i, j)
-                qc.rz(2*gamma_k*J[i,j], j)
-                qc.cx(i, j)
-                
-        for i in range(N):
-            qc.rz(2*gamma_k*h[i], i)
+        if not gamma_k == 0:
+            for i in range(N):
+                for j in range(i):
+                    if J[i,j] == 0: continue
+                    qc.cx(i, j)
+                    qc.rz(2*gamma_k*J[i,j], j)
+                    qc.cx(i, j)
+                    
+            for i in range(N):
+                if h[i] == 0: continue
+                qc.rz(2*gamma_k*h[i], i)
         
-        #qc.barrier()
+        if beta_k == 0: continue
         qc.rx(2*beta_k, range(N))
 
     if measure:
@@ -85,8 +87,7 @@ def run_simulation(J, h, const, TrJ, gamma, beta, shots=1000, draw_circuit=False
 
 def expected_cost(J, h, const, TrJ, gamma, beta, costs, histogram=False):
     qc = qaoa_ising_circuit(J, h, gamma, beta, measure=False)
-    job = execute(qc, SVSIM)
-    sv = job.result().get_statevector()
+    sv = execute(qc, SVSIM).result().get_statevector()
     sv = Statevector(sv)
     prob_dict = sv.probabilities_dict()
 
@@ -120,8 +121,6 @@ def optimize_angles(p, J, h, const, TrJ, all_costs, iter_=1, out=False):
         opt_angles = opt.differential_evolution(_optimize_simulation, bounds=bnd, args=args, disp=out)
         angles.append(opt_angles.x)
         costs.append(_optimize_simulation(opt_angles.x, *args))
-        #print(opt_angles.x)
-        #print(optimize_simulation(opt_angles.x, *args))
 
     t1 = time.time()
     time_opt = t1-t0

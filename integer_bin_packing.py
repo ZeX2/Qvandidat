@@ -1,6 +1,6 @@
 import numpy as np
 
-def integer_bin_packing(W, W_max, A = None, B = None): 
+def integer_bin_packing(W, W_max, A = None, B = None, C_factor = 1): 
     # A > B
     I = len(W)
     N =  W_max*I+I*I
@@ -27,15 +27,20 @@ def integer_bin_packing(W, W_max, A = None, B = None):
             c[j-1, i-1] = 1
 
     if not (A or B):
-        C = sum(sum(max(c[j,i], 0) for i in range(N))**2 for j in range(N))
-        S_ = min(max(1, sum(abs(S[j,i]) for i in range(N))/2) for j in range(M))
+        BB = sum(sum(max(c[j,i], 0) for i in range(N))**2 for j in range(N))
+        AA_lower = min(max(1, sum(abs(S[j,i]) for i in range(N))/2) for j in range(M//2))
         B = 4
-        A = int(B*np.ceil(C/S_))
+        A = int(B*np.ceil(BB/AA_lower))
+        #AA_upper = max(max(1, sum(abs(S[j,i]) for i in range(N))/2) for j in range(M//2))
+        #CC = min(max(1, sum(abs(S[j,i]) for i in range(N))/2) for j in range(M//2, M))
+    
+    C = A*C_factor
 
     J = np.zeros((N, N))
     for i in range(N):
         for j in range(N):
-            J[i, j] = A*sum(S[k, i]*S[k, j] for k in range(M))/4
+            J[i, j] = A*sum(S[k, i]*S[k, j] for k in range(M//2))/4
+            J[i, j] += C*sum(S[k, i]*S[k, j] for k in range(M//2, M))/4
             J[i, j] += B*sum(c[k, i]*c[k, j] for k in range(N))/4
     
     h = np.zeros(N)
@@ -44,14 +49,18 @@ def integer_bin_packing(W, W_max, A = None, B = None):
             h[i] += B*sum(c[j, i]*c[j, k] for k in range(N))/2
     
     for i in range(N):
-        for j in range(M):
+        for j in range(M//2):
             h[i] -= A*S[j, i]*(2*b[j] - sum(S[j, k] for k in range(N)))/2
-    
-    const = (B/4)*sum(sum(c[j,i] for i in range(N))**2 for j in range(N))
-    for j in range(M):
-        const += (A/4)*(2*b[j] - sum(S[j,i] for i in range(N)))**2
+        for j in range(M//2, M):
+            h[i] -= C*S[j, i]*(2*b[j] - sum(S[j, k] for k in range(N)))/2
 
-    return J, h, const, A, B
+    const = (B/4)*sum(sum(c[j,i] for i in range(N))**2 for j in range(N))
+    for j in range(M//2):
+        const += (A/4)*(2*b[j] - sum(S[j,i] for i in range(N)))**2
+    for j in range(M//2, M):
+        const += (C/4)*(2*b[j] - sum(S[j,i] for i in range(N)))**2
+
+    return J, h, const, A, B, C
 
 def correct_solution(W, W_max, bits):
     W = np.array(W)
