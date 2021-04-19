@@ -56,7 +56,10 @@ def generate_energy_landscapes():
     data_dirr = os.path.join('problem_group', 'data')
 
     for root, _, files in os.walk(data_dirr, topdown=False):
-        for filename in np.sort(files):
+        num_qubits = list(map(int, map(lambda x: x.split('_n')[1], files)))
+        order = np.argsort(num_qubits)
+        np_files = np.array(files)
+        for filename in np_files[order]:
             for S in decode_file(filename):
                 print(str(S), filename)
                 run_bruteforce(S, filename)
