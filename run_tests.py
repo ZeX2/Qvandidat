@@ -26,6 +26,12 @@ elif args.problem == 'bp' or args.problem == 'bin' or \
     os.system('python -m unittest tests' +
 
               os.path.sep + 'bin_packing_tests.py')
+elif args.problem == 'bpel' or args.problem == 'binel' or \
+        args.problem == 'bin_packing_energy_landscape' or args.problem == 'binpel':
+
+    os.system('python -m unittest tests' +
+
+              os.path.sep + 'bin_packing_tests_energy_landscape.py')
 else:
     parser.print_help()
     exit(0)
