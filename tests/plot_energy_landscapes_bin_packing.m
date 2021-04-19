@@ -18,6 +18,7 @@ for k = 3 : length(Folders)
     
     files = dir(fullfile(folder.folder,folder.name,'*_bruteforce.mat'));
     
+    isempty = 1;
     for i = 1 : length(files)
         file = files(i);
         data = load(fullfile(file.folder, file.name));
@@ -38,20 +39,24 @@ for k = 3 : length(Folders)
         title(file.name)
         
         
+        isempty = 0;
     end
-    input('Press enter to continue')
-    close all
+    
+    if ~isempty
+        input('Press enter to continue')
+        close all
+    end
     
 end
 
 function n = dir_name2num(dir)
-    a = strsplit(dir, '_n')
+    a = strsplit(dir, '_n');
     if length(a) > 1
-        n = str2num(a{2})
+        n = str2num(a{2});
     else
-        n = -1
+        n = -1;
     end
-    n = n + sum(a{1})*1000
+    n = n + sum(a{1})*1000;
 end
 
 
