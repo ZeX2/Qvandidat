@@ -3,6 +3,14 @@ import math
 from qiskit import QuantumCircuit
 from qiskit.converters import circuit_to_dag
 
+# TODO
+# - Test swap_network with n neq 2**k qubits and
+#   verify that the solutions are correct.
+# - Compare swap_network with linear_swap
+#   and verify that linar_swap actually
+#   outperforms swap_network for large
+#   circuits.
+
 def swap_positions(input_list, pos1, pos2):  
     input_list[pos1], input_list[pos2] = input_list[pos2], input_list[pos1] 
     return input_list
@@ -198,8 +206,7 @@ def seperate_grid(qubit_grid):
 # WARNING: This only works if the circuit only
 # contains ZZ and Rx gates, where all Rx gates
 # are at the end.
-def decompose_qaoa_circuit(circuit):
-    N = circuit.num_qubits
+def decompose_qaoa_circuit(circuit,N):
     zz_ops = np.zeros((N,N))
     rx_ops = np.zeros(N)
 
@@ -223,17 +230,23 @@ def decompose_qaoa_circuit(circuit):
             
     return zz_ops, rx_ops
 
-# WARNING: circuit has to have 2**k qubits
+# WARNING: circuit may need to have 2**k qubits
 def swap_network(qaoa_circuit, qubit_grid=None):
-    N = qaoa_circuit.num_qubits
-
-    operations, rx_ops = decompose_qaoa_circuit(qaoa_circuit)
-    print(operations)
-    circuit = QuantumCircuit(N, N)
-    circuit.h(range(N))
+    N = int(2**np.floor(np.log2(qaoa_circuit.num_qubits)))
 
     if qubit_grid is None:
         qubit_grid = get_qubit_grid(N)
+
+    # Maybe the circuit can be smaller
+    # because we can probably simplify
+    # swaps into single swaps over qubits
+    # not in use. Altough shouldn't hurt
+    # and should be possible to remove qubits
+    # when swap_network is done.
+    circuit = QuantumCircuit(N, N)
+    circuit.h(range(N))
+
+    operations, rx_ops = decompose_qaoa_circuit(qaoa_circuit, N)
 
     def recurse(qubit_grid, logical_qubit_grid, circuit):
         do_all_ops(circuit, logical_qubit_grid, qubit_grid, operations)
@@ -266,4 +279,3 @@ def swap_network(qaoa_circuit, qubit_grid=None):
         circuit.measure(q, qq)
 
     return circuit
-
