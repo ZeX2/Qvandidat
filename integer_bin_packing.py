@@ -31,11 +31,15 @@ def integer_bin_packing(W, W_max, A = None, B = None, C_factor = 1):
         AA_lower = min(max(1, sum(abs(S[j,i]) for i in range(N))/2) for j in range(M//2))
         B = 4
         A = int(B*np.ceil(BB/AA_lower))
+        AA_upper = sum(max(b[j],sum(max(S[j,i],0) for i in range(N))) for j in range(M//2))
+        
         #AA_upper = max(max(1, sum(abs(S[j,i]) for i in range(N))/2) for j in range(M//2))
-        #CC = min(max(1, sum(abs(S[j,i]) for i in range(N))/2) for j in range(M//2, M))
-    
-    C = A*C_factor
-
+        CC = min(max(1, sum(abs(S[j,i]) for i in range(N))/2) for j in range(M//2, M))
+    else:
+        AA_upper = C_factor
+        CC = 1
+    C = int(AA_upper*A/CC)
+    print("A = "+str(A)+", B = "+str(B)+", C = "+str(C))
     J = np.zeros((N, N))
     for i in range(N):
         for j in range(N):
