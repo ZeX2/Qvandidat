@@ -86,14 +86,15 @@ def run_simulation(J, h, const, TrJ, gamma, beta, shots=1000, draw_circuit=False
     avg_cost = sum(count*cost for cost, count in costs.items())/shots
     return avg_cost
 
-def expected_cost(J, h, const, TrJ, gamma, beta, costs, histogram=False,dict_ = False):
+def expected_cost(J, h, const, TrJ, gamma, beta, costs, histogram=False, probs = False):
     qc = qaoa_ising_circuit(J, h, gamma, beta, measure=False)
     sv = execute(qc, SVSIM).result().get_statevector()
     sv = Statevector(sv)
     prob_dict = sv.probabilities_dict()
-    cd = sorted(prob_dict.items(),key=operator.itemgetter(1),reverse=False)
-    if dict_:    
-        print(cd)
+    sorted_probs = sorted(prob_dict.items(),key=operator.itemgetter(1),reverse=False)
+    
+    if probs:    
+        print(sorted_probs)
     if histogram:
         costs_freq = dict()
         for bits, prob in prob_dict.items():
