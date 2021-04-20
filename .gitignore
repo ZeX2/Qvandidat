@@ -1,3 +1,4 @@
 .vscode
 .ipy*
 __pycache__/*
+data/
