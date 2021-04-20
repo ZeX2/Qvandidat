@@ -26,7 +26,7 @@ costs = {bits: cost_function(bits, J, h, const, TrJ)/B for bits in bits_list}
 # TrJ = np.trace(J)
 
 #%% Optimization
-p = 4 # Sets the p-level
+p = 5 # Sets the p-level
 out = True #Set this to True to have continous update on the optimization
 angles, cost = optimize_angles(p, J, h, const, TrJ, costs, out=out)
 print(angles)
@@ -34,8 +34,8 @@ print(cost)
 
 #%%
 # [1, 1], 2, C = 2A, 
-expected_cost(J, h, const, TrJ, 3.12225594, 0.30371598, costs, histogram=True,dict_=True)
-expected_cost(J, h, const, TrJ, [3.15812491, 1.25654823], [2.71176354, 0.27240049], costs, histogram=True,dict_=True)
+expected_cost(J, h, const, TrJ, 3.12225594, 0.30371598, costs, histogram=True,probs=True)
+expected_cost(J, h, const, TrJ, [3.15812491, 1.25654823], [2.71176354, 0.27240049], costs, histogram=True,probs=True)
 expected_cost(J, h, const, TrJ, [1.03095384, 1.0867246 , 2.59478705], [1.5460229 , 3.1757417 , 2.35685995], costs, histogram=True)
 expected_cost(J, h, const, TrJ, [0.99576246, 2.13449288, 5.32455158, 1.18130696], [4.62583989, 2.00279267, 4.36280221, 0.4709013], costs, histogram=True)
 expected_cost(J, h, const, TrJ, [2.36944458, 1.17249538, 0.410751, 0.66790066, 1.91204215], [1.61679967, 3.96129773, 1.30548718, 0.24146866, 1.63173029], costs, histogram=True)
