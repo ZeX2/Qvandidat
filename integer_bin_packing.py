@@ -1,6 +1,6 @@
 import numpy as np
 
-def integer_bin_packing(W, W_max, A = None, B = None, C_factor = 1): 
+def integer_bin_packing(W, W_max, A = None, B = None, C= None): 
     # A > B
     I = len(W)
     N =  W_max*I+I*I
@@ -26,20 +26,22 @@ def integer_bin_packing(W, W_max, A = None, B = None, C_factor = 1):
         for i in range(W_max*(j-1)+1, W_max*j+1):
             c[j-1, i-1] = 1
 
-    if not (A or B):
-        BB = sum(sum(max(c[j,i], 0) for i in range(N))**2 for j in range(N))
-        AA_lower = min(max(1, sum(abs(S[j,i]) for i in range(N))/2) for j in range(M//2))
+    if not (A or B or C):
+        B_upper = sum(sum(max(c[j,i], 0) for i in range(N))**2 for j in range(N))
+        #A_lower = min(min(abs(S[j,i]) if S[j,i] != 0 for i in range(N)) for j in range(M//2))
+        A_lower = min(min(np.abs(np.nonzero(S[j,:]))) for j in range(M//2))
         B = 4
-        A = int(B*np.ceil(BB/AA_lower))
-        AA_upper = sum(max(b[j],sum(max(S[j,i],0) for i in range(N))) for j in range(M//2))
-        
+        A = int(B*np.ceil(B_upper/A_lower))
+        A_upper = sum(max(abs(b[j]-sum(max(S[j,i], 0) for i in range(N))),
+                          abs(b[j]-sum(min(S[j,i], 0) for i in range(N))))**2 for j in range(M//2))
+        #sum(max(S[j,i],0) for i in range(N)))
         #AA_upper = max(max(1, sum(abs(S[j,i]) for i in range(N))/2) for j in range(M//2))
-        CC = min(max(1, sum(abs(S[j,i]) for i in range(N))/2) for j in range(M//2, M))
-    else:
-        AA_upper = C_factor
-        CC = 1
-    C = int(AA_upper*A/CC)
+        #C_lower = min(max(1, sum(abs(S[j,i]) for i in range(N))/2) for j in range(M//2))
+        C_lower = min(min(np.abs(np.nonzero(S[j,:]))) for j in range(M//2, M))
+        C = int(A*np.ceil(A_upper/C_lower))
+    
     print("A = "+str(A)+", B = "+str(B)+", C = "+str(C))
+
     J = np.zeros((N, N))
     for i in range(N):
         for j in range(N):

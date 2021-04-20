@@ -135,6 +135,7 @@ i, j = i[0], j[0]
 print(f'Best angles: ({gammas[i]}, {betas[j]})')
 print('Minimum average cost for best angels:', min_cost)
 
+#%%
 #Optimal value for [1 1] and 1
 expected_cost(J, h, const, TrJ, 4, 0.8, costs, histogram=True)
 run_simulation(J, h, const, TrJ, 4, 0.8, shots=1000000, histogram=True)/B
