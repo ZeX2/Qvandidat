@@ -14,7 +14,7 @@ from funcs import *
 W = [1, 1]
 # Max weight of bin
 W_max = 2
-J, h, const, A, B, C = integer_bin_packing(W, W_max, C_factor=3)
+J, h, const, A, B, C = integer_bin_packing(W, W_max)
 TrJ = np.trace(J)
 
 bits_list = get_bits_list(len(J))

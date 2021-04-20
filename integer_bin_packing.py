@@ -29,7 +29,9 @@ def integer_bin_packing(W, W_max, A = None, B = None, C= None):
     if not (A or B or C):
         B_upper = sum(sum(max(c[j,i], 0) for i in range(N))**2 for j in range(N))
         #A_lower = min(min(abs(S[j,i]) if S[j,i] != 0 for i in range(N)) for j in range(M//2))
-        A_lower = min(min(np.abs(np.nonzero(S[j,:]))) for j in range(M//2))
+        print('pre alower')
+        A_lower = min(min(np.abs(S[j,np.nonzero(S[j,:])[0]])) for j in range(M//2))
+        print('post alower')
         B = 4
         A = int(B*np.ceil(B_upper/A_lower))
         A_upper = sum(max(abs(b[j]-sum(max(S[j,i], 0) for i in range(N))),
@@ -37,7 +39,7 @@ def integer_bin_packing(W, W_max, A = None, B = None, C= None):
         #sum(max(S[j,i],0) for i in range(N)))
         #AA_upper = max(max(1, sum(abs(S[j,i]) for i in range(N))/2) for j in range(M//2))
         #C_lower = min(max(1, sum(abs(S[j,i]) for i in range(N))/2) for j in range(M//2))
-        C_lower = min(min(np.abs(np.nonzero(S[j,:]))) for j in range(M//2, M))
+        C_lower = min(min(np.abs(S[j,np.nonzero(S[j,:])[0]])) for j in range(M//2, M))
         C = int(A*np.ceil(A_upper/C_lower))
     
     print("A = "+str(A)+", B = "+str(B)+", C = "+str(C))
