@@ -206,32 +206,36 @@ def seperate_grid(qubit_grid):
 # WARNING: This only works if the circuit only
 # contains ZZ and Rx gates, where all Rx gates
 # are at the end.
-def decompose_qaoa_circuit(circuit,N):
-    zz_ops = np.zeros((N,N))
-    rx_ops = np.zeros(N)
+def decompose_qaoa_circuit(circuit,N,p):
+    zz_ops = np.zeros((p,N,N))
+    rx_ops = np.zeros((p,N))
 
     dag = circuit_to_dag(circuit)
     nodes = dag.gate_nodes()
-
+    i = 0
+    j = 0
+    operations_order = np.empty(0)
     for node in nodes:
-
         if node.name == 'rzz':
+            operations_order = np.append(operations_order, 'rzz')
+            i = i+1
+            if operations_order[i-2] == 'rx' and operations_order[i-1] == 'rzz':
+                j = j+1
             q1 = node.qargs[0].index
             q2 = node.qargs[1].index
 
             theta = node.op.params
-            zz_ops[min(q1,q2),max(q1,q2)] += theta 
-
+            zz_ops[j,min(q1,q2),max(q1,q2)] += theta 
         elif node.name == 'rx':
+            operations_order = np.append(operations_order, 'rx')
+            i = i+1
             q1 = node.qargs[0].index
-
             theta = node.op.params
-            rx_ops[q1] += theta
-            
+            rx_ops[j,q1] += theta
     return zz_ops, rx_ops
 
 # WARNING: circuit may need to have 2**k qubits
-def swap_network(qaoa_circuit, qubit_grid=None):
+def swap_network(qaoa_circuit, p, qubit_grid=None):
     N = int(2**np.floor(np.log2(qaoa_circuit.num_qubits)))
 
     if qubit_grid is None:
@@ -245,36 +249,37 @@ def swap_network(qaoa_circuit, qubit_grid=None):
     # when swap_network is done.
     circuit = QuantumCircuit(N, N)
     circuit.h(range(N))
-
-    operations, rx_ops = decompose_qaoa_circuit(qaoa_circuit, N)
-
-    def recurse(qubit_grid, logical_qubit_grid, circuit):
-        do_all_ops(circuit, logical_qubit_grid, qubit_grid, operations)
+    operations, rx_ops = decompose_qaoa_circuit(qaoa_circuit, N, p)
+    
+    def recurse(qubit_grid, logical_qubit_grid, circuit, rzz_ops):
+        do_all_ops(circuit, logical_qubit_grid, qubit_grid, rzz_ops)
 
         if qubit_grid.size == 2: return circuit
         if qubit_grid.size != 4: 
-            circuit = qc_UL_UR(circuit, logical_qubit_grid, qubit_grid, operations)
+            circuit = qc_UL_UR(circuit, logical_qubit_grid, qubit_grid, rzz_ops)
 
         qc_color_sep(circuit, logical_qubit_grid, qubit_grid)
 
         logical_grid1, logical_grid2 = seperate_grid(logical_qubit_grid)
         grid1, grid2 = seperate_grid(qubit_grid)
 
-        circuit = recurse(grid1, logical_grid1, circuit)
-        circuit = recurse(grid2, logical_grid2, circuit)
+        circuit = recurse(grid1, logical_grid1, circuit, rzz_ops)
+        circuit = recurse(grid2, logical_grid2, circuit, rzz_ops)
 
         return circuit
 
     logical_qubit_grid = qubit_grid.copy()
-    circuit = recurse(qubit_grid, logical_qubit_grid, circuit)  
 
-    (r, c) = qubit_grid.shape
+    for i in range(p):
+        circuit = recurse(qubit_grid, logical_qubit_grid, circuit, operations[i, :, :])  
 
-    for q, theta in enumerate(rx_ops):
-        qq = logical_qubit_grid[int(np.floor(q / c)), q % c]
-        circuit.rx(theta, qq)
+        (r, c) = qubit_grid.shape
 
-    for q, theta in enumerate(rx_ops):
+        for q, theta in enumerate(rx_ops[i,:]):
+            qq = logical_qubit_grid[int(np.floor(q / c)), q % c]
+            circuit.rx(theta, qq)
+
+    for q, theta in enumerate(rx_ops[0,:]):
         qq = logical_qubit_grid[int(np.floor(q / c)), q % c]
         circuit.measure(q, qq)
 

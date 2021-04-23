@@ -112,7 +112,7 @@ def get_operations(J, gamma):
             operations[i,j] = 2*gamma*J[i,j]
     return operations.T
 
-def decompose_qaoa_circuit(circuit):
+#def decompose_qaoa_circuit_old(circuit):
     N = circuit.num_qubits
     zz_ops = np.zeros((N,N))
     rx_ops = np.zeros(N)
@@ -135,6 +135,34 @@ def decompose_qaoa_circuit(circuit):
             theta = node.op.params
             rx_ops[q1] += theta
             
+    return zz_ops, rx_ops
+
+def decompose_qaoa_circuit(circuit,N,p):
+    zz_ops = np.zeros((p,N,N))
+    rx_ops = np.zeros((p,N))
+
+    dag = circuit_to_dag(circuit)
+    nodes = dag.gate_nodes()
+    i = 0
+    j = 0
+    operations_order = np.empty(0)
+    for node in nodes:
+        if node.name == 'rzz':
+            operations_order = np.append(operations_order, 'rzz')
+            i = i+1
+            if operations_order[i-2] == 'rx' and operations_order[i-1] == 'rzz':
+                j = j+1
+            q1 = node.qargs[0].index
+            q2 = node.qargs[1].index
+
+            theta = node.op.params
+            zz_ops[j,min(q1,q2),max(q1,q2)] += theta 
+        elif node.name == 'rx':
+            operations_order = np.append(operations_order, 'rx')
+            i = i+1
+            q1 = node.qargs[0].index
+            theta = node.op.params
+            rx_ops[j,q1] += theta
     return zz_ops, rx_ops
 
 
@@ -162,11 +190,10 @@ def linear_swap_method_outdated(J, gamma, beta, qubit_line = None):
         new_circ.measure(i, qq)
     return new_circ
 
-def linear_swap_method(qaoa_circuit, qubit_line=None):
+def linear_swap_method(qaoa_circuit, p, qubit_line=None):
     N = qaoa_circuit.num_qubits
 
-    operations, rx_ops = decompose_qaoa_circuit(qaoa_circuit)
-    print(operations)
+    operations, rx_ops = decompose_qaoa_circuit(qaoa_circuit, N, p)
     circuit = QuantumCircuit(N, N)
     circuit.h(range(N))
 
@@ -174,18 +201,19 @@ def linear_swap_method(qaoa_circuit, qubit_line=None):
         qubit_line = np.array(range(N))
     qubit_path = qubit_line.copy()
 
-    do_all_ops(circuit, qubit_line, qubit_path, operations)
-    new_circ = qc_UL_UR(circuit, qubit_line, qubit_path, operations)
-    
-    for q, theta in enumerate(rx_ops):
-        qq = qubit_path[q]
-        new_circ.rx(theta, qq)
+    for i in range(p):
+        do_all_ops(circuit, qubit_line, qubit_path, operations[i,:,:])
+        circuit = qc_UL_UR(circuit, qubit_line, qubit_path, operations[i,:,:])
+        
+        for q, theta in enumerate(rx_ops[i,:]):
+            qq = qubit_path[q]
+            circuit.rx(theta, qq)
 
-    for q, theta in enumerate(rx_ops):
+    for q, theta in enumerate(rx_ops[0,:]):
         qq = qubit_path[q]
-        new_circ.measure(q, qq)
+        circuit.measure(q, qq)
 
-    return new_circ
+    return circuit
 
 def simplify(circuit):
     return transpile(circuit, basis_gates=['cx', 'rz', 'rx', 'swap'], optimization_level=3)
