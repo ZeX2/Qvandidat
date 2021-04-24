@@ -13,7 +13,7 @@ from funcs import *
 # Item weights
 W = [1]
 # Max weight of bin
-W_max = 2
+W_max = 1
 J, h, const, A, B, C = integer_bin_packing(W, W_max)
 TrJ = np.trace(J)
 
@@ -26,14 +26,21 @@ costs = {bits: cost_function(bits, J, h, const, TrJ)/B for bits in bits_list}
 # TrJ = np.trace(J)
 
 #%% Optimization
+<<<<<<< HEAD
 p = 4# Sets the p-level
+=======
+p = 2 # Sets the p-level
+>>>>>>> 3665b5370ef1a14261207f51a5428e35c07184a0
 out = True #Set this to True to have continous update on the optimization
 angles, cost = optimize_angles(p, J, h, const, TrJ, costs, out=out)
 print(angles)
 print(cost)
 
+expected_cost(J, h, const, TrJ, angles[0], angles[1], costs, histogram=True, probs=True)
+
 #%%
 # [1, 1], 2, C = 2A, 
+<<<<<<< HEAD
 expected_cost(J, h, const, TrJ, 2.18168034, 2.67847727, costs, histogram=True,probs=True)
 expected_cost(J, h, const, TrJ, 3.55617626, 2.67613787, costs, histogram=True,probs=True)
 expected_cost(J, h, const, TrJ, [5.8301447 , 0.44925907], [0.87663437, 2.75877368], costs, histogram=True,probs=True)
@@ -50,6 +57,13 @@ expected_cost(J, h, const, TrJ, [6.23190139, 2.02881861, 5.62074188],[2.13734905
 expected_cost(J, h, const, TrJ,[5.09892763, 2.67717234, 4.58377721, 0.78566622], [2.13461128, 2.75068479, 1.03751773, 1.88074092], costs, histogram=True,probs = True)
 expected_cost(J, h, const, TrJ,[3.2717556 , 2.50568816, 4.97004161, 1.2093923 ], [2.01670634, 0.95417758, 1.05442126, 2.36175656], costs, histogram=True,probs = True)
 expected_cost(J, h, const, TrJ, [3.33120428, 2.55052556, 2.84597526, 1.44430147, 2.47147025], [1.23864299, 2.25581141, 2.19424755, 1.76718998, 0.28502504], costs, histogram=True,probs = True)
+=======
+expected_cost(J, h, const, TrJ, 3.12225594, 0.30371598, costs, histogram=True)
+expected_cost(J, h, const, TrJ, [3.15812491, 1.25654823], [2.71176354, 0.27240049], costs, histogram=True)
+expected_cost(J, h, const, TrJ, [1.03095384, 1.0867246 , 2.59478705], [1.5460229 , 3.1757417 , 2.35685995], costs, histogram=True)
+expected_cost(J, h, const, TrJ, [0.99576246, 2.13449288, 5.32455158, 1.18130696], [4.62583989, 2.00279267, 4.36280221, 0.4709013], costs, histogram=True)
+expected_cost(J, h, const, TrJ, [2.36944458, 1.17249538, 0.410751, 0.66790066, 1.91204215], [1.61679967, 3.96129773, 1.30548718, 0.24146866, 1.63173029], costs, histogram=True)
+>>>>>>> 3665b5370ef1a14261207f51a5428e35c07184a0
 expected_cost(J, h, const, TrJ, [5.2888701, 0.2140996, 0.35869375, 1.77861308, 2.59985261, 2.30950479], [1.62633299, 2.62556142, 1.2353983, 0.4110642, 1.77331014, 3.14159265], costs, histogram=True)
 expected_cost(J, h, const, TrJ, [4.681126, 1.96548122, 1.40945676, 0., 5.65443637, 2.35333539, 2.94090352], [2.85699416, 1.91240846, 1.37397275, 1.3255589, 2.77777898, 0.96111532, 2.61819194], costs, histogram=True)
 expected_cost(J, h, const, TrJ, [4.50533816, 0.61417329, 4.34056327, 0.52574006, 2.6101065, 1.55520545, 4.96265275, 0.78157716], [0.20469296, 2.24862138, 3.26560563, 1.49979025, 5.59152463,2.44741017, 5.90621296, 0.16447593], costs, histogram=True)
@@ -61,6 +75,10 @@ expected_cost(J, h, const, TrJ, [2.72039455, 1.39302597, 3.93021204, 2.07757555,
 
 # [1 1], 2, C=3A
 expected_cost(J, h, const, TrJ, 3.16314244, 2.83650637, costs, histogram=True)
+
+# [1 1], 2
+expected_cost(J, h, const, TrJ, 0.4145836, 2.676139, costs, histogram=True)
+expected_cost(J, h, const, TrJ, [3.14626527, 2.97288412], [1.20725898, 0.97471078], costs, histogram=True)
 
 #%% Profile optimization
 def main():
@@ -121,7 +139,7 @@ print(f'Best angles: ([{gammas_1[i]}, {gammas_2[ik]}], [{betas_1[j]}, {betas_2[l
 print('Minimum average cost for best angels:', min_cost)
 
 #%% Expected costs  for p = 1
-s = 0.1; 
+s = 0.05; 
 gammas = np.arange(0, 2*np.pi, s)
 betas = np.arange(0, np.pi, s)
 exp_costs = np.zeros((len(gammas), len(betas)))
@@ -147,15 +165,6 @@ i, j = np.where(exp_costs == min_cost)
 i, j = i[0], j[0]
 print(f'Best angles: ({gammas[i]}, {betas[j]})')
 print('Minimum average cost for best angels:', min_cost)
-
-#%%
-#Optimal value for [1 1] and 1
-expected_cost(J, h, const, TrJ, 4, 0.8, costs, histogram=True)
-run_simulation(J, h, const, TrJ, 4, 0.8, shots=1000000, histogram=True)/B
-
-#Optimal value for [1 1] and 2
-expected_cost(J, h, const, TrJ, 5.9, 0.4, costs, histogram=True)
-run_simulation(J, h, const, TrJ, 5.9, 0.4, shots=1000000, histogram=True)/B
 
 #%% Expected costs  for p = 2
 s = 0.2; 
