@@ -28,14 +28,11 @@ def integer_bin_packing(W, W_max, A = None, B = None, C = None):
 
     if not (A or B or C):
         B_upper = sum(sum(max(c[j,i], 0) for i in range(N))**2 for j in range(N))
-        print(B_upper)
         A_lower = min(min(np.abs(S[j,np.nonzero(S[j,:])[0]])) for j in range(M//2))**2
-        print(A_lower)
+        A_lower = min(min(np.abs(S[j,np.nonzero(S[j,:])[0]])) for j in range(M//2))
         A_upper = sum(max(abs(b[j]-sum(max(S[j,i], 0) for i in range(N))),
                           abs(b[j]-sum(min(S[j,i], 0) for i in range(N))))**2 for j in range(M//2))
-        print(A_upper)
         C_lower = min(min(np.abs(S[j,np.nonzero(S[j,:])[0]])) for j in range(M//2, M))**2
-        print(C_lower)
         B = 4
         A = int(B*max(np.ceil(B_upper/A_lower), 2))
         C = int(A*max(np.ceil(A_upper/C_lower), 1.5))
@@ -134,4 +131,21 @@ def decode_integer_bin_packing(W, W_max, bits):
             print(f'Truck {i+1} is empty!')
     
     return True
+def decode_pure(W,W_max,bits):
+    W = np.array(W)
+    I = len(W)
+    bits = list(map(int, bits))
+    y = bits[:W_max*I]
+    y = np.reshape(y, (-1, W_max))
+    x = bits[W_max*I:]
+    x = np.reshape(x, (-1, I))
+    bins_used = np.sum(y)
+    print(f'{bins_used}/{I} trucks used!')
     
+    for i in range(I):
+        if np.sum(y[i,]) == 1:
+            weight = np.where(y[i,] == 1)[0][0] + 1
+            contains = W[np.where(x[i,] == 1)[0]]
+            print(f'Truck {i+1} has weight {weight} and contains item(s) with weight(s): {contains}')
+        else:
+            print(f'Truck {i+1} is empty!')

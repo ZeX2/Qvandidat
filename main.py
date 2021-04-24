@@ -26,8 +26,8 @@ costs = {bits: cost_function(bits, J, h, const, TrJ)/B for bits in bits_list}
 # TrJ = np.trace(J)
 
 #%% Optimization
-p = 2# Sets the p-level
-out = True#Set this to True to have continous update on the optimization
+p = 2 # Sets the p-level
+out = True #Set this to True to have continous update on the optimization
 angles, cost = optimize_angles(p, J, h, const, TrJ, costs, out=out)
 print(angles)
 print(cost)
@@ -51,11 +51,9 @@ expected_cost(J, h, const, TrJ, [2.72039455, 1.39302597, 3.93021204, 2.07757555,
 # [1 1], 2, C=3A
 expected_cost(J, h, const, TrJ, 3.16314244, 2.83650637, costs, histogram=True)
 
-
 # [1 1], 2
 expected_cost(J, h, const, TrJ, 0.4145836, 2.676139, costs, histogram=True)
 expected_cost(J, h, const, TrJ, [3.14626527, 2.97288412], [1.20725898, 0.97471078], costs, histogram=True)
-
 
 #%% Profile optimization
 def main():
@@ -142,15 +140,6 @@ i, j = np.where(exp_costs == min_cost)
 i, j = i[0], j[0]
 print(f'Best angles: ({gammas[i]}, {betas[j]})')
 print('Minimum average cost for best angels:', min_cost)
-
-#%%
-#Optimal value for [1 1] and 1
-expected_cost(J, h, const, TrJ, 4, 0.8, costs, histogram=True)
-run_simulation(J, h, const, TrJ, 4, 0.8, shots=1000000, histogram=True)/B
-
-#Optimal value for [1 1] and 2
-expected_cost(J, h, const, TrJ, 5.9, 0.4, costs, histogram=True)
-run_simulation(J, h, const, TrJ, 5.9, 0.4, shots=1000000, histogram=True)/B
 
 #%% Expected costs  for p = 2
 s = 0.2; 

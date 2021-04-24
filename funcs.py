@@ -122,7 +122,7 @@ def optimize_angles(p, J, h, const, TrJ, all_costs, iter_=1, out=False):
     args = (J, h, const, TrJ, all_costs)
 
     for i in range(iter_): 
-        opt_angles = opt.differential_evolution(_optimize_simulation, bounds=bnd, args=args, disp=out)
+        opt_angles = opt.differential_evolution(_optimize_simulation, bounds=bnd, args=args, disp=out,maxiter = 3000)
         angles.append(opt_angles.x)
         costs.append(_optimize_simulation(opt_angles.x, *args))
 
