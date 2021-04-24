@@ -11,7 +11,7 @@ from funcs import *
 
 #%% Bin packing
 # Item weights
-W = [1, 1]
+W = [1]
 # Max weight of bin
 W_max = 2
 J, h, const, A, B, C = integer_bin_packing(W, W_max)
@@ -26,7 +26,7 @@ costs = {bits: cost_function(bits, J, h, const, TrJ)/B for bits in bits_list}
 # TrJ = np.trace(J)
 
 #%% Optimization
-p = 2# Sets the p-level
+p = 4# Sets the p-level
 out = True #Set this to True to have continous update on the optimization
 angles, cost = optimize_angles(p, J, h, const, TrJ, costs, out=out)
 print(angles)
@@ -34,16 +34,28 @@ print(cost)
 
 #%%
 # [1, 1], 2, C = 2A, 
-expected_cost(J, h, const, TrJ, 0.61146023, 0.4856769, costs, histogram=True,probs=True)
-expected_cost(J, h, const, TrJ, 2, 2, costs, histogram=True,probs=True)
-expected_cost(J, h, const, TrJ, [2.53134645, 1.22063178], [4.30298314, 1.31990803], costs, histogram=True,probs=True)
+expected_cost(J, h, const, TrJ, 2.18168034, 2.67847727, costs, histogram=True,probs=True)
+expected_cost(J, h, const, TrJ, 3.55617626, 2.67613787, costs, histogram=True,probs=True)
+expected_cost(J, h, const, TrJ, [5.8301447 , 0.44925907], [0.87663437, 2.75877368], costs, histogram=True,probs=True)
+expected_cost(J, h, const, TrJ,[6.23203013, 0.45879047],[2.12965183, 2.33373456], costs, histogram=True,probs=True)
+expected_cost(J, h, const, TrJ,[3.14835833, 2.67311971],[1.21063627, 2.51379613], costs, histogram=True,probs=True)
+expected_cost(J, h, const, TrJ,[3.09032999, 2.02934329],[2.1238183 , 2.37253965], costs, histogram=True,probs=True)
+expected_cost(J, h, const, TrJ,[3.71344144, 1.74901535],[1.06894619, 0.56928088], costs, histogram=True,probs=True)
+
+
 expected_cost(J, h, const, TrJ, [5.98038235, 1.6636659 , 2.05072489],[1.92367328, 4.36814078, 0.82127581], costs, histogram=True,probs = True)
+expected_cost(J, h, const, TrJ, [4.31457763, 2.47943149, 4.50334589],[0.53866227, 2.77216925, 1.1051566 ], costs, histogram=True,probs = True)
+expected_cost(J, h, const, TrJ, [6.23190139, 2.02881861, 5.62074188],[2.13734905, 0.79389712, 1.67627151], costs, histogram=True,probs = True)
+
+expected_cost(J, h, const, TrJ,[5.09892763, 2.67717234, 4.58377721, 0.78566622], [2.13461128, 2.75068479, 1.03751773, 1.88074092], costs, histogram=True,probs = True)
 expected_cost(J, h, const, TrJ,[3.2717556 , 2.50568816, 4.97004161, 1.2093923 ], [2.01670634, 0.95417758, 1.05442126, 2.36175656], costs, histogram=True,probs = True)
 expected_cost(J, h, const, TrJ, [3.33120428, 2.55052556, 2.84597526, 1.44430147, 2.47147025], [1.23864299, 2.25581141, 2.19424755, 1.76718998, 0.28502504], costs, histogram=True,probs = True)
 expected_cost(J, h, const, TrJ, [5.2888701, 0.2140996, 0.35869375, 1.77861308, 2.59985261, 2.30950479], [1.62633299, 2.62556142, 1.2353983, 0.4110642, 1.77331014, 3.14159265], costs, histogram=True)
 expected_cost(J, h, const, TrJ, [4.681126, 1.96548122, 1.40945676, 0., 5.65443637, 2.35333539, 2.94090352], [2.85699416, 1.91240846, 1.37397275, 1.3255589, 2.77777898, 0.96111532, 2.61819194], costs, histogram=True)
 expected_cost(J, h, const, TrJ, [4.50533816, 0.61417329, 4.34056327, 0.52574006, 2.6101065, 1.55520545, 4.96265275, 0.78157716], [0.20469296, 2.24862138, 3.26560563, 1.49979025, 5.59152463,2.44741017, 5.90621296, 0.16447593], costs, histogram=True)
 
+#%% [1] W_max = 1
+expected_cost(J, h, const, TrJ, 4.92891148, 0.49802407, costs, histogram=True,probs=True)
 # [1, 1], 2, C=A
 expected_cost(J, h, const, TrJ, [2.72039455, 1.39302597, 3.93021204, 2.07757555, 0.02526551], [1.56189776, 1.90686837, 2.12362766, 4.71443538, 1.40428264], costs, histogram=True)
 

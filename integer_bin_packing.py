@@ -144,13 +144,14 @@ def decode_pure(W,W_max,bits):
     y = np.reshape(y, (-1, W_max))
     x = bits[W_max*I:]
     x = np.reshape(x, (-1, I))
-    bins_used = np.sum(y)
-    print(f'{bins_used}/{I} trucks used!')
-    
-    for i in range(I):
-        if np.sum(y[i,]) == 1:
-            weight = np.where(y[i,] == 1)[0][0] + 1
-            contains = W[np.where(x[i,] == 1)[0]]
-            print(f'Truck {i+1} has weight {weight} and contains item(s) with weight(s): {contains}')
+
+    for j in range(len(y)):
+        if np.sum(y[j,])!=0:
+            print(f' truck {j} is being used')
         else:
-            print(f'Truck {i+1} is empty!')
+            print(f'truck {j} is not being used')
+    for i in range(len(x)):
+        if np.sum(x[i,])!=0:
+            print(f' truck {i} has weights {x[i]}')
+        else:
+            print(f'truck {i} is empty')
