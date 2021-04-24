@@ -11,9 +11,9 @@ from funcs import *
 
 #%% Bin packing
 # Item weights
-W = [1, 1]
+W = [1]
 # Max weight of bin
-W_max = 2
+W_max = 1
 J, h, const, A, B, C = integer_bin_packing(W, W_max)
 TrJ = np.trace(J)
 
@@ -26,16 +26,18 @@ costs = {bits: cost_function(bits, J, h, const, TrJ)/B for bits in bits_list}
 # TrJ = np.trace(J)
 
 #%% Optimization
-p = 5 # Sets the p-level
-out = True #Set this to True to have continous update on the optimization
+p = 2# Sets the p-level
+out = True#Set this to True to have continous update on the optimization
 angles, cost = optimize_angles(p, J, h, const, TrJ, costs, out=out)
 print(angles)
 print(cost)
 
+expected_cost(J, h, const, TrJ, angles[0], angles[1], costs, histogram=True, probs=True)
+
 #%%
 # [1, 1], 2, C = 2A, 
-expected_cost(J, h, const, TrJ, 3.12225594, 0.30371598, costs, histogram=True,probs=True)
-expected_cost(J, h, const, TrJ, [3.15812491, 1.25654823], [2.71176354, 0.27240049], costs, histogram=True,probs=True)
+expected_cost(J, h, const, TrJ, 3.12225594, 0.30371598, costs, histogram=True)
+expected_cost(J, h, const, TrJ, [3.15812491, 1.25654823], [2.71176354, 0.27240049], costs, histogram=True)
 expected_cost(J, h, const, TrJ, [1.03095384, 1.0867246 , 2.59478705], [1.5460229 , 3.1757417 , 2.35685995], costs, histogram=True)
 expected_cost(J, h, const, TrJ, [0.99576246, 2.13449288, 5.32455158, 1.18130696], [4.62583989, 2.00279267, 4.36280221, 0.4709013], costs, histogram=True)
 expected_cost(J, h, const, TrJ, [2.36944458, 1.17249538, 0.410751, 0.66790066, 1.91204215], [1.61679967, 3.96129773, 1.30548718, 0.24146866, 1.63173029], costs, histogram=True)
@@ -48,6 +50,12 @@ expected_cost(J, h, const, TrJ, [2.72039455, 1.39302597, 3.93021204, 2.07757555,
 
 # [1 1], 2, C=3A
 expected_cost(J, h, const, TrJ, 3.16314244, 2.83650637, costs, histogram=True)
+
+
+# [1 1], 2
+expected_cost(J, h, const, TrJ, 0.4145836, 2.676139, costs, histogram=True)
+expected_cost(J, h, const, TrJ, [3.14626527, 2.97288412], [1.20725898, 0.97471078], costs, histogram=True)
+
 
 #%% Profile optimization
 def main():
@@ -108,7 +116,7 @@ print(f'Best angles: ([{gammas_1[i]}, {gammas_2[ik]}], [{betas_1[j]}, {betas_2[l
 print('Minimum average cost for best angels:', min_cost)
 
 #%% Expected costs  for p = 1
-s = 0.1; 
+s = 0.05; 
 gammas = np.arange(0, 2*np.pi, s)
 betas = np.arange(0, np.pi, s)
 exp_costs = np.zeros((len(gammas), len(betas)))
