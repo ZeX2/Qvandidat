@@ -33,9 +33,8 @@ def qaoa_ising_circuit(J, h, gamma, beta, measure=True):
             for i in range(N):
                 for j in range(i):
                     if J[i,j] == 0: continue
-                    qc.cx(i, j)
-                    qc.rz(2*gamma_k*J[i,j], j)
-                    qc.cx(i, j)
+                    # linear_swap and swap_network requires rzz
+                    qc.rzz(2*gamma_k*J[i,j], i, j) 
                     
             for i in range(N):
                 if h[i] == 0: continue
@@ -70,14 +69,8 @@ def cost_function(bits, J, h, const, TrJ=None):
 
 
 def run_simulation(gamma, beta, J, h, costs, shots):
-    print('This is work in progress please call another function or fix this one!')
-    exit(0)
-
     noise_model = chalmers_noise_model()
     chalmers_circuit = _chalmers_circuit(gamma, beta, J, h)
-
-    print('NONE TYPE?')
-    print(chalmers_circuit)
     job = execute(chalmers_circuit, SIMULATOR, shots=shots, noise_model=noise_model)
     result = job.result()
     counts = result.get_counts()
@@ -90,23 +83,9 @@ def run_chalmers_circuit_ideal(gamma, beta, J, h, costs):
 
 def _chalmers_circuit(gamma, beta, J, h):
     p = len(gamma) if isinstance(gamma, Iterable) else 1
-    print('J h gamma beta')
-    print(J)
-    print(h)
-    print(gamma)
-    print(beta)
-    gamma = 1
-    beta = 1
-
     qaoa_circuit = qaoa_ising_circuit(J, h, gamma, beta)
-    print('QAOA')
-    print(qaoa_circuit)
     chalmers_coupling_circuit = linear_swap(qaoa_circuit, p)
-    print('COUPLING with p', str(p))
-    print(chalmers_coupling_circuit)
     chalmers_circuit = translate_circuit(chalmers_coupling_circuit)
-    print('CHALMERS')
-    print(chalmers_circuit)
     return chalmers_circuit
 
 def _expected_cost(circuit, costs):

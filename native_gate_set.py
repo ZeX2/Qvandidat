@@ -93,3 +93,4 @@ def translate_circuit(circuit):
             h_dag = get_h_dag()
             dag.substitute_node_with_dag(node, h_dag)
 
+    return dag_to_circuit(dag)
