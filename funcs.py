@@ -11,6 +11,10 @@ from qiskit.quantum_info import Statevector
 from qiskit.visualization import plot_histogram
 #from qiskit_textbook.tools import array_to_latex
 
+from native_gate_set import translate_circuit
+from noise import chalmers_noise_model
+from linear_swap import linear_swap_method as linear_swap
+
 BACKEND = Aer.get_backend('unitary_simulator')
 SIMULATOR = Aer.get_backend('qasm_simulator')
 SVSIM = Aer.get_backend('statevector_simulator')
@@ -66,21 +70,55 @@ def cost_function(bits, J, h, const, TrJ=None):
 
 
 def run_simulation(gamma, beta, J, h, costs, shots):
-    #TODO add noice
-    circuit = qaoa_ising_circuit(J, h, gamma, beta)
-    job = execute(circuit, SIMULATOR, shots=shots)
+    print('This is work in progress please call another function or fix this one!')
+    exit(0)
+
+    noise_model = chalmers_noise_model()
+    chalmers_circuit = _chalmers_circuit(gamma, beta, J, h)
+
+    print('NONE TYPE?')
+    print(chalmers_circuit)
+    job = execute(chalmers_circuit, SIMULATOR, shots=shots, noise_model=noise_model)
     result = job.result()
     counts = result.get_counts()
 
     return sum(counts*costs[bits] for bits, counts in counts.items())/shots
 
-def expected_cost(gamma, beta, J, h, costs):
-    circuit = qaoa_ising_circuit(J, h, gamma, beta)
+# should produce the same results as expected_cost
+def run_chalmers_circuit_ideal(gamma, beta, J, h, costs):
+    return _expected_cost(_chalmers_circuit(gamma, beta, J, h), costs)
+
+def _chalmers_circuit(gamma, beta, J, h):
+    p = len(gamma) if isinstance(gamma, Iterable) else 1
+    print('J h gamma beta')
+    print(J)
+    print(h)
+    print(gamma)
+    print(beta)
+    gamma = 1
+    beta = 1
+
+    qaoa_circuit = qaoa_ising_circuit(J, h, gamma, beta)
+    print('QAOA')
+    print(qaoa_circuit)
+    chalmers_coupling_circuit = linear_swap(qaoa_circuit, p)
+    print('COUPLING with p', str(p))
+    print(chalmers_coupling_circuit)
+    chalmers_circuit = translate_circuit(chalmers_coupling_circuit)
+    print('CHALMERS')
+    print(chalmers_circuit)
+    return chalmers_circuit
+
+def _expected_cost(circuit, costs):
     sv = execute(circuit, SVSIM).result().get_statevector()
     sv = Statevector(sv)
     prob_dict = sv.probabilities_dict()
 
     return sum(prob*costs[bits] for bits, prob in prob_dict.items())
+
+def expected_cost(gamma, beta, J, h, costs):
+    circuit = qaoa_ising_circuit(J, h, gamma, beta, measure=False)
+    return _expected_cost(circuit, costs)
 
 def optimize_angles_state(J, h, p, costs, maxiter):
     bnd = opt.Bounds([0]*(2*p), [np.pi]*p + [np.pi/2]*p)
@@ -92,7 +130,7 @@ def optimize_angles_state(J, h, p, costs, maxiter):
     opt_angles = opt.differential_evolution(objective, bounds=bnd, maxiter = maxiter)
     angles = opt_angles.x
 
-    return angles[:len(angles)//2], angles[len(angles)//2:]
+    return angles[:len(angles)//2], angles[len(angles)//2:], opt_angles.fun
    
 def optimize_angles_simul(J, h, p, costs, maxiter, shots = 1000):
     bnd = opt.Bounds([0]*(2*p), [np.pi]*p + [np.pi/2]*p)
@@ -104,9 +142,9 @@ def optimize_angles_simul(J, h, p, costs, maxiter, shots = 1000):
     opt_angles = opt.differential_evolution(objective, bounds=bnd, maxiter = maxiter)
     angles = opt_angles.x
 
-    return angles[:len(angles)//2], angles[len(angles)//2:]
+    return angles[:len(angles)//2], angles[len(angles)//2:], opt_angles.fun
 
-def landscape_state(J, h,costs,iter_,step_size):
+def landscape_state(J, h,costs,iter_):
     
     betas = np.linspace(0, np.pi, int(np.sqrt(iter_)))
     gammas = np.linspace(0, 2*np.pi, int(np.sqrt(iter_)))
@@ -117,9 +155,9 @@ def landscape_state(J, h,costs,iter_,step_size):
         for j, gamma in enumerate(gammas):
             exp_costs[i,j] = expected_cost(gamma, beta, J, h, costs)
     
-    return exp_costs
+    return gammas, betas, exp_costs
 
-def landscape_simul(J, h,costs,iter_,step_size,shots = 1000):
+def landscape_simul(J, h,costs,iter_,shots = 1000):
     
     betas = np.linspace(0, np.pi, int(np.sqrt(iter_)))
     gammas = np.linspace(0, 2*np.pi, int(np.sqrt(iter_)))
@@ -131,3 +169,5 @@ def landscape_simul(J, h,costs,iter_,step_size,shots = 1000):
             exp_costs[i,j] = run_simulation(gamma, beta, J, h, costs,shots)
     
     return gammas, betas, exp_costs
+
+
