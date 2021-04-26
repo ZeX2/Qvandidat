@@ -15,7 +15,7 @@ def UL_swap(array):
 
 def UR_swap(array):
     N = len(array)
-    for i in range(0,N-2,2):
+    for i in range(1,N-2,2):
         array=swapPositions(array, i+1, i+2)
     return array 
 
@@ -25,14 +25,17 @@ def do_all_ops(circuit, qubit_line, qubit_path, operations):
     # The order is to reduce circuit depth
     # so do not simplify the for loops because
     # 
-    for i in range(0,M-1,2):
+    n = 2
+    if M < 4:
+        n = 1
+    for i in range(0,M-1,n):
         logical_q1 = qubit_path[i]
         logical_q2 = qubit_path[i+1]
         q1 = qubit_line[i]
         q2 = qubit_line[i+1]
         didzz |= do_op_new(q1, q2, logical_q1, logical_q2, circuit, operations)
 
-    for i in range(1,M-2,2):
+    for i in range(1,M-1,n):
         logical_q1 = qubit_path[i]
         logical_q2 = qubit_path[i+1]
         q1 = qubit_line[i]
@@ -67,7 +70,7 @@ def do_zz_op2(circuit, qubit1, qubit2, angle):
     circuit.cx(qubit1,qubit2)
     #circuit.barrier()
 
-    print('zz \\w', qubit1, 'and', qubit2)
+    #print('zz \\w', qubit1, 'and', qubit2)
 
 def qc_UL_swap(circuit, qubit_path, qubit_line):
     N = len(qubit_path)
@@ -90,16 +93,13 @@ def qc_UL_UR(input_circuit, qubit_line, qubit_path, operations):
     num_qubits = len(qubit_path)
 
     for i in range(int(num_qubits/2)):
-        print('Operations UL', operations)
+        
         if np.any(operations):
             qc_UL_swap(circuit, qubit_path, qubit_line)
         do_all_ops(circuit, qubit_line, qubit_path, operations)
-        print(qubit_path)
-        print('Operations UR', operations)
+        
         if np.any(operations):
             qc_UR_swap(circuit, qubit_path, qubit_line)
-        print(qubit_line)
-        print(qubit_path)
         do_all_ops(circuit, qubit_line, qubit_path, operations)
     return circuit
 
@@ -170,7 +170,7 @@ def decompose_qaoa_circuit(circuit,N,p):
 def linear_swap_method_outdated(J, gamma, beta, qubit_line = None):
     N = len(J)
     operations = get_operations(J, gamma)
-    print(operations)
+    #print(operations)
     circuit = QuantumCircuit(N)
     circuit.h(range(N))
     circuit.barrier()
@@ -184,7 +184,7 @@ def linear_swap_method_outdated(J, gamma, beta, qubit_line = None):
     new_circ = qc_UL_UR(circuit, qubit_line, qubit_path, operations)
 
     new_circ.rx(2*beta, range(N))
-    print(operations)
+    #print(operations)
     for i in range(N):
         qq = qubit_path[i]
         new_circ.measure(i, qq)
@@ -192,15 +192,14 @@ def linear_swap_method_outdated(J, gamma, beta, qubit_line = None):
 
 def linear_swap_method(qaoa_circuit, p, qubit_line=None):
     N = qaoa_circuit.num_qubits
-
     operations, rx_ops = decompose_qaoa_circuit(qaoa_circuit, N, p)
     circuit = QuantumCircuit(N, N)
     circuit.h(range(N))
-
+    
     if qubit_line is None:
         qubit_line = np.array(range(N))
     qubit_path = qubit_line.copy()
-
+    
     for i in range(p):
         do_all_ops(circuit, qubit_line, qubit_path, operations[i,:,:])
         circuit = qc_UL_UR(circuit, qubit_line, qubit_path, operations[i,:,:])
