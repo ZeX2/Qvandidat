@@ -5,25 +5,19 @@ import numpy as np
 import scipy.io
 
 
-def differential_evolution(objective, bounds, save_file=None):
+def differential_evolution(objective, bounds):
     result = optimize.differential_evolution(objective, bounds)
 
-    if save_file:
-        scipy.io.savemat(save_file + '.mat', result)
-
     return (result.x, result.fun, result)
 
 
-def shgo(objective, bounds, save_file=None):
+def shgo(objective, bounds):
     result = optimize.shgo(objective, bounds, iters=5)
 
-    if save_file:
-        scipy.io.savemat(save_file + '.mat', result)
-
     return (result.x, result.fun, result)
 
 
-def bruteforce(objective, bounds, max_evaluations=100, plot=False, save_file=None):
+def bruteforce(objective, bounds, max_evaluations=100, plot=False):
     if len(bounds) > 2:
         raise ValueError('This method only work in two dimensions')
 
@@ -56,9 +50,7 @@ def bruteforce(objective, bounds, max_evaluations=100, plot=False, save_file=Non
         ax.invert_yaxis()
         plt.show()
 
-    if save_file:
-        c = {'betas': betas, 'gammas': gammas,
-             'results': result}
-        scipy.io.savemat(save_file + '.mat', c)
+    c = {'betas': betas, 'gammas': gammas,
+         'results': result}
 
-    return (minimum_x, minimum, result)
+    return (minimum_x, minimum, c)

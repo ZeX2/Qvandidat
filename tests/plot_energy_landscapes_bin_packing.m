@@ -1,66 +1,52 @@
 clear;clc;close all
 
 
-Folders= dir(fullfile('data','bin_packing','nonoise_sv'));
-dirFlags = [Folders.isdir];
-Folders = Folders(dirFlags);
+files = dir(fullfile('data','bin_packing','nonoise_sv','*_bruteforce.mat'));
+files = dir(fullfile('data','bin_packing','nonoise_sv_old','*_bruteforce.mat'));
 
-for k = 3 : length(Folders)
-    fprintf('Sub folder #%d = %s\n', k, Folders(k).name);
-    folder = Folders(k);
+for k = 1:length(files)
+    file = files(k);
+	fprintf('File #%d = %s\n', k, file.name);
     
-    listan = vfunc(Folders.name);
+    data = load(fullfile(file.folder, file.name));
     
-    listan_numbers = cellfun(@(x)dir_name2num(x), listan);
-    [~,order] = sort(listan_numbers);
-    sorted_listan = listan(order);
+    if ~pred(data); continue; end
     
-    
-    files = dir(fullfile(folder.folder,folder.name,'*_bruteforce.mat'));
-    
-    isempty = 1;
-    for i = 1 : length(files)
-        file = files(i);
-        data = load(fullfile(file.folder, file.name));
-        
-        
-        gammas = data.gammas;
-        betas = data.betas;
-        results = data.results;
-        
-        
-        figure('Name', file.name)
-        
-        surf(gammas, betas,results)
-        
-        xlabel('gamma')
-        ylabel('beta')
-        zlabel('Expected value')
-        title(file.name)
-        
-        
-        isempty = 0;
-    end
-    
-    if ~isempty
-        input('Press enter to continue')
-        close all
-    end
+    gammas = data.gammas;
+    betas = data.betas;
+    results = data.results;
+
+    figure('Name', file.name)
+
+    surf(gammas, betas, -results)
+
+    xlabel('gamma')
+    ylabel('beta')
+    zlabel('Expected value')
+    title(file.name)
     
 end
 
-function n = dir_name2num(dir)
-    a = strsplit(dir, '_n');
-    if length(a) > 1
-        n = str2num(a{2});
-    else
-        n = -1;
-    end
-    n = n + sum(a{1})*1000;
-end
-
-
-
-function not_a_cell=vfunc(varargin)
-    not_a_cell = varargin;
+function ret=pred(data)
+    W = data.problem_identifier.W;
+    I = length(W);
+    W_max = data.problem_identifier.W_max;
+	ret = 0;
+        
+    %if W_max == 3; ret = 1; end
+    
+    if W_max == 1; ret = 1; end
+    if W_max == 2 && all(size(W) == size([1, 1])); ret = 1; end
+    
+    %if I > 1; ret = 1; end
+    %if I > 1 && all(W == W(1)); ret = 1; end
+    
+    %if W_max == 1; ret = 1; end
+    
+    %if all(size(W) == size([1, 1])) && all(W == [1, 1]); ret = 1; end
+    
+    %if sum(W) == W_max; ret = 1; end
+    
+    %if mod(sum(W), W_max) == 0; ret = 1; end
+    
 end
