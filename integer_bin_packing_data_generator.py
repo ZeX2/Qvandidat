@@ -10,6 +10,9 @@ rnd = np.random.RandomState(2021)
 # solution missing that are relevant please modify this
 # script to generate them too.
 
+# possible things to sort by
+#  W_max, len(W)
+
 def one_exactly_full_truck(num_of_qubits=10, max_tries=10000):
     hash_set = set()
 
@@ -126,14 +129,13 @@ def decode_data(s):
     parts = s.split(':')
     W = list(map(int, parts[0].split(',')))
     W_max = int(parts[1])
-    num_qubits = int(parts[2])
     
-    return return_data.add({'W': W, 'W_max': W_max})
+    return {'W': W, 'W_max': W_max}
 
 
 def save_data(dataset, file_name):
-    data_dir = os.path.dirname(__file__)
-    data_file = os.path.join(data_dir,'data', file_name)
+    data_dir = os.path.join(os.path.dirname(__file__), 'data') 
+    data_file = os.path.join(data_dir, file_name)
     os.makedirs(data_dir, exist_ok=True)
 
     string_data = ''
@@ -150,8 +152,8 @@ def save_data(dataset, file_name):
 
         
 def decode_file(file_name):
-    data_dir = os.path.dirname(__file__)
-    data_file = os.path.join(data_dir,'data', file_name)
+    data_dir = os.path.join(os.path.dirname(__file__), 'data') 
+    data_file = os.path.join(data_dir, file_name)
 
     f = open(data_file, 'r')
     file_lines = f.readlines()
@@ -188,5 +190,6 @@ def dev_funcs():
         input()
 
 
-generate_and_save_a_lot_of_data()
-#dev_funcs()
+if __name__ == '__main__':
+    generate_and_save_a_lot_of_data()
+    #dev_funcs()
