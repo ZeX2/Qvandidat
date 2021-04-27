@@ -106,7 +106,7 @@ def optimize_angles_state(J, h, p, costs, maxiter):
         gamma, beta = angles[:len(angles)//2], angles[len(angles)//2:]
         return expected_cost(gamma, beta, J, h, costs)
  
-    opt_angles = opt.differential_evolution(objective, bounds=bnd, maxiter = maxiter)
+    opt_angles = opt.differential_evolution(objective, bounds=bnd, maxiter = maxiter, workers = -1)
     angles = opt_angles.x
 
     return angles[:len(angles)//2], angles[len(angles)//2:], opt_angles.fun
@@ -118,7 +118,7 @@ def optimize_angles_simul(J, h, p, costs, maxiter, shots = 1000):
         gamma, beta = angles[:len(angles)//2], angles[len(angles)//2:]
         return run_simulation(gamma, beta, J, h, costs,shots)
  
-    opt_angles = opt.differential_evolution(objective, bounds=bnd, maxiter = maxiter)
+    opt_angles = opt.differential_evolution(objective, bounds=bnd, maxiter = maxiter, workers = -1)
     angles = opt_angles.x
 
     return angles[:len(angles)//2], angles[len(angles)//2:], opt_angles.fun

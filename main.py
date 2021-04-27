@@ -12,30 +12,30 @@ from datetime import timedelta, datetime
 # TODO
 # Make sure run_chalmers_circuit_ideal and expected_value returns 
 # identical results
-
+MAX_P = 7
+MAX_ITER = 10
 
 def main():
-    # TODO Investigate why generate circuit isn't working.
-    run_problem([1, 1], 2, noise=False, test_const=False)
-    #run_problem([1, 1], 2, noise=True, test_const=True)
-    #TODO run_problem for different problems.
-
-    run_problem([1], 1, noise=False, test_const=False)
-
-    run_problem([1, 1, 1], 1, noise=True, test_const=True)
+    # prioritized order
+    run_problem([1], 1, noise=True, test_const=False) #2 qubits
+    run_problem([1, 1], 2, noise=True, test_const=True) #8 qubits
+    run_problem([1, 1, 1], 1, noise=False, test_const=False)  #12 qubits
+    #run_problem([1, 2, 3], 3, noise = False, test_const=False) #18 qubits
+    #run_problem([1 ,2], 2, noise = False, test_const=False) #8 qubits
+    #run_problem([1 ,6], 6, noise = False, test_const=False) #16 qubits
+    
     
 def run_problem(W,W_max, noise = False, test_const = False):
     if noise:
-        exit(0)
+        _run_problem_simul(W,W_max)
+        
     if test_const:
         B = 4
-        for a in range(2,12,2):
-            for c in range(2,26,4):
+        for a in range(2,15,4):
+            for c in range(2,27,8):
                  _run_problem_state(W,W_max,A = a*B, B=B, C=c*a*B)
-
-    _run_problem_simul(W,W_max)
-    _run_problem_state(W,W_max)
-    
+    else:
+        _run_problem_state(W,W_max)
 
 def _run_problem_simul(W,W_max, A = None,B = None, C = None):
     S = {'W':W, 'W_max':W_max,'A':A, 'B':B, 'C':C}
@@ -57,12 +57,12 @@ def _run_problem_simul(W,W_max, A = None,B = None, C = None):
     file_name = 'landscape' + file_suffix
     save_results(gammas, betas, -1, str(S), end_time-start_time, file_name, {'landscape':exp_costs})
 
-    for p in range(1,11):
-        for iter_ in range(1,11):
+    for p in range(1,MAX_P+1):
+        for iter_ in range(1,MAX_ITER+1):
             # TODO Set shots to reasonable value
             print('Finding optimal angles for p =', str(p))
             start_time = time.monotonic()
-            gammas, betas, exp_val = optimize_angles_simul(J, h, p, costs, maxiter=p**2*1000, shots=10000)
+            gammas, betas, exp_val = optimize_angles_simul(J, h, p, costs, maxiter=p**(3/2)*1000, shots=10000)
             end_time = time.monotonic()
 
             file_name = 'angles-p' + str(p) + '-iter-' + str(iter_) + file_suffix
@@ -84,17 +84,17 @@ def _run_problem_state(W,W_max, A = None,B = None, C = None):
 
     start_time = time.monotonic()
     # TODO Set iter_ to a good value
-    gammas, betas, exp_costs = landscape_state(J, h,costs, 5000)
+    gammas, betas, exp_costs = landscape_state(J, h,costs, iter_=5000)
     end_time = time.monotonic()
 
     file_name = 'landscape' + file_suffix
     save_results(gammas, betas, -1, str(S), end_time-start_time, file_name, {'landscape':exp_costs})
 
-    for p in range(1,11):
-        for iter_ in range(1,11):
+    for p in range(1,MAX_P+1):
+        for iter_ in range(1,MAX_ITER+1):
             print('Finding optimal angles for p =', str(p))
             start_time = time.monotonic()
-            gammas, betas, exp_val = optimize_angles_state(J, h, p, costs, maxiter=p**2*1000)
+            gammas, betas, exp_val = optimize_angles_state(J, h, p, costs, maxiter=p**(3/2)*1000)
             end_time = time.monotonic()
 
             file_name = 'angles-p' + str(p) + '-iter-' + str(iter_) + file_suffix
