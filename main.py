@@ -45,6 +45,9 @@ def _run_problem_simul(W,W_max, A = None,B = None, C = None):
     bits_list = get_bits_list(len(J))
     costs = {bits: cost_function(bits, J, h, const, np.trace(J))/B for bits in bits_list}
 
+    print('Running noisy simulations for', str(S))
+
+    print('Creating lanscape')
     start_time = time.monotonic()
     # TODO Set shots to reasonable value
     # TODO Set iter_ to a good value
@@ -57,6 +60,7 @@ def _run_problem_simul(W,W_max, A = None,B = None, C = None):
     for p in range(1,11):
         for iter_ in range(1,11):
             # TODO Set shots to reasonable value
+            print('Finding optimal angles for p =', str(p))
             start_time = time.monotonic()
             gammas, betas, exp_val = optimize_angles_simul(J, h, p, costs, maxiter=p**2*1000, shots=10000)
             end_time = time.monotonic()
@@ -74,6 +78,10 @@ def _run_problem_state(W,W_max, A = None,B = None, C = None):
     bits_list = get_bits_list(len(J))
     costs = {bits: cost_function(bits, J, h, const, np.trace(J))/B for bits in bits_list}
 
+    print('Running statevector simulations for', str(S))
+
+    print('Creating lanscape')
+
     start_time = time.monotonic()
     # TODO Set iter_ to a good value
     gammas, betas, exp_costs = landscape_state(J, h,costs, 5000)
@@ -84,6 +92,7 @@ def _run_problem_state(W,W_max, A = None,B = None, C = None):
 
     for p in range(1,11):
         for iter_ in range(1,11):
+            print('Finding optimal angles for p =', str(p))
             start_time = time.monotonic()
             gammas, betas, exp_val = optimize_angles_state(J, h, p, costs, maxiter=p**2*1000)
             end_time = time.monotonic()
@@ -105,6 +114,8 @@ def save_results(gammas, betas, fun, problem, dt=-1, file_name=None, extra_data=
 
     if file_name is None: 
         file_name = 'unkown-' + problem + '-' + str(str(int(datetime.now().timestamp())))
+
+    print('Found optimal angles for', problem, 'after running for', dt_str, 'saved to file', file_name)
 
     file_name = os.path.join('data', file_name)
     os.makedirs('data', exist_ok=True)
