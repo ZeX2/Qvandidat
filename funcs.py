@@ -99,26 +99,31 @@ def expected_cost(gamma, beta, J, h, costs):
     circuit = qaoa_ising_circuit(J, h, gamma, beta, measure=False)
     return _expected_cost(circuit, costs)
 
-def optimize_angles_state(J, h, p, costs, maxiter):
-    bnd = opt.Bounds([0]*(2*p), [np.pi]*p + [np.pi/2]*p)
+def objective_state(angles,*variables):
     
-    def objective(angles):
-        gamma, beta = angles[:len(angles)//2], angles[len(angles)//2:]
-        return expected_cost(gamma, beta, J, h, costs)
- 
-    opt_angles = opt.differential_evolution(objective, bounds=bnd, maxiter = maxiter, workers = -1)
+    J, h, costs = variables
+    gamma, beta = angles[:len(angles)//2], angles[len(angles)//2:]
+    return expected_cost(gamma, beta, J, h, costs)
+
+def optimize_angles_state(J, h, p, costs, maxiter):
+    
+    bnd = opt.Bounds([0]*(2*p), [np.pi]*p + [np.pi/2]*p) 
+    args = (J, h, costs)
+    opt_angles = opt.differential_evolution(objective_state, bounds=bnd, args = args, maxiter = maxiter, workers = -1)
     angles = opt_angles.x
 
     return angles[:len(angles)//2], angles[len(angles)//2:], opt_angles.fun
-   
+
+def objective_simul(angles,*variables):
+    J, h, costs, shots = variables
+    gamma, beta = angles[:len(angles)//2], angles[len(angles)//2:]
+    return run_simulation(gamma, beta, J, h, costs,shots)  
+
 def optimize_angles_simul(J, h, p, costs, maxiter, shots = 1000):
-    bnd = opt.Bounds([0]*(2*p), [np.pi]*p + [np.pi/2]*p)
     
-    def objective(angles):
-        gamma, beta = angles[:len(angles)//2], angles[len(angles)//2:]
-        return run_simulation(gamma, beta, J, h, costs,shots)
- 
-    opt_angles = opt.differential_evolution(objective, bounds=bnd, maxiter = maxiter, workers = -1)
+    bnd = opt.Bounds([0]*(2*p), [np.pi]*p + [np.pi/2]*p)   
+    args = (J,h,costs,shots)
+    opt_angles = opt.differential_evolution(objective_simul, bounds=bnd, maxiter = maxiter, args = args,workers = -1)
     angles = opt_angles.x
 
     return angles[:len(angles)//2], angles[len(angles)//2:], opt_angles.fun
