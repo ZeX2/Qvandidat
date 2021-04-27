@@ -62,7 +62,7 @@ def _run_problem_simul(W,W_max, A = None,B = None, C = None):
             # TODO Set shots to reasonable value
             print('Finding optimal angles for p =', str(p))
             start_time = time.monotonic()
-            gammas, betas, exp_val = optimize_angles_simul(J, h, p, costs, maxiter=p**(3/2)*1000, shots=10000)
+            gammas, betas, exp_val = optimize_angles_simul(J, h, p, costs, maxiter=int(p**(3/2))*1000, shots=10000)
             end_time = time.monotonic()
 
             file_name = 'angles-p' + str(p) + '-iter-' + str(iter_) + file_suffix
@@ -94,7 +94,7 @@ def _run_problem_state(W,W_max, A = None,B = None, C = None):
         for iter_ in range(1,MAX_ITER+1):
             print('Finding optimal angles for p =', str(p))
             start_time = time.monotonic()
-            gammas, betas, exp_val = optimize_angles_state(J, h, p, costs, maxiter=p**(3/2)*1000)
+            gammas, betas, exp_val = optimize_angles_state(J, h, p, costs, maxiter=int(p**(3/2))*1000)
             end_time = time.monotonic()
 
             file_name = 'angles-p' + str(p) + '-iter-' + str(iter_) + file_suffix
