@@ -8,28 +8,19 @@ from qiskit.transpiler.passes import(
     DenseLayout)
 from qiskit.visualization import plot_circuit_layout
 
+def simplify(circuit):
+    return transpile(circuit, optimization_level=3)
 
+def optimize_mapping(circuit, coupling, n):
+    return transpile(circuit, coupling_map = coupling, optimization_level=n)
 
-def optimize_mapping(circuit, backend, n):
-    print(circuit)
-    optimized_circ = transpile(circuit, backend = backend, optimization_level=n)
-    print(optimized_circ)
-    plot_circuit_layout(optimized_circ, backend)
-
-def optimize_circuit(circuit, backend, coupling_map, n):
-    if (n != 0 and n != 1):
-        return print('Gate mapping performance not defined')
-
-    if type(coupling_map) is not CouplingMap:
-        coupling_map = CouplingMap(couplinglist=coupling_map)
-
+def optimize_circ(circuit, coupling_map, n):
     if n == 0:
         tl = TrivialLayout(coupling_map=coupling_map)
         pass_manager = PassManager(tl)
-        trivial_circ = pass_manager.run(circuit)
-        return trivial_circ
+        return pass_manager.run(circuit)
+
     elif n == 1:
         dl = DenseLayout(coupling_map=coupling_map)
         pass_manager = PassManager(dl)
-        dense_circ = pass_manager.run(circuit)
-        return dense_circ
+        return pass_manager.run(circuit)
