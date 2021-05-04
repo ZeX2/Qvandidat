@@ -3,35 +3,31 @@ from qiskit.providers.aer.noise import NoiseModel
 from qiskit.providers.aer.noise import pauli_error, depolarizing_error, amplitude_damping_error, phase_damping_error
 
 def chalmers_probability_phase_damp(gate):
-    T_1 = 55*10**(-6)
-    T_22 = 49*10**(-6)
-    T_2 = 1/((1/T_22)+(1/(2*T_1)))
 
     if gate == 1:
+        T_2star = 49*10**(-6)
         t = 50*10**(-9)
 
     if gate == 2:
+        T_2star = 82*10**(-6)
         t = 271*10**(-9)
 
-    p = 0.5*(1 + math.exp(-t/T_2))
-
-    # return 1-p
-
-    gamma = 1 - (2*(1-p) - 1)**2
+    gamma = 1 - math.exp(-2*t/T_2star)
 
     return gamma
 
 
 def chalmers_probability_amp_damp(gate):
-    T_1 = 55*10**(-6)
 
     if gate == 1:
+        T_1 = 77*10**(-6)
         t = 50*10**(-9)
 
     if gate == 2:
+        T_1 = 55*10**(-6)
         t = 271*10**(-9)
 
-    p = 1 - math.exp(-t/T_1)
+    p = 1 - math.exp(-2*t/T_1)
 
     return p
 
