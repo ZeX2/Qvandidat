@@ -143,6 +143,3 @@ cython_debug/
 # Matlab tempfiles
 *.m~
 
-# Data files
-/data/*.json
-/data/*.mat

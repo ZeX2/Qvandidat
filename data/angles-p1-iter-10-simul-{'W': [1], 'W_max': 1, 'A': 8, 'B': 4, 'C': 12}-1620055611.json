@@ -1,0 +1,12 @@
+{
+    "expected_value": 2.0071,
+    "optimal_gammas": [
+        2.7531435318976314
+    ],
+    "optimal_betas": [
+        0.3699374855527849
+    ],
+    "problem_identifier": "{'W': [1], 'W_max': 1, 'A': 8, 'B': 4, 'C': 12}",
+    "now": "2021-05-03 17:45:11",
+    "execution_time": "0:00:58.634544"
+}
