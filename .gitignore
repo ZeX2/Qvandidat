@@ -143,3 +143,4 @@ cython_debug/
 # Matlab tempfiles
 *.m~
 
+tests/data/
