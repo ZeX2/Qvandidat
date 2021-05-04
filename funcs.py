@@ -123,7 +123,7 @@ def optimize_angles_state(J, h, p, costs, maxiter):
     opt_angles = opt.differential_evolution(_objective_state, bounds=bnd, args = args, maxiter = maxiter)
     angles = opt_angles.x
 
-    return angles[:len(angles)//2], angles[len(angles)//2:], opt_angles.fun
+    return angles[:len(angles)//2], angles[len(angles)//2:], opt_angles
 
 def _objective_simul(angles,*variables):
     J, h, costs, shots = variables
@@ -137,7 +137,7 @@ def optimize_angles_simul(J, h, p, costs, maxiter, shots = 1000):
     opt_angles = opt.differential_evolution(_objective_simul, bounds=bnd, maxiter = maxiter, args = args)
     angles = opt_angles.x
 
-    return angles[:len(angles)//2], angles[len(angles)//2:], opt_angles.fun
+    return angles[:len(angles)//2], angles[len(angles)//2:], opt_angles
 
 def landscape_state(J, h,costs,iter_):
     
