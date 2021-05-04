@@ -93,11 +93,18 @@ def save_results(file_name, results, save_mat=True, save_json=True):
     os.makedirs('results', exist_ok=True)
 
     if save_mat:
-        scipy.io.savemat(file_name + '.mat', results)
+        try:
+            with open(file_name + '.mat', 'x') as fp: pass
+            scipy.io.savemat(file_name + '.mat', results)
+        except:
+            print('Skipping file', file_name, 'because already saved')
 
     if save_json:
-        with open(file_name + '.json', 'w') as fp:
-            json.dump(results, fp, indent=4, cls=NumpyEncoder)
+        try:
+            with open(file_name + '.json', 'x') as fp:
+                json.dump(results, fp, indent=4, cls=NumpyEncoder)
+        except:
+            print('Skipping file', file_name, 'because already saved')
     
     return results
 
