@@ -68,13 +68,13 @@ def cost_function(bits, J, h, const, TrJ=None):
     return cost
 
 
-def probability_cost_distribution_state(gamma, beta, J, h, costs, shots):
+def probability_cost_distribution_state(gamma, beta, J, h, costs):
     counts = _expected_cost(gamma, beta, J, h)
     return _probability_cost_distribution(counts, costs)
 
 def probability_cost_distribution_simul(gamma, beta, J, h, costs, shots):
     prob_dict = _run_simulation(gamma, beta, J, h, shots)
-    return _probability_cost_distribution(counts, costs)
+    return _probability_cost_distribution(prob_dict, costs)
 
 def _probability_cost_distribution(count_results, costs):
     total_counts = sum(count_results.values())
@@ -90,7 +90,7 @@ def _probability_cost_distribution(count_results, costs):
     return prob_dist
 
 
-def approximation_ratio_state(gamma, beta, J, h, costs, shots):
+def approximation_ratio_state(gamma, beta, J, h, costs):
     counts = _expected_cost(gamma, beta, J, h)
     return _approximation_ratio(counts, costs)
 
@@ -98,7 +98,7 @@ def approximation_ratio_simul(gamma, beta, J, h, costs, shots):
     prob_dict = _run_simulation(gamma, beta, J, h, shots)
     return _approximation_ratio(prob_dict, costs)
 
-def _approximation_ratio(counts, costs):
+def _approximation_ratio(count_results, costs):
 
     total_cost = 0
     total_counts = sum(count_results.values())
