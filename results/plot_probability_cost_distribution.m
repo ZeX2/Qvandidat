@@ -1,7 +1,7 @@
 clear;clc;close all
 
 
-files = dir(fullfile('landscape*.mat'));
+files = dir(fullfile('angles*.mat'));
 
 for k = 1:length(files)
     file = files(k);
@@ -11,19 +11,19 @@ for k = 1:length(files)
     
     if ~pred(data); continue; end
     
-    gammas = data.gammas;
-    betas = data.betas;
-    results = data.landscape;
+    prob_dist = data.probability_distribution_items;
+    appr_ratio = data.approximation_ratio;
 
+    
     figure('Name', file.name)
 
-    surf(gammas, betas, -results)
+    bar(prob_dist(:,1), prob_dist(:,2))
     axis tight
-    
-    xlabel('gamma')
-    ylabel('beta')
-    zlabel('Expected value')
+    ylim([0, 1])
+    xlabel('Cost')
+    ylabel('Probability')
     title(file.name)
+    
     
 end
 
@@ -32,12 +32,14 @@ function ret=pred(data)
     I = length(W);
     W_max = data.problem.W_max;
     noise = data.noise;
+    p = data.p;
 	ret = 0;
         
     %if W_max == 3; ret = 1; end
     
     if I == 1 && W_max == 1; ret = 1; end
-    ret = ~noise;
+    
+    ret = ~noise && p == 1 && I == 2 && W_max == 1;
     %if W_max == 2 && all(size(W) == size([1, 1])); ret = 1; end
     
     %if I > 1; ret = 1; end

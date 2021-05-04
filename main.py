@@ -43,15 +43,15 @@ def main():
             optimal_gammas = gammas[indices[0][0]]
             optimal_betas = betas[indices[0][1]]
 
-            data['optimal_gammas'] = optimal_gammas
-            data['optimal_betas'] = optimal_betas
+            data['optimal_gammas'] = [optimal_gammas]
+            data['optimal_betas'] = [optimal_betas]
 
             data['gammas'] = gammas
             data['betas'] = betas
 
-        continue
         problem_identifier = data['problem_identifier']
         S = ast.literal_eval(problem_identifier)
+        data['problem'] = S
         print(S)
 
         J, h, const, A, B, C = integer_bin_packing(**S)
@@ -65,17 +65,24 @@ def main():
             prob_dist = probability_cost_distribution_state(optimal_gammas, optimal_betas, J, h, costs)
             appr_ratio = approximation_ratio_state(optimal_gammas, optimal_betas, J, h, costs)
 
-        if 'simul' in filename:
+        elif 'simul' in filename:
             prob_dist = probability_cost_distribution_simul(optimal_gammas, optimal_betas, J, h, costs, shots=10000)
             appr_ratio = approximation_ratio_simul(optimal_gammas, optimal_betas, J, h, costs, shots=10000)
 
         else:
+            print()
             print('Invalid file, file name needs to contain either state or simul')
+            print(filename)
+            print()
             continue
         
         data['probability_distribution'] = prob_dist
+        data['probability_distribution_items'] = list(prob_dist.items())
         data['approximation_ratio'] = appr_ratio
         
+        data['noise'] = 'simul' in filename
+        data['p'] = len(optimal_gammas)
+
         save_results(filename, data)
 
 
