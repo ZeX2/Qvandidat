@@ -67,19 +67,29 @@ def cost_function(bits, J, h, const, TrJ=None):
     
     return cost
 
-
-def run_simulation(gamma, beta, J, h, costs, shots):
+def _run_simulation(gamma, beta, J, h, shots):
     noise_model = chalmers_noise_model()
     chalmers_circuit = _chalmers_circuit(gamma, beta, J, h)
     job = execute(chalmers_circuit, SIMULATOR, shots=shots, noise_model=noise_model)
     result = job.result()
-    counts = result.get_counts()
+    return result.get_counts()
 
+def run_simulation(gamma, beta, J, h, costs, shots):
+    counts = _run_simulation(gamma, beta, J, h, shots)
     return sum(counts*costs[bits] for bits, counts in counts.items())/shots
 
+
 # should produce the same results as expected_cost
+def _run_chalmers_circuit_ideal(gamma, beta, J, h):
+    circuit = _chalmers_circuit(gamma, beta, J, h)
+    sv = execute(circuit, SVSIM).result().get_statevector()
+    sv = Statevector(sv)
+    return sv.probabilities_dict()
+
 def run_chalmers_circuit_ideal(gamma, beta, J, h, costs):
-    return _expected_cost(_chalmers_circuit(gamma, beta, J, h), costs)
+    prob_dict = _run_chalmers_circuit_ideal(gamma, beta, J, h)
+    return sum(prob*costs[bits] for bits, prob in prob_dict.items())
+
 
 def _chalmers_circuit(gamma, beta, J, h):
     p = len(gamma) if isinstance(gamma, Iterable) else 1
@@ -88,16 +98,17 @@ def _chalmers_circuit(gamma, beta, J, h):
     chalmers_circuit = translate_circuit(chalmers_coupling_circuit)
     return chalmers_circuit
 
-def _expected_cost(circuit, costs):
+
+def _expected_cost(gamma, beta, J, h):
+    circuit = qaoa_ising_circuit(J, h, gamma, beta, measure=False)
     sv = execute(circuit, SVSIM).result().get_statevector()
     sv = Statevector(sv)
-    prob_dict = sv.probabilities_dict()
-
-    return sum(prob*costs[bits] for bits, prob in prob_dict.items())
+    return sv.probabilities_dict()
 
 def expected_cost(gamma, beta, J, h, costs):
-    circuit = qaoa_ising_circuit(J, h, gamma, beta, measure=False)
-    return _expected_cost(circuit, costs)
+    prob_dict = _expected_cost(gamma, beta, J, h)
+    return sum(prob*costs[bits] for bits, prob in prob_dict.items())
+
 
 def _objective_state(angles,*variables):
     
