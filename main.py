@@ -249,7 +249,7 @@ def save_results(gammas, betas, fun, problem, dt=-1, file_name=None, extra_data=
         file_name = 'unkown-' + problem + '-' + str(str(int(datetime.now().timestamp())))
 
     print('Found optimal angles for', problem, 'after running for', dt_str, 'saved to file', file_name)
-
+    file_name = file_name.replace(':','_')
     file_name = os.path.join('data', file_name)
     os.makedirs('data', exist_ok=True)
 
