@@ -13,7 +13,7 @@ from datetime import timedelta, datetime
 # TODO
 # Make sure run_chalmers_circuit_ideal and expected_value returns 
 # identical results
-
+MAX_ITER = 10
 
 def main(problem_number):
     print(problem_number)
