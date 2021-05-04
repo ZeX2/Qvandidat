@@ -67,6 +67,64 @@ def cost_function(bits, J, h, const, TrJ=None):
     
     return cost
 
+
+def probability_cost_distribution_state(gamma, beta, J, h, costs, shots):
+    counts = _expected_cost(gamma, beta, J, h)
+    return _probability_cost_distribution(counts, costs)
+
+def probability_cost_distribution_simul(gamma, beta, J, h, costs, shots):
+    prob_dict = _run_simulation(gamma, beta, J, h, shots)
+    return _probability_cost_distribution(counts, costs)
+
+def _probability_cost_distribution(count_results, costs):
+    total_counts = sum(count_results.values())
+    total_cost = 0
+    prob_dist = {}
+
+    for key in count_results:
+        value = count_results[key]
+
+        cost = costs[key]
+        prob_dist[cost] = prob_dist.get(cost, 0) + value/total_counts
+
+    return prob_dist
+
+
+def approximation_ratio_state(gamma, beta, J, h, costs, shots):
+    counts = _expected_cost(gamma, beta, J, h)
+    return _approximation_ratio(counts, costs)
+
+def approximation_ratio_simul(gamma, beta, J, h, costs, shots):
+    prob_dict = _run_simulation(gamma, beta, J, h, shots)
+    return _approximation_ratio(prob_dict, costs)
+
+def _approximation_ratio(counts, costs):
+
+    total_cost = 0
+    total_counts = sum(count_results.values())
+    cost_best = None
+    cost_max = -1
+
+    for key in count_results:
+        value = count_results[key]
+        # Note: q1 is the leftmost bit
+
+        spins = [1 if s == '1' else -1 for s in key]
+        cost = costs[key]
+        total_cost += value*cost
+        
+        if cost_best == None or cost < cost_best:
+            cost_best = cost
+        if cost > cost_max:
+            cost_max = cost
+    
+    if cost_best == None:
+        raise Exception('Invalid job, no costs found')
+
+    exp_val = total_cost/total_counts
+    return (exp_val - cost_max)/(cost_best - cost_max)
+
+
 def _run_simulation(gamma, beta, J, h, shots):
     noise_model = chalmers_noise_model()
     chalmers_circuit = _chalmers_circuit(gamma, beta, J, h)
