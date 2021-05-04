@@ -17,11 +17,40 @@
     "problem_identifier": "{'W': [1], 'W_max': 1, 'A': 8, 'B': 4, 'C': 12}",
     "now": "2021-05-04 00:29:19",
     "execution_time": "4:25:22.407331",
-    "probability_distribution": {
-        "3.0": 0.428,
-        "2.0": 0.051,
-        "6.0": 0.045,
-        "1.0": 0.476
+    "problem": {
+        "W": [
+            1
+        ],
+        "W_max": 1,
+        "A": 8,
+        "B": 4,
+        "C": 12
     },
-    "approximation_ratio": 0.7731600000000001
+    "probability_distribution": {
+        "3.0": 0.4267,
+        "2.0": 0.052,
+        "6.0": 0.0358,
+        "1.0": 0.4855
+    },
+    "probability_distribution_items": [
+        [
+            3.0,
+            0.4267
+        ],
+        [
+            2.0,
+            0.052
+        ],
+        [
+            6.0,
+            0.0358
+        ],
+        [
+            1.0,
+            0.4855
+        ]
+    ],
+    "approximation_ratio": 0.78386,
+    "noise": true,
+    "p": 5
 }
