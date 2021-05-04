@@ -19,7 +19,7 @@ def main(problem_number):
     print(problem_number)
     problem_list = [{'W_max': 1, 'W': [1], 'A': 8, 'B': 4, 'C': 12, 'p': 1, 'noise': False},
 {'W_max': 1, 'W': [1], 'A': 8, 'B': 4, 'C': 12, 'p': 2, 'noise': False},
-{'W_max': 1, 'W': [1], 'A': 8, 'B': 4, 'C': 12, 'p': 3, 'noise': False},
+{'W_max': 1, 'W': [1], 'A': 8, 'B': 4, 'C': 12, 'p': 3, 'noise': False}, # test
 {'W_max': 1, 'W': [1], 'A': 8, 'B': 4, 'C': 12, 'p': 4, 'noise': False},
 {'W_max': 1, 'W': [1], 'A': 8, 'B': 4, 'C': 12, 'p': 5, 'noise': False},
 {'W_max': 1, 'W': [1], 'A': 8, 'B': 4, 'C': 12, 'p': 6, 'noise': False},

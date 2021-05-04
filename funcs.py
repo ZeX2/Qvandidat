@@ -118,9 +118,9 @@ def _objective_state(angles,*variables):
 
 def optimize_angles_state(J, h, p, costs, maxiter):
     
-    bnd = opt.Bounds([0]*(2*p), [np.pi]*p + [np.pi/2]*p) 
+    bnd = opt.Bounds([0]*(2*p), [2*np.pi]*p + [np.pi]*p) 
     args = (J, h, costs)
-    opt_angles = opt.differential_evolution(_objective_state, bounds=bnd, args = args, maxiter = maxiter, updating='deferred', workers = -1)
+    opt_angles = opt.differential_evolution(_objective_state, bounds=bnd, args = args, maxiter = maxiter)
     angles = opt_angles.x
 
     return angles[:len(angles)//2], angles[len(angles)//2:], opt_angles.fun
@@ -132,9 +132,9 @@ def _objective_simul(angles,*variables):
 
 def optimize_angles_simul(J, h, p, costs, maxiter, shots = 1000):
     
-    bnd = opt.Bounds([0]*(2*p), [np.pi]*p + [np.pi/2]*p)   
+    bnd = opt.Bounds([0]*(2*p), [2*np.pi]*p + [np.pi]*p)   
     args = (J,h,costs,shots)
-    opt_angles = opt.differential_evolution(_objective_simul, bounds=bnd, maxiter = maxiter, args = args, updating='deferred', workers = -1)
+    opt_angles = opt.differential_evolution(_objective_simul, bounds=bnd, maxiter = maxiter, args = args)
     angles = opt_angles.x
 
     return angles[:len(angles)//2], angles[len(angles)//2:], opt_angles.fun
