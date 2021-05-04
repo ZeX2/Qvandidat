@@ -29,7 +29,6 @@ def integer_bin_packing(W, W_max, A = None, B = None, C = None):
     if not (A or B or C):
         B_upper = sum(sum(max(c[j,i], 0) for i in range(N))**2 for j in range(N))
         A_lower = min(min(np.abs(S[j,np.nonzero(S[j,:])[0]])) for j in range(M//2))**2
-        A_lower = min(min(np.abs(S[j,np.nonzero(S[j,:])[0]])) for j in range(M//2))
         A_upper = sum(max(abs(b[j]-sum(max(S[j,i], 0) for i in range(N))),
                           abs(b[j]-sum(min(S[j,i], 0) for i in range(N))))**2 for j in range(M//2))
         C_lower = min(min(np.abs(S[j,np.nonzero(S[j,:])[0]])) for j in range(M//2, M))**2
