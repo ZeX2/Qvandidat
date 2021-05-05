@@ -19,6 +19,36 @@ TrJ = np.trace(J)
 
 bits_list = get_bits_list(len(J))
 costs = {bits: cost_function(bits, J, h, const, TrJ)/B for bits in bits_list}
+#%%
+path = "C:\\Users\\Isak Brundin\\Downloads\\Qvandidat-data-analysis\\Qvandidat-data-analysis\\data"
+p1W11 = get_data_for_p(1,2,path = path,true_constant = 8)
+p1W11json = extracted_data_for_p(p1W11)
+best_test_dictp1,best_test_probp1=best_optimal(p1W11json,histogram = True)
+avg_test_dictp1,avg_test_optimalp1 = avg_costs(p1W11json)
+
+p2W11 = get_data_for_p(2,2,path = path,true_constant = 8)
+p3W11 = get_data_for_p(3,2,path = path,true_constant = 8)
+p4W11 = get_data_for_p(4,2,path = path,true_constant = 8)
+p5W11 = get_data_for_p(5,2,path = path,true_constant = 8)
+p6W11 = get_data_for_p(6,2,path = path,true_constant = 8)
+
+p2W11json = extracted_data_for_p(p2W11)
+
+
+
+
+for i in range(len(p2W11)):
+    p2W11json.append(data_extracter(p2W11[i]))
+    i+=1
+best_test_dictp2,best_test_probp2=best_optimal(p2W11json)
+avg_test_dictp2,avg_test_optimalp2 = avg_costs(p2W11json)
+p4W11json =list()
+for i in range(len(p4W11)):
+    p4W11json.append(data_extracter(p4W11[i]))
+    i+=1
+best_test_dictp4,best_test_probp4=best_optimal(p4W11json)
+avg_test_dictp4,avg_test_optimalp4 = avg_costs(p4W11json)
+    
 
 #%% Equal Size Partition
 # S = [1, 2, 3, 4]
