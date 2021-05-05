@@ -4,6 +4,21 @@ Created on Wed May  5 19:11:53 2021
 
 @author: Isak Brundin
 """
+import os
+import json
+import ast
+
+from integer_bin_packing import *
+from funcs import *
+
+from qiskit import QuantumCircuit, execute, Aer
+from qiskit.quantum_info import Statevector
+from qiskit.visualization import plot_histogram
+
+BACKEND = Aer.get_backend('unitary_simulator')
+SIMULATOR = Aer.get_backend('qasm_simulator')
+SVSIM = Aer.get_backend('statevector_simulator')
+
 
 def get_data_for_p(p,problem_instance,true_constant=False,path=False):
     search_string = "angles-p"+str(p)
