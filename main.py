@@ -162,11 +162,12 @@ def main(problem_number):
     problem_dict = problem_list[problem_number]
     if problem_dict['noise']:
         del problem_dict['noise']
-        _run_problem_simul(**problem_dict)
+        #_run_problem_simul(**problem_dict)
+        _run_problem_state(**problem_dict)
         
     else:
         del problem_dict['noise']
-        _run_problem_state(**problem_dict)
+        #_run_problem_state(**problem_dict)
         
     
 
