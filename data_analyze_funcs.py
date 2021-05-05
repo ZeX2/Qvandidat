@@ -135,5 +135,3 @@ p3W11 = get_data_for_p(3,2,path = path,true_constant = 8)
 p4W11 = get_data_for_p(4,2,path = path,true_constant = 8)
 p5W11 = get_data_for_p(5,2,path = path,true_constant = 8)
 p6W11 = get_data_for_p(6,2,path = path,true_constant = 8)
-
-p
