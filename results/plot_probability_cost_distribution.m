@@ -39,7 +39,7 @@ function ret=pred(data)
     
     if I == 1 && W_max == 1; ret = 1; end
     
-    ret = ~noise && p == 1 && I == 2 && W_max == 1;
+    ret = ~noise && p == 1 && I == 2 && W_max == 2;
     %if W_max == 2 && all(size(W) == size([1, 1])); ret = 1; end
     
     %if I > 1; ret = 1; end
