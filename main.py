@@ -39,19 +39,6 @@ def _run_problem_simul(W,W_max,p,A = None,B = None, C = None):
     J, h, const, A, B, C = integer_bin_packing(W, W_max, A, B, C)
     bits_list = get_bits_list(len(J))
     costs = {bits: cost_function(bits, J, h, const, np.trace(J))/B for bits in bits_list}
-    if p==1:
-        print('Running noisy simulations for', str(S))
-    
-        print('Creating lanscape')
-        start_time = time.monotonic()
-        # TODO Set shots to reasonable value
-        # TODO Set iter_ to a good value
-        gammas, betas, exp_costs = landscape_simul(J, h,costs, iter_=5000, shots=5000)
-        end_time = time.monotonic()
-    
-        file_name = 'landscape' + file_suffix
-        save_results(gammas, betas, -1, str(S), end_time-start_time, file_name, {'landscape':exp_costs})
-
     
     for iter_ in range(1,MAX_ITER+1):
         # TODO Set shots to reasonable value
@@ -72,20 +59,7 @@ def _run_problem_state(W,W_max,p , A = None,B = None, C = None):
     J, h, const, A, B, C = integer_bin_packing(W, W_max, A, B, C)
     bits_list = get_bits_list(len(J))
     costs = {bits: cost_function(bits, J, h, const, np.trace(J))/B for bits in bits_list}
-    if p ==1:
-        print('Running statevector simulations for', str(S))
-    
-        print('Creating lanscape')
-    
-        start_time = time.monotonic()
-        # TODO Set iter_ to a good value
-        gammas, betas, exp_costs = landscape_state(J, h,costs, iter_=5000)
-        end_time = time.monotonic()
-    
-        file_name = 'landscape' + file_suffix
-        save_results(gammas, betas, -1, str(S), end_time-start_time, file_name, {'landscape':exp_costs})
 
-    #for p in range(1,MAX_P+1):
     for iter_ in range(1,MAX_ITER+1):
         print('Finding optimal angles for p =', str(p))
         start_time = time.monotonic()
