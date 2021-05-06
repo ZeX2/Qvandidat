@@ -1,0 +1,16 @@
+{
+    "expected_value": 28.57203879504355,
+    "optimal_gammas": [
+        1.0360732303948295
+    ],
+    "optimal_betas": [
+        2.0439915956044876
+    ],
+    "problem_identifier": "{'W': [1, 1, 1], 'W_max': 1, 'A': 12, 'B': 4, 'C': 48}",
+    "now": "2021-05-06 19:31:41",
+    "execution_time": "0:08:05.976942",
+    "nfev": 1494,
+    "message": "Optimization terminated successfully.",
+    "success": true,
+    "nit": 48
+}

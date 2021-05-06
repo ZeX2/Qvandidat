@@ -1,0 +1,49 @@
+{
+    "expected_value": 1.5017,
+    "optimal_gammas": [
+        4.665573621128223,
+        1.9730927047691782
+    ],
+    "optimal_betas": [
+        0.3598578589771271,
+        1.238065713285326
+    ],
+    "problem_identifier": "{'W': [1], 'W_max': 1, 'A': 8, 'B': 4, 'C': 8}",
+    "now": "2021-05-06 20:10:56",
+    "execution_time": "0:38:05.410872",
+    "nfev": 7945,
+    "message": "Optimization terminated successfully.",
+    "success": true,
+    "nit": 130,
+    "problem": {
+        "W": [
+            1
+        ],
+        "W_max": 1,
+        "A": 8,
+        "B": 4,
+        "C": 8
+    },
+    "probability_distribution": {
+        "2.0": 0.48919999999999997,
+        "5.0": 0.013,
+        "1.0": 0.4978
+    },
+    "probability_distribution_items": [
+        [
+            2.0,
+            0.48919999999999997
+        ],
+        [
+            5.0,
+            0.013
+        ],
+        [
+            1.0,
+            0.4978
+        ]
+    ],
+    "approximation_ratio": 0.864725,
+    "noise": true,
+    "p": 2
+}
