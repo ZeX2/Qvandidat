@@ -8,6 +8,8 @@ import json
 import scipy.io
 import numpy as np
 from datetime import timedelta, datetime
+#from problem_list import get_problem_list
+from problem_list_2 import get_problem_list
 
 
 # TODO
@@ -17,159 +19,17 @@ MAX_ITER = 10
 
 def main(problem_number):
     print(problem_number)
-    problem_list = [{'W_max': 1, 'W': [1], 'A': 8, 'B': 4, 'C': 12, 'p': 1, 'noise': False},
-{'W_max': 1, 'W': [1], 'A': 8, 'B': 4, 'C': 12, 'p': 2, 'noise': False},
-{'W_max': 1, 'W': [1], 'A': 8, 'B': 4, 'C': 12, 'p': 3, 'noise': False}, # test
-{'W_max': 1, 'W': [1], 'A': 8, 'B': 4, 'C': 12, 'p': 4, 'noise': False},
-{'W_max': 1, 'W': [1], 'A': 8, 'B': 4, 'C': 12, 'p': 5, 'noise': False},
-{'W_max': 1, 'W': [1], 'A': 8, 'B': 4, 'C': 12, 'p': 6, 'noise': False},
-{'W_max': 1, 'W': [1], 'A': 8, 'B': 4, 'C': 12, 'p': 7, 'noise': False},
-{'W_max': 1, 'W': [1], 'A': 8, 'B': 4, 'C': 12, 'p': 1, 'noise': True},
-{'W_max': 1, 'W': [1], 'A': 8, 'B': 4, 'C': 12, 'p': 2, 'noise': True},
-{'W_max': 1, 'W': [1], 'A': 8, 'B': 4, 'C': 12, 'p': 3, 'noise': True},
-{'W_max': 1, 'W': [1], 'A': 8, 'B': 4, 'C': 12, 'p': 4, 'noise': True},
-{'W_max': 1, 'W': [1], 'A': 8, 'B': 4, 'C': 12, 'p': 5, 'noise': True},
-{'W_max': 1, 'W': [1], 'A': 8, 'B': 4, 'C': 12, 'p': 6, 'noise': True},
-{'W_max': 1, 'W': [1], 'A': 8, 'B': 4, 'C': 12, 'p': 7, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 32, 'B': 4, 'C': 576, 'p': 1, 'noise': False},
-{'W_max': 2, 'W': [1, 1], 'A': 32, 'B': 4, 'C': 576, 'p': 2, 'noise': False},
-{'W_max': 2, 'W': [1, 1], 'A': 32, 'B': 4, 'C': 576, 'p': 3, 'noise': False},
-{'W_max': 2, 'W': [1, 1], 'A': 32, 'B': 4, 'C': 576, 'p': 4, 'noise': False},
-{'W_max': 2, 'W': [1, 1], 'A': 32, 'B': 4, 'C': 576, 'p': 5, 'noise': False},
-{'W_max': 2, 'W': [1, 1], 'A': 32, 'B': 4, 'C': 576, 'p': 6, 'noise': False},
-{'W_max': 2, 'W': [1, 1], 'A': 32, 'B': 4, 'C': 576, 'p': 7, 'noise': False},
-{'W_max': 1, 'W': [1, 1, 1], 'A': 12, 'B': 4, 'C': 324, 'p': 1, 'noise': True},
-{'W_max': 1, 'W': [1, 1, 1], 'A': 12, 'B': 4, 'C': 324, 'p': 2, 'noise': True},
-{'W_max': 1, 'W': [1, 1, 1], 'A': 12, 'B': 4, 'C': 324, 'p': 3, 'noise': True},
-{'W_max': 1, 'W': [1, 1, 1], 'A': 12, 'B': 4, 'C': 324, 'p': 4, 'noise': True},
-{'W_max': 1, 'W': [1, 1, 1], 'A': 12, 'B': 4, 'C': 324, 'p': 5, 'noise': True},
-{'W_max': 1, 'W': [1, 1, 1], 'A': 12, 'B': 4, 'C': 324, 'p': 6, 'noise': True},
-{'W_max': 1, 'W': [1, 1, 1], 'A': 12, 'B': 4, 'C': 324, 'p': 7, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 8, 'B': 4, 'C': 16, 'p': 1, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 8, 'B': 4, 'C': 16, 'p': 2, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 8, 'B': 4, 'C': 16, 'p': 3, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 8, 'B': 4, 'C': 16, 'p': 4, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 8, 'B': 4, 'C': 16, 'p': 5, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 8, 'B': 4, 'C': 16, 'p': 6, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 8, 'B': 4, 'C': 16, 'p': 7, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 8, 'B': 4, 'C': 80, 'p': 1, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 8, 'B': 4, 'C': 80, 'p': 2, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 8, 'B': 4, 'C': 80, 'p': 3, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 8, 'B': 4, 'C': 80, 'p': 4, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 8, 'B': 4, 'C': 80, 'p': 5, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 8, 'B': 4, 'C': 80, 'p': 6, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 8, 'B': 4, 'C': 80, 'p': 7, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 8, 'B': 4, 'C': 144, 'p': 1, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 8, 'B': 4, 'C': 144, 'p': 2, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 8, 'B': 4, 'C': 144, 'p': 3, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 8, 'B': 4, 'C': 144, 'p': 4, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 8, 'B': 4, 'C': 144, 'p': 5, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 8, 'B': 4, 'C': 144, 'p': 6, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 8, 'B': 4, 'C': 144, 'p': 7, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 8, 'B': 4, 'C': 208, 'p': 1, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 8, 'B': 4, 'C': 208, 'p': 2, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 8, 'B': 4, 'C': 208, 'p': 3, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 8, 'B': 4, 'C': 208, 'p': 4, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 8, 'B': 4, 'C': 208, 'p': 5, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 8, 'B': 4, 'C': 208, 'p': 6, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 24, 'B': 4, 'C': 48, 'p': 1, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 8, 'B': 4, 'C': 208, 'p': 7, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 24, 'B': 4, 'C': 48, 'p': 2, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 24, 'B': 4, 'C': 48, 'p': 3, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 24, 'B': 4, 'C': 48, 'p': 4, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 24, 'B': 4, 'C': 48, 'p': 5, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 24, 'B': 4, 'C': 48, 'p': 6, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 24, 'B': 4, 'C': 48, 'p': 7, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 24, 'B': 4, 'C': 240, 'p': 1, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 24, 'B': 4, 'C': 240, 'p': 2, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 24, 'B': 4, 'C': 240, 'p': 3, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 24, 'B': 4, 'C': 240, 'p': 4, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 24, 'B': 4, 'C': 240, 'p': 5, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 24, 'B': 4, 'C': 240, 'p': 6, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 24, 'B': 4, 'C': 240, 'p': 7, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 24, 'B': 4, 'C': 432, 'p': 1, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 24, 'B': 4, 'C': 432, 'p': 2, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 24, 'B': 4, 'C': 432, 'p': 3, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 24, 'B': 4, 'C': 432, 'p': 4, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 24, 'B': 4, 'C': 432, 'p': 5, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 24, 'B': 4, 'C': 432, 'p': 6, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 24, 'B': 4, 'C': 432, 'p': 7, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 24, 'B': 4, 'C': 624, 'p': 1, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 24, 'B': 4, 'C': 624, 'p': 2, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 24, 'B': 4, 'C': 624, 'p': 3, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 24, 'B': 4, 'C': 624, 'p': 4, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 24, 'B': 4, 'C': 624, 'p': 5, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 24, 'B': 4, 'C': 624, 'p': 6, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 24, 'B': 4, 'C': 624, 'p': 7, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 40, 'B': 4, 'C': 80, 'p': 1, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 40, 'B': 4, 'C': 80, 'p': 2, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 40, 'B': 4, 'C': 80, 'p': 3, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 40, 'B': 4, 'C': 80, 'p': 4, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 40, 'B': 4, 'C': 80, 'p': 5, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 40, 'B': 4, 'C': 80, 'p': 6, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 40, 'B': 4, 'C': 80, 'p': 7, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 40, 'B': 4, 'C': 400, 'p': 1, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 40, 'B': 4, 'C': 400, 'p': 2, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 40, 'B': 4, 'C': 400, 'p': 3, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 40, 'B': 4, 'C': 400, 'p': 4, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 40, 'B': 4, 'C': 400, 'p': 5, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 40, 'B': 4, 'C': 400, 'p': 6, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 40, 'B': 4, 'C': 400, 'p': 7, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 40, 'B': 4, 'C': 720, 'p': 1, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 40, 'B': 4, 'C': 720, 'p': 2, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 40, 'B': 4, 'C': 720, 'p': 3, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 40, 'B': 4, 'C': 720, 'p': 4, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 40, 'B': 4, 'C': 720, 'p': 5, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 40, 'B': 4, 'C': 720, 'p': 6, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 40, 'B': 4, 'C': 720, 'p': 7, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 40, 'B': 4, 'C': 1040, 'p': 1, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 40, 'B': 4, 'C': 1040, 'p': 2, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 40, 'B': 4, 'C': 1040, 'p': 3, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 40, 'B': 4, 'C': 1040, 'p': 4, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 40, 'B': 4, 'C': 1040, 'p': 5, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 40, 'B': 4, 'C': 1040, 'p': 6, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 40, 'B': 4, 'C': 1040, 'p': 7, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 56, 'B': 4, 'C': 112, 'p': 1, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 56, 'B': 4, 'C': 112, 'p': 2, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 56, 'B': 4, 'C': 112, 'p': 3, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 56, 'B': 4, 'C': 112, 'p': 4, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 56, 'B': 4, 'C': 112, 'p': 5, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 56, 'B': 4, 'C': 112, 'p': 6, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 56, 'B': 4, 'C': 112, 'p': 7, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 56, 'B': 4, 'C': 560, 'p': 1, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 56, 'B': 4, 'C': 560, 'p': 2, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 56, 'B': 4, 'C': 560, 'p': 3, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 56, 'B': 4, 'C': 560, 'p': 4, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 56, 'B': 4, 'C': 560, 'p': 5, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 56, 'B': 4, 'C': 560, 'p': 6, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 56, 'B': 4, 'C': 560, 'p': 7, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 56, 'B': 4, 'C': 1008, 'p': 1, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 56, 'B': 4, 'C': 1008, 'p': 2, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 56, 'B': 4, 'C': 1008, 'p': 3, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 56, 'B': 4, 'C': 1008, 'p': 4, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 56, 'B': 4, 'C': 1008, 'p': 5, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 56, 'B': 4, 'C': 1008, 'p': 6, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 56, 'B': 4, 'C': 1008, 'p': 7, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 56, 'B': 4, 'C': 1456, 'p': 1, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 56, 'B': 4, 'C': 1456, 'p': 2, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 56, 'B': 4, 'C': 1456, 'p': 3, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 56, 'B': 4, 'C': 1456, 'p': 4, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 56, 'B': 4, 'C': 1456, 'p': 5, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 56, 'B': 4, 'C': 1456, 'p': 6, 'noise': True},
-{'W_max': 2, 'W': [1, 1], 'A': 56, 'B': 4, 'C': 1456, 'p': 7, 'noise': True}
-]
+
     # prioritized order
+    problem_list = get_problem_list()
     problem_dict = problem_list[problem_number]
+
     if problem_dict['noise']:
         del problem_dict['noise']
-        #_run_problem_simul(**problem_dict)
-        _run_problem_state(**problem_dict)
-        
+        _run_problem_simul(**problem_dict)
     else:
         del problem_dict['noise']
-        #_run_problem_state(**problem_dict)
-        
-    
+        _run_problem_state(**problem_dict)
 
 
 def _run_problem_simul(W,W_max,p,A = None,B = None, C = None):
