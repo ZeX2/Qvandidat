@@ -90,7 +90,6 @@ def best_optimal(costs_list,histogram = False,optimal_cost = 1.0):
         except:
             curr_prob = 0
         if curr_prob>true_prob:
-            print(true_prob)
             true_prob = curr_prob
             true_prob_dict = costs_list[i]
     if histogram:
@@ -115,7 +114,7 @@ def avg_costs(costs_list,optimal_cost = 1.0):
 
 #&&
 # Example on how to run
-path = "C:\\Users\\Isak Brundin\\Downloads\\Qvandidat-data-analysis\\Qvandidat-data-analysis\\data"
+path = "C:\\Users\\Isak Brundin\\Desktop\\qvand\\Qvandidat\\data"
 #gets all files with given problem and p
 # problem_instance = 1 is the problem W=[1],W_max =1
 # problem_instance = 2 is the problem W=[1,1],W_max =2
@@ -126,12 +125,77 @@ path = "C:\\Users\\Isak Brundin\\Downloads\\Qvandidat-data-analysis\\Qvandidat-d
 p1W11 = get_data_for_p(1,2,path = path,true_constant = 8)
 p1W11json = extracted_data_for_p(p1W11)
 # gives the angles that yielded the highest probability for optimal solution
-best_test_dictp1,best_test_probp1=best_optimal(p1W11json,histogram = True)
+best_dictp1A8,best_probp1A8=best_optimal(p1W11json,histogram = True)
 # averages over all files
-avg_test_dictp1,avg_test_optimalp1 = avg_costs(p1W11json)
+avg_dictp1,avg_optimalp1 = avg_costs(p1W11json)
 
 p2W11 = get_data_for_p(2,2,path = path,true_constant = 8)
+p2W11json = extracted_data_for_p(p2W11)
+best_dictp2A8,best_probp2A8 = best_optimal(p2W11json,histogram = True)
 p3W11 = get_data_for_p(3,2,path = path,true_constant = 8)
+p3W11json = extracted_data_for_p(p3W11)
+best_dictp3A8,best_probp3A8 = best_optimal(p3W11json,histogram = True)
 p4W11 = get_data_for_p(4,2,path = path,true_constant = 8)
+p4W11json = extracted_data_for_p(p4W11)
+best_dictp4A8,best_probp4A8 = best_optimal(p4W11json,histogram = True)
 p5W11 = get_data_for_p(5,2,path = path,true_constant = 8)
+p5W11json = extracted_data_for_p(p5W11)
+best_dictp5A8,best_probp5A8 = best_optimal(p5W11json,histogram = True)
 p6W11 = get_data_for_p(6,2,path = path,true_constant = 8)
+p6W11json = extracted_data_for_p(p6W11)
+best_dictp6A8,best_probp6A8 = best_optimal(p6W11json,histogram = True)
+p7W11 = get_data_for_p(6,2,path = path,true_constant = 8)
+p7W11json = extracted_data_for_p(p7W11)
+best_dictp7A8,best_probp7A8 = best_optimal(p7W11json,histogram = True)
+#%%
+p1W11 = get_data_for_p(1,2,path = path,true_constant = 24)
+p1W11json = extracted_data_for_p(p1W11)
+# gives the angles that yielded the highest probability for optimal solution
+best_dictp1A24,best_probp1A24=best_optimal(p1W11json,histogram = True)
+# averages over all files
+avg_dictp1,avg_optimalp1 = avg_costs(p1W11json)
+
+p2W11 = get_data_for_p(2,2,path = path,true_constant = 24)
+p2W11json = extracted_data_for_p(p2W11)
+best_dictp2A24,best_probp2A24 = best_optimal(p2W11json,histogram = True)
+p3W11 = get_data_for_p(3,2,path = path,true_constant = 24)
+p3W11json = extracted_data_for_p(p3W11)
+best_dictp3A24,best_probp3A24 = best_optimal(p3W11json,histogram = True)
+p4W11 = get_data_for_p(4,2,path = path,true_constant = 24)
+p4W11json = extracted_data_for_p(p4W11)
+best_dictp4A24,best_probp4A24 = best_optimal(p4W11json,histogram = True)
+p5W11 = get_data_for_p(5,2,path = path,true_constant = 24)
+p5W11json = extracted_data_for_p(p5W11)
+best_dictp5A24,best_probp5A24 = best_optimal(p5W11json,histogram = True)
+p6W11 = get_data_for_p(6,2,path = path,true_constant = 24)
+p6W11json = extracted_data_for_p(p6W11)
+best_dictp6A24,best_probp6A24 = best_optimal(p6W11json,histogram = True)
+p7W11 = get_data_for_p(6,2,path = path,true_constant = 24)
+p7W11json = extracted_data_for_p(p7W11)
+best_dictp7A24,best_probp7A24 = best_optimal(p7W11json,histogram = True)
+#%%
+p1W11 = get_data_for_p(1,2,path = path,true_constant = 40)
+p1W11json = extracted_data_for_p(p1W11)
+# gives the angles that yielded the highest probability for optimal solution
+best_dictp1A40,best_probp1A40=best_optimal(p1W11json,histogram = True)
+# averages over all files
+avg_dictp1,avg_optimalp1 = avg_costs(p1W11json)
+
+p2W11 = get_data_for_p(2,2,path = path,true_constant = 40)
+p2W11json = extracted_data_for_p(p2W11)
+best_dictp2A40,best_probp2A40 = best_optimal(p2W11json,histogram = True)
+p3W11 = get_data_for_p(3,2,path = path,true_constant = 40)
+p3W11json = extracted_data_for_p(p3W11)
+best_dictp3A40,best_probp3A40 = best_optimal(p3W11json,histogram = True)
+p4W11 = get_data_for_p(4,2,path = path,true_constant = 40)
+p4W11json = extracted_data_for_p(p4W11)
+best_dictp4A40,best_probp4A40 = best_optimal(p4W11json,histogram = True)
+p5W11 = get_data_for_p(5,2,path = path,true_constant = 40)
+p5W11json = extracted_data_for_p(p5W11)
+best_dictp5A40,best_probp5A40 = best_optimal(p5W11json,histogram = True)
+p6W11 = get_data_for_p(6,2,path = path,true_constant = 40)
+p6W11json = extracted_data_for_p(p6W11)
+best_dictp6A40,best_probp6A40 = best_optimal(p6W11json,histogram = True)
+p7W11 = get_data_for_p(6,2,path = path,true_constant = 40)
+p7W11json = extracted_data_for_p(p7W11)
+best_dictp7A40,best_probp7A40 = best_optimal(p7W11json,histogram = True)
