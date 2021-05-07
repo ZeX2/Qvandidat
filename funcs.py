@@ -139,11 +139,9 @@ def optimize_angles_simul(J, h, p, costs, maxiter, shots = 1000):
 
     return angles[:len(angles)//2], angles[len(angles)//2:], opt_angles
 
-def landscape_state(J, h,costs,iter_):
+def landscape_state(J, h,costs,step_size = 0.01):
     
-    betas = np.linspace(0, np.pi, int(np.sqrt(iter_)))
-    gammas = np.linspace(0, 2*np.pi, int(np.sqrt(iter_)))
-    
+    gammas, betas = _generate_gammas_betas(step_size)
     exp_costs = np.zeros((len(gammas), len(betas)))
 
     for i, beta in enumerate(betas):
@@ -152,11 +150,9 @@ def landscape_state(J, h,costs,iter_):
     
     return gammas, betas, exp_costs
 
-def landscape_simul(J, h,costs,iter_,shots = 1000):
+def landscape_simul(J, h,costs,step_size = 0.01,shots = 1000):
     
-    betas = np.linspace(0, np.pi, int(np.sqrt(iter_)))
-    gammas = np.linspace(0, 2*np.pi, int(np.sqrt(iter_)))
-    
+    gammas, betas = _generate_gammas_betas(step_size)
     exp_costs = np.zeros((len(gammas), len(betas)))
 
     for i, beta in enumerate(betas):
@@ -165,4 +161,14 @@ def landscape_simul(J, h,costs,iter_,shots = 1000):
     
     return gammas, betas, exp_costs
 
+def _generate_gammas_betas(step_size):
+    # Numpy recommends not to use arange because
+    # it is inconsistent with floating point numbers
+    # see arange docs for more info
+    iters_per_pi = int(np.pi / step_size)
+
+    betas = np.linspace(0, np.pi, iters_per_pi)
+    gammas = np.linspace(0, 2*np.pi, 2 * iters_per_pi)
+
+    return gammas, betas
 
