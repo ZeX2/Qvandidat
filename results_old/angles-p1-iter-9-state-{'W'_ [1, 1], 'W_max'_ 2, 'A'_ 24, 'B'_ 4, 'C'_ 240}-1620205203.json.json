@@ -23,6 +23,7 @@
         "B": 4,
         "C": 240
     },
+    "optimal_cost": 1.0,
     "probability_distribution": {
         "120.0": 0.07125834262622384,
         "66.0": 0.05316955061515177,
@@ -372,7 +373,8 @@
             0.007651606768124203
         ]
     ],
-    "approximation_ratio": 0.6951270156984591,
+    "approximation_ratio": 72.64515131086212,
+    "approximation_ratio_offset": 0.6951270156984591,
     "noise": false,
     "p": 1
 }
