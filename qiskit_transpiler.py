@@ -8,10 +8,12 @@ from qiskit.transpiler.passes import(
     BasicSwap, 
     LookaheadSwap, 
     StochasticSwap, 
-    SabreSwap) 
+    SabreSwap,
+    DenseLayout, NoiseAdaptiveLayout, SabreLayout) 
+from chalmers_backend import FakeChalmers
 
 def swap_update(circuit, coupling_map, n, print_depth=True):
-    if n not in range(0, 4):
+    if n not in range(0, 5):
         return print('SWAP performance not defined')
     
     if type(coupling_map) is not CouplingMap:
@@ -52,4 +54,24 @@ def swap_update(circuit, coupling_map, n, print_depth=True):
             sabre_circ.draw(output='mpl', filename='output/SabreSwap')
             print('Sabre Swap circuit depth', sabre_circ.depth())
         return sabre_circ
+    elif n == 4:
+        backend = FakeChalmers()
+        best_circuit = None
+        for kk in range(4):
+            circ = transpile(circuit, backend,  optimization_level=kk)
+            #print(kk, circ.depth())
+            if (best_circuit is None) or (best_circuit.depth() > circ.depth()):
+                best_circuit = circ
+                #print('vest', best_circuit.depth())
+        return best_circuit
 
+def transpile_circuit(circuit, print_depth=True):
+    backend = FakeChalmers()
+    best_circuit = None
+    for kk in range(4):
+        circ = transpile(circuit, backend,  optimization_level=kk)
+        #print(kk, circ.depth())
+        if (best_circuit is None) or (best_circuit.depth() > circ.depth()):
+            best_circuit = circ
+            #print('vest', best_circuit.depth())
+    return best_circuit
