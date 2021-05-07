@@ -93,7 +93,8 @@ def qc_UL_UR(input_circuit, logical_qubit_path, qubit_path, qubit_grid, operatio
 
     circuit = input_circuit.copy()
     num_qubits = circuit.num_qubits
-
+    if not np.any(operations):
+        return circuit
     for i in range(int(num_qubits/2)):
         
         if np.any(operations):
