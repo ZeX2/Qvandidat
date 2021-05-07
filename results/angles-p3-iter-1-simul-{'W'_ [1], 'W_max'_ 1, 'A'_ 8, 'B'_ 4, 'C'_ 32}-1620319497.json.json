@@ -26,31 +26,33 @@
         "B": 4,
         "C": 32
     },
+    "optimal_cost": 1.0,
     "probability_distribution": {
-        "8.0": 0.4446,
-        "2.0": 0.0315,
-        "11.0": 0.0236,
-        "1.0": 0.5003
+        "8.0": 0.4393,
+        "2.0": 0.032,
+        "11.0": 0.0225,
+        "1.0": 0.5062
     },
     "probability_distribution_items": [
         [
             8.0,
-            0.4446
+            0.4393
         ],
         [
             2.0,
-            0.0315
+            0.032
         ],
         [
             11.0,
-            0.0236
+            0.0225
         ],
         [
             1.0,
-            0.5003
+            0.5062
         ]
     ],
-    "approximation_ratio": 0.65656,
+    "approximation_ratio": 4.3876,
+    "approximation_ratio_offset": 0.66124,
     "noise": true,
     "p": 3
 }
