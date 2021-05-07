@@ -144,8 +144,8 @@ def landscape_state(J, h,costs,step_size = 0.01):
     gammas, betas = _generate_gammas_betas(step_size)
     exp_costs = np.zeros((len(gammas), len(betas)))
 
-    for i, beta in enumerate(betas):
-        for j, gamma in enumerate(gammas):
+    for j, beta in enumerate(betas):
+        for i, gamma in enumerate(gammas):
             exp_costs[i,j] = expected_cost(gamma, beta, J, h, costs)
     
     return gammas, betas, exp_costs
@@ -155,8 +155,8 @@ def landscape_simul(J, h,costs,step_size = 0.01,shots = 1000):
     gammas, betas = _generate_gammas_betas(step_size)
     exp_costs = np.zeros((len(gammas), len(betas)))
 
-    for i, beta in enumerate(betas):
-        for j, gamma in enumerate(gammas):
+    for j, beta in enumerate(betas):
+        for i, gamma in enumerate(gammas):
             exp_costs[i,j] = run_simulation(gamma, beta, J, h, costs,shots)
     
     return gammas, betas, exp_costs
