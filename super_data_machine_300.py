@@ -3,6 +3,7 @@ import json
 from statistics import mean
 
 import numpy as np
+from matplotlib import cm
 import matplotlib.pyplot as plt
 
 from integer_bin_packing import *
@@ -16,7 +17,7 @@ def time_in_sec(time):
     return int(3600*h + 60*m + s)
 
 dir_path = os.getcwd()
-data_path = os.path.join(dir_path, 'results')
+data_path = os.path.join(dir_path, 'results_old')
 data_json_paths = [f for f in os.listdir(data_path) if f.endswith('.json.json')]
 
 data = {}
@@ -41,13 +42,14 @@ unique_problems = [eval(i) for i in unique_problems]
 
 
 #%% Data extraction
-#Best expected costs and approximation ratio vs p for all noise instances
 
 instances_data = {}
+landscape_data = {}
 conditions_ = {'noise': False, 'success': True}
 for instance in unique_instances:
     conditions = {'problem': instance, **conditions_}
     instances_data[str(instance)] = filter_data(data.values(), conditions)
+    landscape_data[str(instance)] = next(d for d in data.values() if 'landscape' in d and d['problem']==instance)
 
 exp_data = {}
 approx_ratio_data = {}
@@ -139,6 +141,23 @@ for problem, plot_data in avg_time_data.items():
     plt.title(str(problem))
     plt.show()
     plt.plot()
+
+# Energy landscapes
+for problem, landscape in landscape_data.items():
+    gammas = landscape['gammas']
+    betas = landscape['betas']
+    exp_costs = np.array(landscape['landscape'])
+    betas_, gammas_ = np.meshgrid(betas, gammas)
+
+    fig = plt.figure()
+    ax  = fig.gca(projection='3d')
+    ax.set_xlabel(r'$\gamma$')
+    ax.set_ylabel(r'$\beta$')
+    ax.set_zlabel('Expected costs')
+    surf = ax.plot_surface(gammas_, betas_, exp_costs, cmap=cm.coolwarm, rstride=1, cstride=1, alpha=None, antialiased=True)
+    #
+    plt.title(str(problem))
+    plt.show()
 
 #%% 
 # analytic_constants_problems = []
