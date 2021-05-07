@@ -111,7 +111,7 @@ def qc_UL_UR(input_circuit, logical_qubit_grid, qubit_grid, operations):
     # optimization to reduce number of swaps
     zz_circuit = circuit.copy()
     zz_qubit_path = qubit_path.copy()
-
+    zz_logical_grid = get_logical_grid(qubit_path, qubit_grid)
     for i in range(int(num_qubits / 2)):
 
         qc_UL_swap(circuit, qubit_path, qubit_grid)
@@ -236,7 +236,7 @@ def decompose_qaoa_circuit(circuit,N,p):
 
 # WARNING: circuit may need to have 2**k qubits
 def swap_network(qaoa_circuit, p, qubit_grid=None):
-    N = int(2**np.floor(np.log2(qaoa_circuit.num_qubits)))
+    N = qaoa_circuit.num_qubits
 
     if qubit_grid is None:
         qubit_grid = get_qubit_grid(N)
