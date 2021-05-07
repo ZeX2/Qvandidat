@@ -60,14 +60,15 @@ def main():
 
         optimal_gammas = data['optimal_gammas']
         optimal_betas = data['optimal_betas']
+        data['optimal_cost'] = min(costs.values())
         
         if 'state' in filename:
             prob_dist = probability_cost_distribution_state(optimal_gammas, optimal_betas, J, h, costs)
-            appr_ratio = approximation_ratio_state(optimal_gammas, optimal_betas, J, h, costs)
+            appr_ratio, appr_ratio_off = approximation_ratio_state(optimal_gammas, optimal_betas, J, h, costs)
 
         elif 'simul' in filename:
             prob_dist = probability_cost_distribution_simul(optimal_gammas, optimal_betas, J, h, costs, shots=10000)
-            appr_ratio = approximation_ratio_simul(optimal_gammas, optimal_betas, J, h, costs, shots=10000)
+            appr_ratio, appr_ratio_off = approximation_ratio_simul(optimal_gammas, optimal_betas, J, h, costs, shots=10000)
 
         else:
             print()
@@ -79,6 +80,7 @@ def main():
         data['probability_distribution'] = prob_dist
         data['probability_distribution_items'] = list(prob_dist.items())
         data['approximation_ratio'] = appr_ratio
+        data['approximation_ratio_offset'] = appr_ratio_off
         
         data['noise'] = 'simul' in filename
         data['p'] = len(optimal_gammas)

@@ -109,7 +109,6 @@ def _approximation_ratio(count_results, costs):
         value = count_results[key]
         # Note: q1 is the leftmost bit
 
-        spins = [1 if s == '1' else -1 for s in key]
         cost = costs[key]
         total_cost += value*cost
         
@@ -122,7 +121,7 @@ def _approximation_ratio(count_results, costs):
         raise Exception('Invalid job, no costs found')
 
     exp_val = total_cost/total_counts
-    return (exp_val - cost_max)/(cost_best - cost_max)
+    return (exp_val/cost_best), (exp_val - cost_max)/(cost_best - cost_max)
 
 
 def _run_simulation(gamma, beta, J, h, shots):
