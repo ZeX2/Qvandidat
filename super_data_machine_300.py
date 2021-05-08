@@ -1,10 +1,10 @@
 import os
 import json
-from statistics import mean
 
 import numpy as np
 from matplotlib import cm
 import matplotlib.pyplot as plt
+from matplotlib.ticker import PercentFormatter
 
 from integer_bin_packing import *
 from funcs import *
@@ -45,11 +45,11 @@ unique_problems = [eval(i) for i in unique_problems]
 
 instances_data = {}
 landscape_data = {}
-conditions_ = {'noise': False, 'success': True}
+conditions_ = {'noise': True, 'success': True}
 for instance in unique_instances:
     conditions = {'problem': instance, **conditions_}
     instances_data[str(instance)] = filter_data(data.values(), conditions)
-    landscape_data[str(instance)] = next(d for d in data.values() if 'landscape' in d and d['problem']==instance)
+    landscape_data[str(instance)] = next((d for d in data.values() if 'landscape' in d and d['problem']==instance), None)
 
 exp_data = {}
 approx_ratio_data = {}
@@ -69,73 +69,102 @@ for problem, instances in instances_data.items():
     max_valid_cost = len(eval(problem)['W'])
     
     p_values = sorted(list({instance['p'] for instance in instances}))
-    exp_costs = []
-    approx_ratio = []
-    optimal_probs = []
-    valid_probs = []
-    avg_times = []
+    exp_costs = {'avg': [], 'best': [], 'std': []}
+    approx_ratios = {'avg': [], 'best': [], 'std': []}
+    optimal_probs = {'avg': [], 'best': [], 'std': []}
+    valid_probs = {'avg': [], 'best': [], 'std': []}
+    times = {'avg': [], 'best': [], 'std': []}
 
     for p in p_values:
-        exp_costs.append(min(instance['expected_value'] for instance in instances if instance['p']==p))
-        approx_ratio.append(max(instance['approximation_ratio'] for instance in instances if instance['p']==p))
-        optimal_probs.append(max(instance['probability_distribution'][str(min_cost)] 
+        exp_cost = [instance['expected_value'] for instance in instances if instance['p']==p]
+        exp_costs['avg'].append(np.mean(exp_cost))
+        exp_costs['best'].append(min(exp_cost))
+        exp_costs['std'].append(np.std(exp_cost))
+
+        approx_ratio = [instance['approximation_ratio'] for instance in instances if instance['p']==p]
+        approx_ratios['avg'].append(np.mean(approx_ratio))
+        approx_ratios['best'].append(max(approx_ratio))
+        approx_ratios['std'].append(np.std(approx_ratio))
+        
+        optimal_prob = [instance['probability_distribution'][str(min_cost)] 
                                  if (instance['p']==p and str(min_cost) in instance['probability_distribution']) else 0
-                                 for instance in instances))
-        valid_probs.append(max(sum(float(prob) for cost, prob in instance['probability_distribution'].items() 
+                                 for instance in instances]
+        optimal_probs['avg'].append(np.mean(optimal_prob))
+        optimal_probs['best'].append(max(optimal_prob))
+        optimal_probs['std'].append(np.std(optimal_prob))      
+
+        valid_prob = [sum(float(prob) for cost, prob in instance['probability_distribution'].items() 
                                    if float(cost) <= max_valid_cost)
-                               for instance in instances if instance['p']==p))
-        avg_times.append(mean(time_in_sec(instance['execution_time']) for instance in instances if instance['p']==p))
+                               for instance in instances if instance['p']==p]
+        valid_probs['avg'].append(np.mean(valid_prob))
+        valid_probs['best'].append(max(valid_prob))
+        valid_probs['std'].append(np.std(valid_prob))
+
+        
+        time = [time_in_sec(instance['execution_time']) for instance in instances if instance['p']==p]
+        times['avg'].append(np.mean(time))
 
     exp_data[problem] = (p_values, exp_costs)
-    approx_ratio_data[problem] = (p_values, approx_ratio)
+    approx_ratio_data[problem] = (p_values, approx_ratios)
     optimal_prob_data[problem] = (p_values, optimal_probs)
     valid_prob_data[problem] = (p_values, valid_probs)
-    avg_time_data[problem] = (p_values, avg_times)
+    avg_time_data[problem] = (p_values, times)
 
 #%% Plotting
+err_bar_format = {'capsize': 5, 'elinewidth': 2, 'capthick': 2, 'barsabove': True}
 
 # Expected value vs p
 for problem, plot_data in exp_data.items():
     plt.figure()
-    plt.plot(plot_data[0], plot_data[1], '-o')
-    plt.ylabel('Best expected cost')
+    plt.plot(plot_data[0], plot_data[1]['best'], '-o', label='Lowest')
+    plt.errorbar(plot_data[0], plot_data[1]['avg'], fmt='-o', yerr=plot_data[1]['std'], label='Average', **err_bar_format)
+    plt.ylabel('Expected cost')
     plt.xlabel('p')
     plt.title(str(problem))
+    plt.legend()
     plt.show()
 
 # Approximation ratio vs p
 for problem, plot_data in approx_ratio_data.items():
     plt.figure()
-    plt.plot(plot_data[0], plot_data[1], '-o')
-    plt.ylabel('Best approximation ratio')
+    plt.plot(plot_data[0], plot_data[1]['best'], '-o', label='Highest')
+    plt.errorbar(plot_data[0], plot_data[1]['avg'], fmt='-o', yerr=plot_data[1]['std'], label='Average', **err_bar_format)
+    plt.ylabel('Approximation ratio')
     plt.xlabel('p')
     plt.title(str(problem))
+    plt.legend()
     plt.show()
 
 # Probability of optimal solution vs p
 for problem, plot_data in optimal_prob_data.items():
     plt.figure()
-    plt.plot(plot_data[0], plot_data[1], '-o')
+    plt.plot(plot_data[0], plot_data[1]['best'], '-o', label='Highest')
+    plt.errorbar(plot_data[0], plot_data[1]['avg'], fmt='-o', yerr=plot_data[1]['std'], label='Average', **err_bar_format)
+    plt.gca().yaxis.set_major_formatter(PercentFormatter(1))
     plt.ylabel('Probability of optimal solution')
     plt.xlabel('p')
     plt.title(str(problem))
     plt.show()
+    plt.legend()
     plt.plot()
     
 # Probability of valid solution vs p
 for problem, plot_data in valid_prob_data.items():
     plt.figure()
-    plt.plot(plot_data[0], plot_data[1], '-o')
+    plt.plot(plot_data[0], plot_data[1]['best'], '-o', label='Highest')
+    plt.errorbar(plot_data[0], plot_data[1]['avg'], fmt='-o', yerr=plot_data[1]['std'], label='Average', **err_bar_format)
+    plt.gca().yaxis.set_major_formatter(PercentFormatter(1))
     plt.ylabel('Probability of valid solution')
     plt.xlabel('p')
     plt.title(str(problem))
     plt.show()
+    plt.legend()
     plt.plot()
 
 # Average execution time vs p
 for problem, plot_data in avg_time_data.items():
     plt.figure()
-    plt.plot(plot_data[0], plot_data[1], '-o')
+    plt.plot(plot_data[0], plot_data[1]['avg'], '-o')
     plt.ylabel('Average execution time (s)')
     plt.xlabel('p')
     plt.title(str(problem))
@@ -144,6 +173,8 @@ for problem, plot_data in avg_time_data.items():
 
 # Energy landscapes
 for problem, landscape in landscape_data.items():
+    if not landscape:
+        continue
     gammas = landscape['gammas']
     betas = landscape['betas']
     exp_costs = np.array(landscape['landscape'])
@@ -155,7 +186,6 @@ for problem, landscape in landscape_data.items():
     ax.set_ylabel(r'$\beta$')
     ax.set_zlabel('Expected costs')
     surf = ax.plot_surface(gammas_, betas_, exp_costs, cmap=cm.coolwarm, rstride=1, cstride=1, alpha=None, antialiased=True)
-    #
     plt.title(str(problem))
     plt.show()
 
