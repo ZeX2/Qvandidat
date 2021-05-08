@@ -2,7 +2,7 @@ import numpy as np
 import math
 from qiskit import QuantumCircuit
 from qiskit.converters import circuit_to_dag
-
+from decompose_circuit import decompose_qaoa_circuit
 # TODO
 # - Test swap_network with n neq 2**k qubits and
 #   verify that the solutions are correct.
@@ -203,37 +203,6 @@ def seperate_grid(qubit_grid):
         new_grid2 = qubit_grid[0:m,n_range:n]
         return (new_grid1, new_grid2)    
 
-# WARNING: This only works if the circuit only
-# contains ZZ and Rx gates, where all Rx gates
-# are at the end.
-def decompose_qaoa_circuit(circuit,N,p):
-    zz_ops = np.zeros((p,N,N))
-    rx_ops = np.zeros((p,N))
-
-    dag = circuit_to_dag(circuit)
-    nodes = dag.gate_nodes()
-    i = 0
-    j = 0
-    operations_order = np.empty(0)
-    for node in nodes:
-        if node.name == 'rzz':
-            operations_order = np.append(operations_order, 'rzz')
-            i = i+1
-            if operations_order[i-2] == 'rx' and operations_order[i-1] == 'rzz':
-                j = j+1
-            q1 = node.qargs[0].index
-            q2 = node.qargs[1].index
-
-            theta = node.op.params
-            zz_ops[j,min(q1,q2),max(q1,q2)] += theta 
-        elif node.name == 'rx':
-            operations_order = np.append(operations_order, 'rx')
-            i = i+1
-            q1 = node.qargs[0].index
-            theta = node.op.params
-            rx_ops[j,q1] += theta
-    return zz_ops, rx_ops
-
 # WARNING: circuit may need to have 2**k qubits
 def swap_network(qaoa_circuit, p, qubit_grid=None):
     N = qaoa_circuit.num_qubits
@@ -249,7 +218,7 @@ def swap_network(qaoa_circuit, p, qubit_grid=None):
     # when swap_network is done.
     circuit = QuantumCircuit(N, N)
     circuit.h(range(N))
-    operations, rx_ops = decompose_qaoa_circuit(qaoa_circuit, N, p)
+    operations, rz_ops, rx_ops = decompose_qaoa_circuit(qaoa_circuit, N, p)
     
     def recurse(qubit_grid, logical_qubit_grid, circuit, rzz_ops):
         do_all_ops(circuit, logical_qubit_grid, qubit_grid, rzz_ops)
@@ -274,6 +243,9 @@ def swap_network(qaoa_circuit, p, qubit_grid=None):
         circuit = recurse(qubit_grid, logical_qubit_grid, circuit, operations[i, :, :])  
 
         (r, c) = qubit_grid.shape
+        for q, theta in enumerate(rz_ops[i,:]):
+            qq = logical_qubit_grid[int(np.floor(q / c)), q % c]
+            circuit.rz(theta, qq)
 
         for q, theta in enumerate(rx_ops[i,:]):
             qq = logical_qubit_grid[int(np.floor(q / c)), q % c]

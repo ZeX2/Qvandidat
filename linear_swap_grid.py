@@ -2,6 +2,7 @@ import numpy as np
 import math
 from qiskit import QuantumCircuit
 from qiskit.converters import circuit_to_dag
+from decompose_circuit import decompose_qaoa_circuit
 
 def swap_positions(input_list, pos1, pos2): 
     if input_list[pos1] >= 0 and input_list[pos2] >= 0:
@@ -168,39 +169,10 @@ def get_logical_grid(logical_qubit_path):
                 count = count + 1
     return vec.astype(int)
 
- 
-
-def decompose_qaoa_circuit(circuit,N,p):
-    zz_ops = np.zeros((p,N,N))
-    rx_ops = np.zeros((p,N))
-
-    dag = circuit_to_dag(circuit)
-    nodes = dag.gate_nodes()
-    i = 0
-    j = 0
-    operations_order = np.empty(0)
-    for node in nodes:
-        if node.name == 'rzz':
-            operations_order = np.append(operations_order, 'rzz')
-            i = i+1
-            if operations_order[i-2] == 'rx' and operations_order[i-1] == 'rzz':
-                j = j+1
-            q1 = node.qargs[0].index
-            q2 = node.qargs[1].index
-
-            theta = node.op.params
-            zz_ops[j,min(q1,q2),max(q1,q2)] += theta 
-        elif node.name == 'rx':
-            operations_order = np.append(operations_order, 'rx')
-            i = i+1
-            q1 = node.qargs[0].index
-            theta = node.op.params
-            rx_ops[j,q1] += theta
-    return zz_ops, rx_ops
 
 def linear_swap_method(qaoa_circuit, p, qubit_path=None):
     N = qaoa_circuit.num_qubits
-    operations, rx_ops = decompose_qaoa_circuit(qaoa_circuit, N, p)
+    operations, rz_ops, rx_ops = decompose_qaoa_circuit(qaoa_circuit, N, p)
     circuit = QuantumCircuit(N, N)
     circuit.h(range(N))
     if qubit_path is None:
@@ -215,6 +187,10 @@ def linear_swap_method(qaoa_circuit, p, qubit_path=None):
         do_all_ops(circuit, logical_qubit_grid, qubit_grid, operations[i,:,:])
         circuit = qc_UL_UR(circuit, logical_qubit_path, qubit_path, qubit_grid, operations[i,:,:])
         
+        for q, theta in enumerate(rz_ops[i,:]):
+            qq = logical_qubit_path[q]
+            circuit.rz(theta, qq)
+
         for q, theta in enumerate(rx_ops[i,:]):
             qq = logical_qubit_path[q]
             circuit.rx(theta, qq)

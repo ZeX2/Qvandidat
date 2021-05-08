@@ -2,6 +2,7 @@ import numpy as np
 import math
 from qiskit import QuantumCircuit
 from qiskit.converters import circuit_to_dag
+from decompose_circuit import decompose_qaoa_circuit
 
 def swapPositions(list, pos1, pos2):  
     list[pos1], list[pos2] = list[pos2], list[pos1] 
@@ -112,59 +113,6 @@ def get_operations(J, gamma):
             operations[i,j] = 2*gamma*J[i,j]
     return operations.T
 
-#def decompose_qaoa_circuit_old(circuit):
-    N = circuit.num_qubits
-    zz_ops = np.zeros((N,N))
-    rx_ops = np.zeros(N)
-
-    dag = circuit_to_dag(circuit)
-    nodes = dag.gate_nodes()
-
-    for node in nodes:
-
-        if node.name == 'rzz':
-            q1 = node.qargs[0].index
-            q2 = node.qargs[1].index
-
-            theta = node.op.params
-            zz_ops[min(q1,q2),max(q1,q2)] += theta 
-
-        elif node.name == 'rx':
-            q1 = node.qargs[0].index
-
-            theta = node.op.params
-            rx_ops[q1] += theta
-            
-    return zz_ops, rx_ops
-
-def decompose_qaoa_circuit(circuit,N,p):
-    zz_ops = np.zeros((p,N,N))
-    rx_ops = np.zeros((p,N))
-
-    dag = circuit_to_dag(circuit)
-    nodes = dag.gate_nodes()
-    i = 0
-    j = 0
-    operations_order = np.empty(0)
-    for node in nodes:
-        if node.name == 'rzz':
-            operations_order = np.append(operations_order, 'rzz')
-            i = i+1
-            if operations_order[i-2] == 'rx' and operations_order[i-1] == 'rzz':
-                j = j+1
-            q1 = node.qargs[0].index
-            q2 = node.qargs[1].index
-
-            theta = node.op.params
-            zz_ops[j,min(q1,q2),max(q1,q2)] += theta 
-        elif node.name == 'rx':
-            operations_order = np.append(operations_order, 'rx')
-            i = i+1
-            q1 = node.qargs[0].index
-            theta = node.op.params
-            rx_ops[j,q1] += theta
-    return zz_ops, rx_ops
-
 
 # J and qubit_path has to have 2**k qubits
 def linear_swap_method_outdated(J, gamma, beta, qubit_line = None):
@@ -192,7 +140,7 @@ def linear_swap_method_outdated(J, gamma, beta, qubit_line = None):
 
 def linear_swap_method(qaoa_circuit, p, qubit_line=None):
     N = qaoa_circuit.num_qubits
-    operations, rx_ops = decompose_qaoa_circuit(qaoa_circuit, N, p)
+    operations, rz_ops, rx_ops = decompose_qaoa_circuit(qaoa_circuit, N, p)
     circuit = QuantumCircuit(N, N)
     circuit.h(range(N))
     
@@ -204,6 +152,10 @@ def linear_swap_method(qaoa_circuit, p, qubit_line=None):
         do_all_ops(circuit, qubit_line, qubit_path, operations[i,:,:])
         circuit = qc_UL_UR(circuit, qubit_line, qubit_path, operations[i,:,:])
         
+        for q, theta in enumerate(rz_ops[i,:]):
+            qq = qubit_path[q]
+            circuit.rz(theta, qq)
+
         for q, theta in enumerate(rx_ops[i,:]):
             qq = qubit_path[q]
             circuit.rx(theta, qq)
@@ -211,9 +163,9 @@ def linear_swap_method(qaoa_circuit, p, qubit_line=None):
     for q, theta in enumerate(rx_ops[0,:]):
         qq = qubit_path[q]
         circuit.measure(q, qq)
-
+    
     return circuit
 
 def simplify(circuit):
-    return transpile(circuit, basis_gates=['cx', 'rz', 'rx', 'swap'], optimization_level=3)
+    return transpile(circuit, basis_gates=['cz', 'rz', 'u3', 'iswap'], optimization_level=3)
 

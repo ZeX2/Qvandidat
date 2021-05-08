@@ -2,39 +2,12 @@ import numpy as np
 import math
 from qiskit import QuantumCircuit
 from qiskit.converters import circuit_to_dag
+from decompose_circuit import decompose_qaoa_circuit
+
 
 def swap_positions(input_list, pos1, pos2):
     input_list[pos1], input_list[pos2] = input_list[pos2], input_list[pos1] 
     return input_list
-
-def decompose_qaoa_circuit(circuit,p):
-    N = circuit.num_qubits
-    zz_ops = np.zeros((p,N,N))
-    rx_ops = np.zeros((p,N))
-
-    dag = circuit_to_dag(circuit)
-    nodes = dag.gate_nodes()
-    i = 0
-    j = 0
-    operations_order = np.empty(0)
-    for node in nodes:
-        if node.name == 'rzz':
-            operations_order = np.append(operations_order, 'rzz')
-            i = i+1
-            if operations_order[i-2] == 'rx' and operations_order[i-1] == 'rzz':
-                j = j+1
-            q1 = node.qargs[0].index
-            q2 = node.qargs[1].index
-
-            theta = node.op.params
-            zz_ops[j,min(q1,q2),max(q1,q2)] += theta 
-        elif node.name == 'rx':
-            operations_order = np.append(operations_order, 'rx')
-            i = i+1
-            q1 = node.qargs[0].index
-            theta = node.op.params
-            rx_ops[j,q1] += theta
-    return zz_ops, rx_ops
 
 def do_all_ops(circuit, coupling, qubit_order, operations):
     N = circuit.num_qubits
@@ -107,9 +80,8 @@ def star_swap(qaoa_circuit, p, coupling = None):
     N = qaoa_circuit.num_qubits
     circuit = QuantumCircuit(N,N)
     circuit.h(range(N))
-    zz_ops, rx_ops = decompose_qaoa_circuit(qaoa_circuit, p)
-    print(zz_ops)
-    print(rx_ops)
+    zz_ops, rz_ops, rx_ops = decompose_qaoa_circuit(qaoa_circuit, N, p)
+
     if coupling is None:
         coupling = []
         # Last qubit in the middle
@@ -122,6 +94,11 @@ def star_swap(qaoa_circuit, p, coupling = None):
             do_all_ops(circuit, coupling, qubit_order, zz_ops[i,:,:])
         
             circuit = swap(circuit, coupling, qubit_order, zz_ops[i,:,:])
+
+        for q, theta in enumerate(rz_ops[i,:]):
+            qq = qubit_order[q]
+            if theta != 0:
+                circuit.rz(theta, qq) 
 
         for q, theta in enumerate(rx_ops[i,:]):
             qq = qubit_order[q]
