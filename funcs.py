@@ -84,7 +84,33 @@ def run_simulation(gamma, beta, J, h, costs, shots):
     return sum(counts*costs[bits] for bits, counts in counts.items())/shots
 
 
-# should produce the same results as expected_cost
+def _run_routing(gamma, beta, J, h, routing, shots):
+    if routing == 'star':
+        chalmers_coupling_circuit = star_swap_chalmers_circuit(gamma, beta, J, h)
+    elif routing == 'line':
+        chalmers_coupling_circuit = linear_swap_chalmers_circuit(gamma, beta, J, h)
+    elif routing == 'transpile':
+        chalmers_coupling_circuit = transpile_swap_chalmers_circuit(gamma, beta, J, h)
+    elif routing == 'linegrid':
+        chalmers_coupling_circuit = linear_swap_grid_chalmers_circuit(gamma, beta, J, h)
+    elif routing == 'network':
+        chalmers_coupling_circuit = swap_network_chalmers_circuit(gamma, beta, J, h)
+    else:
+        print('This routing method dose not exists.', routing, 'Exiting')
+        exit(0)
+
+    noise_model = chalmers_noise_model()
+    chalmers_circuit = translate_circuit(chalmers_coupling_circuit)
+
+    job = execute(chalmers_circuit, SIMULATOR, shots=shots, noise_model=noise_model)
+    result = job.result()
+    return result.get_counts()
+
+def run_routing(gamma, beta, J, h, routing, costs, shots):
+    counts = _run_routing(gamma, beta, J, h, routing, shots)
+    return sum(counts*costs[bits] for bits, counts in counts.items())/shots
+
+
 def _run_chalmers_circuit_ideal(gamma, beta, J, h):
     circuit = _chalmers_circuit(gamma, beta, J, h)
     sv = execute(circuit, SVSIM).result().get_statevector()
@@ -168,6 +194,20 @@ def optimize_angles_state(J, h, p, costs, maxiter):
     bnd = opt.Bounds([0]*(2*p), [2*np.pi]*p + [np.pi]*p) 
     args = (J, h, costs)
     opt_angles = opt.differential_evolution(_objective_state, bounds=bnd, args = args, maxiter = maxiter)
+    angles = opt_angles.x
+
+    return angles[:len(angles)//2], angles[len(angles)//2:], opt_angles
+
+def _objective_routing(angles,*variables):
+    J, h, routing, costs, shots = variables
+    gamma, beta = angles[:len(angles)//2], angles[len(angles)//2:]
+    return run_routing(gamma, beta, J, h, routing, costs, shots)  
+
+def optimize_angles_routing(J, h, p, routing, costs, maxiter, shots = 1000):
+    
+    bnd = opt.Bounds([0]*(2*p), [2*np.pi]*p + [np.pi]*p)   
+    args = (J,h,routing,costs,shots)
+    opt_angles = opt.differential_evolution(_objective_routing, bounds=bnd, maxiter = maxiter, args = args)
     angles = opt_angles.x
 
     return angles[:len(angles)//2], angles[len(angles)//2:], opt_angles
