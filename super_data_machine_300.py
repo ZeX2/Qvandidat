@@ -5,6 +5,7 @@ import numpy as np
 from matplotlib import cm
 import matplotlib.pyplot as plt
 from matplotlib.ticker import PercentFormatter
+from scipy.stats import sem
 
 from integer_bin_packing import *
 from funcs import *
@@ -17,7 +18,7 @@ def time_in_sec(time):
     return int(3600*h + 60*m + s)
 
 dir_path = os.getcwd()
-data_path = os.path.join(dir_path, 'results_old')
+data_path = os.path.join(dir_path, 'results')
 data_json_paths = [f for f in os.listdir(data_path) if f.endswith('.json.json')]
 
 data = {}
@@ -25,7 +26,6 @@ for file_name in data_json_paths:
     with open(os.path.join(data_path, file_name)) as f:
         data[file_name.rstrip('.json.json')] = json.load(f)
         #data.append(json.load(f))
-        
 
 unique_problems = []
 unique_instances = []
@@ -40,12 +40,10 @@ unique_instances = [eval(i) for i in unique_instances]
 unique_problems = set([str(i) for i in unique_problems])
 unique_problems = [eval(i) for i in unique_problems]
 
-
 #%% Data extraction
-
 instances_data = {}
 landscape_data = {}
-conditions_ = {'noise': True, 'success': True}
+conditions_ = {'noise': False}
 for instance in unique_instances:
     conditions = {'problem': instance, **conditions_}
     instances_data[str(instance)] = filter_data(data.values(), conditions)
@@ -56,7 +54,6 @@ approx_ratio_data = {}
 optimal_prob_data = {}
 valid_prob_data = {}
 avg_time_data = {}
-#Staplar?
 
 for problem, instances in instances_data.items():
     if not instances:
@@ -79,27 +76,25 @@ for problem, instances in instances_data.items():
         exp_cost = [instance['expected_value'] for instance in instances if instance['p']==p]
         exp_costs['avg'].append(np.mean(exp_cost))
         exp_costs['best'].append(min(exp_cost))
-        exp_costs['std'].append(np.std(exp_cost))
+        exp_costs['std'].append(sem(exp_cost))
 
         approx_ratio = [instance['approximation_ratio'] for instance in instances if instance['p']==p]
         approx_ratios['avg'].append(np.mean(approx_ratio))
         approx_ratios['best'].append(max(approx_ratio))
-        approx_ratios['std'].append(np.std(approx_ratio))
+        approx_ratios['std'].append(sem(approx_ratio))
         
-        optimal_prob = [instance['probability_distribution'][str(min_cost)] 
-                                 if (instance['p']==p and str(min_cost) in instance['probability_distribution']) else 0
-                                 for instance in instances]
+        optimal_prob = [instance['probability_distribution'][str(min_cost)] for instance in instances
+                        if (instance['p']==p and str(min_cost) in instance['probability_distribution'])]
         optimal_probs['avg'].append(np.mean(optimal_prob))
         optimal_probs['best'].append(max(optimal_prob))
-        optimal_probs['std'].append(np.std(optimal_prob))      
+        optimal_probs['std'].append(sem(optimal_prob))
 
         valid_prob = [sum(float(prob) for cost, prob in instance['probability_distribution'].items() 
                                    if float(cost) <= max_valid_cost)
                                for instance in instances if instance['p']==p]
         valid_probs['avg'].append(np.mean(valid_prob))
         valid_probs['best'].append(max(valid_prob))
-        valid_probs['std'].append(np.std(valid_prob))
-
+        valid_probs['std'].append(sem(valid_prob))
         
         time = [time_in_sec(instance['execution_time']) for instance in instances if instance['p']==p]
         times['avg'].append(np.mean(time))
