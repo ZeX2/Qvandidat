@@ -13,7 +13,12 @@ from qiskit.visualization import plot_histogram
 
 from native_gate_set import translate_circuit
 from noise import chalmers_noise_model
-from linear_swap import linear_swap_method as linear_swap
+
+from routing_methods.linear_swap import linear_swap_method as linear_swap
+from routing_methods.swap_network import swap_network
+from routing_methods.five_qubit_swap_technique import star_swap
+from routing_methods.qiskit_transpiler import transpile_circuit as transpile_swap
+from routing_methods.linear_swap_grid import linear_swap_method as linear_swap_grid
 
 BACKEND = Aer.get_backend('unitary_simulator')
 SIMULATOR = Aer.get_backend('qasm_simulator')
@@ -95,6 +100,48 @@ def _chalmers_circuit(gamma, beta, J, h):
     p = len(gamma) if isinstance(gamma, Iterable) else 1
     qaoa_circuit = qaoa_ising_circuit(J, h, gamma, beta)
     chalmers_coupling_circuit = linear_swap(qaoa_circuit, p)
+    chalmers_circuit = translate_circuit(chalmers_coupling_circuit)
+    return chalmers_circuit
+
+
+def linear_swap_chalmers_circuit(gamma, beta, J, h):
+    p = len(gamma) if isinstance(gamma, Iterable) else 1
+    qaoa_circuit = qaoa_ising_circuit(J, h, gamma, beta)
+    chalmers_coupling_circuit = linear_swap(qaoa_circuit, p)
+    chalmers_circuit = translate_circuit(chalmers_coupling_circuit)
+    return chalmers_circuit
+
+def linear_swap_grid_chalmers_circuit(gamma, beta, J, h):
+    p = len(gamma) if isinstance(gamma, Iterable) else 1
+    qaoa_circuit = qaoa_ising_circuit(J, h, gamma, beta)
+    chalmers_coupling_circuit = linear_swap_grid(qaoa_circuit, p)
+    chalmers_circuit = translate_circuit(chalmers_coupling_circuit)
+    return chalmers_circuit
+
+def swap_network_chalmers_circuit2(gamma, beta, J, h):
+    p = len(gamma) if isinstance(gamma, Iterable) else 1
+    qaoa_circuit = qaoa_ising_circuit(J, h, gamma, beta)
+    chalmers_coupling_circuit = swap_network(qaoa_circuit, p)
+    return chalmers_coupling_circuit
+
+def swap_network_chalmers_circuit(gamma, beta, J, h):
+    p = len(gamma) if isinstance(gamma, Iterable) else 1
+    qaoa_circuit = qaoa_ising_circuit(J, h, gamma, beta)
+    chalmers_coupling_circuit = swap_network(qaoa_circuit, p)
+    chalmers_circuit = translate_circuit(chalmers_coupling_circuit)
+    return chalmers_circuit
+
+def star_swap_chalmers_circuit(gamma, beta, J, h):
+    p = len(gamma) if isinstance(gamma, Iterable) else 1
+    qaoa_circuit = qaoa_ising_circuit(J, h, gamma, beta)
+    chalmers_coupling_circuit = star_swap(qaoa_circuit, p)
+    chalmers_circuit = translate_circuit(chalmers_coupling_circuit)
+    return chalmers_circuit
+
+def transpile_swap_chalmers_circuit(gamma, beta, J, h):
+    p = len(gamma) if isinstance(gamma, Iterable) else 1
+    qaoa_circuit = qaoa_ising_circuit(J, h, gamma, beta)
+    chalmers_coupling_circuit = transpile_swap(qaoa_circuit, p)
     chalmers_circuit = translate_circuit(chalmers_coupling_circuit)
     return chalmers_circuit
 
