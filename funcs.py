@@ -49,7 +49,7 @@ def qaoa_ising_circuit(J, h, gamma, beta, measure=True):
         qc.rx(2*beta_k, range(N))
 
     if measure:
-        qc.measure_all()
+        qc.measure(range(N), range(N))
     return qc
 
 def bits_to_spins(bits):
