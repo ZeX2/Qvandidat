@@ -1,5 +1,6 @@
 import os
 import json
+from pathlib import Path
 
 import numpy as np
 from matplotlib import cm
@@ -17,6 +18,9 @@ def time_in_sec(time):
     h, m, s = [float(i) for i in time.split(':')]
     return int(3600*h + 60*m + s)
 
+def problem_dict2str(problem):
+    return f"W={problem['W']}-W_max={problem['W_max']}-A={problem['A']}-B={problem['B']}-C={problem['C']}"
+    
 dir_path = os.getcwd()
 data_path = os.path.join(dir_path, 'results')
 data_json_paths = [f for f in os.listdir(data_path) if f.endswith('.json.json')]
@@ -43,7 +47,9 @@ unique_problems = [eval(i) for i in unique_problems]
 #%% Data extraction
 instances_data = {}
 landscape_data = {}
-conditions_ = {'noise': False}
+noise = False #If noise or not
+noise_string = 'noise' if noise else 'state'
+conditions_ = {'noise': noise}
 for instance in unique_instances:
     conditions = {'problem': instance, **conditions_}
     instances_data[str(instance)] = filter_data(data.values(), conditions)
@@ -108,6 +114,13 @@ for problem, instances in instances_data.items():
 #%% Plotting
 err_bar_format = {'capsize': 5, 'elinewidth': 2, 'capthick': 2, 'barsabove': True}
 
+plots = ['expected_cost', 'approximation_ratio', 'optimal_solution', 'valid_solution', 'execution_time', 'landscape']
+for plot in plots:
+    for sim_type in ['state', 'noise']:
+        Path(f'plots/{plot}/{sim_type}').mkdir(parents=True, exist_ok=True)
+
+show_plots = False
+
 # Expected value vs p
 for problem, plot_data in exp_data.items():
     plt.figure()
@@ -117,7 +130,9 @@ for problem, plot_data in exp_data.items():
     plt.xlabel('p')
     plt.title(str(problem))
     plt.legend()
-    plt.show()
+    if show_plots: plt.show()
+    problem_string = problem_dict2str(eval(problem))
+    plt.savefig(f'plots/expected_cost/{noise_string}/expected_cost-{noise_string}-{problem_string}-')
 
 # Approximation ratio vs p
 for problem, plot_data in approx_ratio_data.items():
@@ -128,7 +143,9 @@ for problem, plot_data in approx_ratio_data.items():
     plt.xlabel('p')
     plt.title(str(problem))
     plt.legend()
-    plt.show()
+    if show_plots: plt.show()
+    problem_string = problem_dict2str(eval(problem))
+    plt.savefig(f'plots/approximation_ratio/{noise_string}/approximation_ratio-{noise_string}-{problem_string}')
 
 # Probability of optimal solution vs p
 for problem, plot_data in optimal_prob_data.items():
@@ -141,7 +158,9 @@ for problem, plot_data in optimal_prob_data.items():
     plt.title(str(problem))
     plt.show()
     plt.legend()
-    plt.plot()
+    if show_plots: plt.show()
+    problem_string = problem_dict2str(eval(problem))
+    plt.savefig(f'plots/optimal_solution/{noise_string}/optimal_solution-{noise_string}-{problem_string}')
     
 # Probability of valid solution vs p
 for problem, plot_data in valid_prob_data.items():
@@ -154,7 +173,9 @@ for problem, plot_data in valid_prob_data.items():
     plt.title(str(problem))
     plt.show()
     plt.legend()
-    plt.plot()
+    if show_plots: plt.show()
+    problem_string = problem_dict2str(eval(problem))
+    plt.savefig(f'plots/valid_solution/{noise_string}/valid_solution-{noise_string}-{problem_string}')
 
 # Average execution time vs p
 for problem, plot_data in avg_time_data.items():
@@ -164,7 +185,9 @@ for problem, plot_data in avg_time_data.items():
     plt.xlabel('p')
     plt.title(str(problem))
     plt.show()
-    plt.plot()
+    if show_plots: plt.show()
+    problem_string = problem_dict2str(eval(problem))
+    plt.savefig(f'plots/execution_time/{noise_string}/execution_time-{noise_string}-{problem_string}')
 
 # Energy landscapes
 for problem, landscape in landscape_data.items():
@@ -182,7 +205,9 @@ for problem, landscape in landscape_data.items():
     ax.set_zlabel('Expected costs')
     surf = ax.plot_surface(gammas_, betas_, exp_costs, cmap=cm.coolwarm, rstride=1, cstride=1, alpha=None, antialiased=True)
     plt.title(str(problem))
-    plt.show()
+    if show_plots: plt.show()
+    problem_string = problem_dict2str(eval(problem))
+    plt.savefig(f'plots/landscape/{noise_string}/landscape-{noise_string}-{problem_string}')
 
 #%% 
 # analytic_constants_problems = []
