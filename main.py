@@ -26,7 +26,7 @@ def main(problem_number):
 
     if problem_dict['noise']:
         del problem_dict['noise']
-        _run_problem_simul(**problem_dict)
+        #_run_problem_simul(**problem_dict)
     else:
         del problem_dict['noise']
         _run_problem_state(**problem_dict)
@@ -44,7 +44,7 @@ def _run_problem_simul(W,W_max,p,A = None,B = None, C = None):
         # TODO Set shots to reasonable value
         print('Finding optimal angles for p =', str(p))
         start_time = time.monotonic()
-        gammas, betas, opt_result = optimize_angles_simul(J, h, p, costs, maxiter=int(p**(3/2))*1000, shots=10000)
+        gammas, betas, opt_result = optimize_angles_simul(J, h, p, costs, maxiter=50, shots=10000)
         end_time = time.monotonic()
         opt_dict = {'nfev':opt_result.nfev,'message':opt_result.message,'success':opt_result.success,'nit':opt_result.nit}
         file_name = 'angles-p' + str(p) + '-iter-' + str(iter_) + file_suffix
@@ -63,7 +63,7 @@ def _run_problem_state(W,W_max,p , A = None,B = None, C = None):
     for iter_ in range(1,MAX_ITER+1):
         print('Finding optimal angles for p =', str(p))
         start_time = time.monotonic()
-        gammas, betas, opt_result = optimize_angles_state(J, h, p, costs, maxiter=int(p**(3/2))*1000)
+        gammas, betas, opt_result = optimize_angles_state(J, h, p, costs, maxiter=50)
         end_time = time.monotonic()
 
         file_name = 'angles-p' + str(p) + '-iter-' + str(iter_) + file_suffix
