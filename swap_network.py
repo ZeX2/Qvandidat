@@ -11,8 +11,9 @@ from decompose_circuit import decompose_qaoa_circuit
 #   outperforms swap_network for large
 #   circuits.
 
-def swap_positions(input_list, pos1, pos2):  
-    input_list[pos1], input_list[pos2] = input_list[pos2], input_list[pos1] 
+def swap_positions(input_list, pos1, pos2):
+    if input_list[pos1] >= 0 or input_list[pos2] >= 0:  
+        input_list[pos1], input_list[pos2] = input_list[pos2], input_list[pos1] 
     return input_list
 
 def do_all_ops(circuit, logical_qubit_grid, qubit_grid, operations):
@@ -27,7 +28,8 @@ def do_all_ops(circuit, logical_qubit_grid, qubit_grid, operations):
             logical_q2 = logical_qubit_grid[i+1,j]
             q1 = qubit_grid[i,j]
             q2 = qubit_grid[i+1,j]
-            didzz |= do_op(q1, q2, logical_q1, logical_q2, circuit, operations)
+            if q1 >= 0 and q2 >= 0 and logical_q1 >= 0 and logical_q2 >= 0:
+                didzz |= do_op(q1, q2, logical_q1, logical_q2, circuit, operations)
 
     for i in range(1,M-2,2):
         for j in range(N):
@@ -35,7 +37,8 @@ def do_all_ops(circuit, logical_qubit_grid, qubit_grid, operations):
             logical_q2 = logical_qubit_grid[i+1,j]
             q1 = qubit_grid[i,j]
             q2 = qubit_grid[i+1,j]
-            didzz |= do_op(q1, q2, logical_q1, logical_q2, circuit, operations)
+            if q1 >= 0 and q2 >= 0 and logical_q1 >= 0 and logical_q2 >= 0:
+                didzz |= do_op(q1, q2, logical_q1, logical_q2, circuit, operations)
 
     for i in range(M):
         for j in range(0,N-1,2):
@@ -43,7 +46,8 @@ def do_all_ops(circuit, logical_qubit_grid, qubit_grid, operations):
             logical_q2 = logical_qubit_grid[i,j+1]
             q1 = qubit_grid[i,j]
             q2 = qubit_grid[i,j+1]
-            didzz |= do_op(q1, q2, logical_q1, logical_q2, circuit, operations)
+            if q1 >= 0 and q2 >= 0 and logical_q1 >= 0 and logical_q2 >= 0:
+                didzz |= do_op(q1, q2, logical_q1, logical_q2, circuit, operations)
 
     for i in range(M):
         for j in range(1,N-2,2):
@@ -51,7 +55,8 @@ def do_all_ops(circuit, logical_qubit_grid, qubit_grid, operations):
             logical_q2 = logical_qubit_grid[i,j+1]
             q1 = qubit_grid[i,j]
             q2 = qubit_grid[i,j+1]
-            didzz |= do_op(q1, q2, logical_q1, logical_q2, circuit, operations)
+            if q1 >= 0 and q2 >= 0 and logical_q1 >= 0 and logical_q2 >= 0:
+                didzz |= do_op(q1, q2, logical_q1, logical_q2, circuit, operations)
 
     return didzz
 
@@ -83,8 +88,9 @@ def qc_UL_swap(circuit, qubit_path, qubit_grid):
     qubit_grid_path = get_qubit_path(qubit_grid)
 
     for i in range(0,N-1,2):
-        qubit_path = swap_positions(qubit_path, i, i+1)
-        circuit.swap(qubit_grid_path[i], qubit_grid_path[i+1])
+        if qubit_path[i] >= 0 and qubit_path[i+1] >= 0:
+            qubit_path = swap_positions(qubit_path, i, i+1)
+            circuit.swap(qubit_grid_path[i], qubit_grid_path[i+1])
 
     return circuit 
 
@@ -93,11 +99,12 @@ def qc_UR_swap(circuit, qubit_path, qubit_grid):
     qubit_grid_path = get_qubit_path(qubit_grid)
 
     for i in range(1,N-1,2):
-        qubit_path = swap_positions(qubit_path, i, i+1)
-        circuit.swap(qubit_grid_path[i], qubit_grid_path[i+1])
-
-    qubit_path = swap_positions(qubit_path, N-1, 0)
-    circuit.swap(qubit_grid_path[N-1], qubit_grid_path[0])
+        if qubit_path[i] >= 0 and qubit_path[i+1] >= 0:
+            qubit_path = swap_positions(qubit_path, i, i+1)
+            circuit.swap(qubit_grid_path[i], qubit_grid_path[i+1])
+    if qubit_path[N-1] >= 0 and qubit_path[0] >= 0:
+        qubit_path = swap_positions(qubit_path, N-1, 0)
+        circuit.swap(qubit_grid_path[N-1], qubit_grid_path[0])
 
     return circuit 
 
@@ -139,18 +146,20 @@ def qc_UL_UR(input_circuit, logical_qubit_grid, qubit_grid, operations):
 
     return zz_circuit
 
-def qc_color_sep(circuit, logical_qubit_grid, qubit_grid): 
+def qc_color_sep(circuit, logical_qubit_grid, qubit_grid,operations): 
     m,n = qubit_grid.shape
     if m > n:
         for k in range(n):
             for i in range((k+1)%2,int(m/2),1):
                 for j in range(i,m-i-1,2):
+                    if logical_qubit_grid[j,k] == logical_qubit_grid[j+1,k] or np.all(operations == 0): continue
                     logical_qubit_grid = swap_positions(logical_qubit_grid, (j,k),(j+1,k))
                     circuit.swap(qubit_grid[j, k], qubit_grid[j + 1, k])   
     else: 
         for k in range(m):
             for i in range((k+1)%2,int(n/2),1):
                 for j in range(i,n-i-1,2):
+                    if logical_qubit_grid[k,j] == logical_qubit_grid[k,j+1] or np.all(operations == 0): continue
                     logical_qubit_grid = swap_positions(logical_qubit_grid, (k,j),(k,j+1))
                     circuit.swap(qubit_grid[k, j], qubit_grid[k, j + 1])   
 
@@ -203,9 +212,26 @@ def seperate_grid(qubit_grid):
         new_grid2 = qubit_grid[0:m,n_range:n]
         return (new_grid1, new_grid2)    
 
+def get_qubit_path2(qubit_grid):
+    m,n =  qubit_grid.shape
+    #qubit_path = np.flip(qubit_grid[m-1,:])
+    qubit_path = np.array([])
+
+    for i in range(m-1,-1, -1):
+            vec_reverse = np.flip(qubit_grid[i,:])
+            if i%2 == 0:
+                qubit_path = np.append(qubit_path, vec_reverse)
+            else:
+                qubit_path = np.append(qubit_path, qubit_grid[i,:])
+    return qubit_path.astype(int)
+
+    
+
+
 # WARNING: circuit may need to have 2**k qubits
-def swap_network(qaoa_circuit, p, qubit_grid=None):
-    N = qaoa_circuit.num_qubits
+def swap_network(qaoa_circuit, p, qubit_grid=None, measure = True):
+    num = qaoa_circuit.num_qubits
+    N = 2**math.ceil(math.log2(num))
 
     if qubit_grid is None:
         qubit_grid = get_qubit_grid(N)
@@ -216,10 +242,11 @@ def swap_network(qaoa_circuit, p, qubit_grid=None):
     # not in use. Altough shouldn't hurt
     # and should be possible to remove qubits
     # when swap_network is done.
-    circuit = QuantumCircuit(N, N)
-    circuit.h(range(N))
+    circuit = QuantumCircuit(N, num)
+    circuit.h(range(num))
     operations, rz_ops, rx_ops = decompose_qaoa_circuit(qaoa_circuit, N, p)
     
+
     def recurse(qubit_grid, logical_qubit_grid, circuit, rzz_ops):
         do_all_ops(circuit, logical_qubit_grid, qubit_grid, rzz_ops)
 
@@ -227,7 +254,7 @@ def swap_network(qaoa_circuit, p, qubit_grid=None):
         if qubit_grid.size != 4: 
             circuit = qc_UL_UR(circuit, logical_qubit_grid, qubit_grid, rzz_ops)
 
-        qc_color_sep(circuit, logical_qubit_grid, qubit_grid)
+        qc_color_sep(circuit, logical_qubit_grid, qubit_grid, rzz_ops)
 
         logical_grid1, logical_grid2 = seperate_grid(logical_qubit_grid)
         grid1, grid2 = seperate_grid(qubit_grid)
@@ -236,23 +263,43 @@ def swap_network(qaoa_circuit, p, qubit_grid=None):
         circuit = recurse(grid2, logical_grid2, circuit, rzz_ops)
 
         return circuit
+    
 
-    logical_qubit_grid = qubit_grid.copy()
+    qubit_path = -1* np.ones(N)
+    qubit_path = qubit_path.astype(int)
 
+    for i in range(num):
+        qubit_path[i] = i
+
+    #logical_qubit_grid = -1*np.ones((qubit_grid.shape))
+    logical_qubit_grid = qubit_path.reshape((qubit_grid.shape))
     for i in range(p):
         circuit = recurse(qubit_grid, logical_qubit_grid, circuit, operations[i, :, :])  
+        qubit_path = get_qubit_path(qubit_grid)
 
         (r, c) = qubit_grid.shape
+
         for q, theta in enumerate(rz_ops[i,:]):
             qq = logical_qubit_grid[int(np.floor(q / c)), q % c]
-            circuit.rz(theta, qq)
+            theta = rz_ops[i,:][qq]
+            if qq != -1 and theta != 0:
+                circuit.rz(theta, q)
 
         for q, theta in enumerate(rx_ops[i,:]):
             qq = logical_qubit_grid[int(np.floor(q / c)), q % c]
-            circuit.rx(theta, qq)
+            theta = rx_ops[i,:][qq]
+            if qq != -1 and theta != 0:
+                circuit.rx(theta, q)
 
     for q, theta in enumerate(rx_ops[0,:]):
         qq = logical_qubit_grid[int(np.floor(q / c)), q % c]
-        circuit.measure(q, qq)
+        
+        if qq != -1 and qq < num:
+            if measure:
+                circuit.measure(q,qq)
+            elif q > qq:
+                circuit.swap(q,qq)
+
+
 
     return circuit
