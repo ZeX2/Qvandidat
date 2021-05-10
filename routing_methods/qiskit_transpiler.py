@@ -69,9 +69,18 @@ def transpile_circuit(circuit, print_depth=True):
     backend = FakeChalmers()
     best_circuit = None
     for kk in range(4):
-        circ = transpile(circuit, backend,  optimization_level=kk)
-        #print(kk, circ.depth())
+        try:
+            circ = transpile(circuit, backend,  optimization_level=kk)
+        except ex:
+            print('Transpiled failed with message', ex)
+            try:
+                circ = transpile(circuit, backend,  optimization_level=kk)
+            except ex:
+                print('Transpiled failed AGAIN now with message', ex)
+                print('Ignoring this optimization_level', kk)
+                continue
+
         if (best_circuit is None) or (best_circuit.depth() > circ.depth()):
             best_circuit = circ
-            #print('vest', best_circuit.depth())
+
     return best_circuit
