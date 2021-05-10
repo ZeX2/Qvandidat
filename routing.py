@@ -31,6 +31,16 @@ def _run_problem(W,W_max,p,routing):
     S = {'W':W, 'W_max':W_max,'A':A, 'B':B, 'C':C}
     file_suffix = '-routing-' + routing + '-' + str(S) + '-' + str(int(datetime.now().timestamp()))
 
+    n = len(W) * len(W) + len(W) * W_max
+
+    if routing == 'star' and n > 5:
+        print('Star routing method is only defined for n <= 5')
+        return
+
+    if routing == 'network' and not n in [2**k for k in range(0, 10)]:
+        print('Swap network routing method is only defined for n = 2**k')
+        return
+
     bits_list = get_bits_list(len(J))
     costs = {bits: cost_function(bits, J, h, const, np.trace(J))/B for bits in bits_list}
     
@@ -40,7 +50,7 @@ def _run_problem(W,W_max,p,routing):
         start_time = time.monotonic()
         gammas, betas, opt_result = optimize_angles_routing(J, h, p, routing, costs, maxiter=50, shots=10000)
         end_time = time.monotonic()
-        opt_dict = {'nfev':opt_result.nfev,'message':opt_result.message,'success':opt_result.success,'nit':opt_result.nit}
+        opt_dict = {'nfev':opt_result.nfev,'message':opt_result.message,'success':opt_result.success,'nit':opt_result.nit,'routing':routing}
         file_name = 'angles-p' + str(p) + '-iter-' + str(iter_) + file_suffix
         save_results(gammas, betas, opt_result.fun, str(S), end_time-start_time, file_name,opt_dict)
 
