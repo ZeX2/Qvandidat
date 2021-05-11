@@ -108,7 +108,7 @@ class NumpyEncoder(json.JSONEncoder):
 
 
 if __name__ == '__main__':
-
+    print("h")
     main(int(sys.argv[1]))
 
 

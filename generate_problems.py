@@ -6,9 +6,9 @@ MAX_P = 7
 def main():
     # prioritized order
     print('[')
-    run_problem([1], 1, A = 8) #8 qubits
-    run_problem([1, 1], 2, A = 32) #8 qubits
-    run_problem([1, 1, 1], 1, A = 12)  #12 qubits
+    run_problem([1], 1, A = 12) #8 qubits
+    run_problem([1, 1], 2, A = 36) #8 qubits
+    run_problem([1, 1, 1], 1, A = 16)  #12 qubits
     #run_problem([1, 2, 3], 3, noise = False, test_const=False) #18 qubits
     #run_problem([1 ,2], 2, noise = False, test_const=False) #8 qubits
     #run_problem([1 ,6], 6, noise = False, test_const=False) #16 qubits
