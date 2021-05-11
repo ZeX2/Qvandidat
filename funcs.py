@@ -81,6 +81,10 @@ def probability_cost_distribution_simul(gamma, beta, J, h, costs, shots):
     prob_dict = _run_simulation(gamma, beta, J, h, shots)
     return _probability_cost_distribution(prob_dict, costs)
 
+def probability_cost_distribution_routing(gamma, beta, J, h, routing, costs, shots):
+    prob_dict = _run_routing(gamma, beta, J, h, routing, shots)
+    return _probability_cost_distribution(prob_dict, costs)
+
 def _probability_cost_distribution(count_results, costs):
     total_counts = sum(count_results.values())
     total_cost = 0
@@ -101,6 +105,10 @@ def approximation_ratio_state(gamma, beta, J, h, costs):
 
 def approximation_ratio_simul(gamma, beta, J, h, costs, shots):
     prob_dict = _run_simulation(gamma, beta, J, h, shots)
+    return _approximation_ratio(prob_dict, costs)
+
+def approximation_ratio_routing(gamma, beta, J, h, routing, costs, shots):
+    prob_dict = _run_routing(gamma, beta, J, h, routing, shots)
     return _approximation_ratio(prob_dict, costs)
 
 def _approximation_ratio(count_results, costs):

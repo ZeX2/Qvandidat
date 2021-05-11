@@ -70,6 +70,10 @@ def main():
             prob_dist = probability_cost_distribution_simul(optimal_gammas, optimal_betas, J, h, costs, shots=10000)
             appr_ratio, appr_ratio_off = approximation_ratio_simul(optimal_gammas, optimal_betas, J, h, costs, shots=10000)
 
+        elif 'routing' in filename:
+            prob_dist = probability_cost_distribution_routing(optimal_gammas, optimal_betas, J, h, data['routing'], costs, shots=10000)
+            appr_ratio, appr_ratio_off = approximation_ratio_routing(optimal_gammas, optimal_betas, J, h, data['routing'], costs, shots=10000)
+            
         else:
             print()
             print('Invalid file, file name needs to contain either state or simul')
