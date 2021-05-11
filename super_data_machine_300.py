@@ -1,10 +1,12 @@
 import os
 import json
+from pathlib import Path
 
 import numpy as np
 from matplotlib import cm
 import matplotlib.pyplot as plt
 from matplotlib.ticker import PercentFormatter
+from scipy.stats import sem
 
 from integer_bin_packing import *
 from funcs import *
@@ -16,8 +18,11 @@ def time_in_sec(time):
     h, m, s = [float(i) for i in time.split(':')]
     return int(3600*h + 60*m + s)
 
+def problem_dict2str(problem):
+    return f"W={problem['W']}-W_max={problem['W_max']}-A={problem['A']}-B={problem['B']}-C={problem['C']}"
+    
 dir_path = os.getcwd()
-data_path = os.path.join(dir_path, 'results_old')
+data_path = os.path.join(dir_path, 'results')
 data_json_paths = [f for f in os.listdir(data_path) if f.endswith('.json.json')]
 
 data = {}
@@ -25,7 +30,6 @@ for file_name in data_json_paths:
     with open(os.path.join(data_path, file_name)) as f:
         data[file_name.rstrip('.json.json')] = json.load(f)
         #data.append(json.load(f))
-        
 
 unique_problems = []
 unique_instances = []
@@ -40,12 +44,12 @@ unique_instances = [eval(i) for i in unique_instances]
 unique_problems = set([str(i) for i in unique_problems])
 unique_problems = [eval(i) for i in unique_problems]
 
-
 #%% Data extraction
-
 instances_data = {}
 landscape_data = {}
-conditions_ = {'noise': True, 'success': True}
+noise = False #If noise or not
+noise_string = 'noise' if noise else 'state'
+conditions_ = {'noise': noise}
 for instance in unique_instances:
     conditions = {'problem': instance, **conditions_}
     instances_data[str(instance)] = filter_data(data.values(), conditions)
@@ -56,7 +60,6 @@ approx_ratio_data = {}
 optimal_prob_data = {}
 valid_prob_data = {}
 avg_time_data = {}
-#Staplar?
 
 for problem, instances in instances_data.items():
     if not instances:
@@ -79,27 +82,25 @@ for problem, instances in instances_data.items():
         exp_cost = [instance['expected_value'] for instance in instances if instance['p']==p]
         exp_costs['avg'].append(np.mean(exp_cost))
         exp_costs['best'].append(min(exp_cost))
-        exp_costs['std'].append(np.std(exp_cost))
+        exp_costs['std'].append(sem(exp_cost))
 
         approx_ratio = [instance['approximation_ratio'] for instance in instances if instance['p']==p]
         approx_ratios['avg'].append(np.mean(approx_ratio))
         approx_ratios['best'].append(max(approx_ratio))
-        approx_ratios['std'].append(np.std(approx_ratio))
+        approx_ratios['std'].append(sem(approx_ratio))
         
-        optimal_prob = [instance['probability_distribution'][str(min_cost)] 
-                                 if (instance['p']==p and str(min_cost) in instance['probability_distribution']) else 0
-                                 for instance in instances]
+        optimal_prob = [instance['probability_distribution'][str(min_cost)] for instance in instances
+                        if (instance['p']==p and str(min_cost) in instance['probability_distribution'])]
         optimal_probs['avg'].append(np.mean(optimal_prob))
         optimal_probs['best'].append(max(optimal_prob))
-        optimal_probs['std'].append(np.std(optimal_prob))      
+        optimal_probs['std'].append(sem(optimal_prob))
 
         valid_prob = [sum(float(prob) for cost, prob in instance['probability_distribution'].items() 
                                    if float(cost) <= max_valid_cost)
                                for instance in instances if instance['p']==p]
         valid_probs['avg'].append(np.mean(valid_prob))
         valid_probs['best'].append(max(valid_prob))
-        valid_probs['std'].append(np.std(valid_prob))
-
+        valid_probs['std'].append(sem(valid_prob))
         
         time = [time_in_sec(instance['execution_time']) for instance in instances if instance['p']==p]
         times['avg'].append(np.mean(time))
@@ -113,6 +114,13 @@ for problem, instances in instances_data.items():
 #%% Plotting
 err_bar_format = {'capsize': 5, 'elinewidth': 2, 'capthick': 2, 'barsabove': True}
 
+plots = ['expected_cost', 'approximation_ratio', 'optimal_solution', 'valid_solution', 'execution_time', 'landscape']
+for plot in plots:
+    for sim_type in ['state', 'noise']:
+        Path(f'plots/{plot}/{sim_type}').mkdir(parents=True, exist_ok=True)
+
+show_plots = False
+
 # Expected value vs p
 for problem, plot_data in exp_data.items():
     plt.figure()
@@ -122,7 +130,9 @@ for problem, plot_data in exp_data.items():
     plt.xlabel('p')
     plt.title(str(problem))
     plt.legend()
-    plt.show()
+    if show_plots: plt.show()
+    problem_string = problem_dict2str(eval(problem))
+    plt.savefig(f'plots/expected_cost/{noise_string}/expected_cost-{noise_string}-{problem_string}-')
 
 # Approximation ratio vs p
 for problem, plot_data in approx_ratio_data.items():
@@ -133,7 +143,9 @@ for problem, plot_data in approx_ratio_data.items():
     plt.xlabel('p')
     plt.title(str(problem))
     plt.legend()
-    plt.show()
+    if show_plots: plt.show()
+    problem_string = problem_dict2str(eval(problem))
+    plt.savefig(f'plots/approximation_ratio/{noise_string}/approximation_ratio-{noise_string}-{problem_string}')
 
 # Probability of optimal solution vs p
 for problem, plot_data in optimal_prob_data.items():
@@ -146,7 +158,9 @@ for problem, plot_data in optimal_prob_data.items():
     plt.title(str(problem))
     plt.show()
     plt.legend()
-    plt.plot()
+    if show_plots: plt.show()
+    problem_string = problem_dict2str(eval(problem))
+    plt.savefig(f'plots/optimal_solution/{noise_string}/optimal_solution-{noise_string}-{problem_string}')
     
 # Probability of valid solution vs p
 for problem, plot_data in valid_prob_data.items():
@@ -159,7 +173,9 @@ for problem, plot_data in valid_prob_data.items():
     plt.title(str(problem))
     plt.show()
     plt.legend()
-    plt.plot()
+    if show_plots: plt.show()
+    problem_string = problem_dict2str(eval(problem))
+    plt.savefig(f'plots/valid_solution/{noise_string}/valid_solution-{noise_string}-{problem_string}')
 
 # Average execution time vs p
 for problem, plot_data in avg_time_data.items():
@@ -169,7 +185,9 @@ for problem, plot_data in avg_time_data.items():
     plt.xlabel('p')
     plt.title(str(problem))
     plt.show()
-    plt.plot()
+    if show_plots: plt.show()
+    problem_string = problem_dict2str(eval(problem))
+    plt.savefig(f'plots/execution_time/{noise_string}/execution_time-{noise_string}-{problem_string}')
 
 # Energy landscapes
 for problem, landscape in landscape_data.items():
@@ -187,7 +205,9 @@ for problem, landscape in landscape_data.items():
     ax.set_zlabel('Expected costs')
     surf = ax.plot_surface(gammas_, betas_, exp_costs, cmap=cm.coolwarm, rstride=1, cstride=1, alpha=None, antialiased=True)
     plt.title(str(problem))
-    plt.show()
+    if show_plots: plt.show()
+    problem_string = problem_dict2str(eval(problem))
+    plt.savefig(f'plots/landscape/{noise_string}/landscape-{noise_string}-{problem_string}')
 
 #%% 
 # analytic_constants_problems = []
