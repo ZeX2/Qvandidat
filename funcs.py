@@ -234,6 +234,7 @@ def landscape_state(J, h,costs,step_size = 0.01):
     for j, beta in enumerate(betas):
         for i, gamma in enumerate(gammas):
             exp_costs[i,j] = expected_cost(gamma, beta, J, h, costs)
+        print(j, '/', len(betas))
     
     return gammas, betas, exp_costs
 
@@ -245,6 +246,19 @@ def landscape_simul(J, h,costs,step_size = 0.01,shots = 1000):
     for j, beta in enumerate(betas):
         for i, gamma in enumerate(gammas):
             exp_costs[i,j] = run_simulation(gamma, beta, J, h, costs,shots)
+        print(j, '/', len(betas))
+    
+    return gammas, betas, exp_costs
+
+def landscape_routing(J, h, routing, costs,step_size = 0.01,shots = 1000):
+    
+    gammas, betas = _generate_gammas_betas(step_size)
+    exp_costs = np.zeros((len(gammas), len(betas)))
+
+    for j, beta in enumerate(betas):
+        for i, gamma in enumerate(gammas):
+            exp_costs[i,j] = run_routing(gamma, beta, J, h, routing, costs, shots)
+        print(j, '/', len(betas))
     
     return gammas, betas, exp_costs
 
