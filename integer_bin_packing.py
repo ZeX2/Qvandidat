@@ -34,8 +34,8 @@ def integer_bin_packing(W, W_max, A = None, B = None, C = None):
         C_lower = min(min(np.abs(S[j,np.nonzero(S[j,:])[0]])) for j in range(M//2, M))**2
         B = 4
         A = int(B*(np.ceil(B_upper/A_lower)+1))
-        C = int(A*(np.ceil(A_upper/C_lower)+1))
-        #C = 2 * A
+        #C = int(A*(np.ceil(A_upper/C_lower)+1))
+        C = 2 * A
 
     J = np.zeros((N, N))
     for i in range(N):

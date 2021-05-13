@@ -37,10 +37,6 @@ def _run_problem(W,W_max,p,routing):
         print('Star routing method is only defined for n <= 5')
         return
 
-    if routing == 'network' and not n in [2**k for k in range(0, 10)]:
-        print('Swap network routing method is only defined for n = 2**k')
-        return
-
     bits_list = get_bits_list(len(J))
     costs = {bits: cost_function(bits, J, h, const, np.trace(J))/B for bits in bits_list}
     
