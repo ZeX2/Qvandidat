@@ -27,7 +27,7 @@ def chalmers_probability_amp_damp(gate):
         T_1 = 55*10**(-6)
         t = 271*10**(-9)
 
-    p = 1 - math.exp(-2*t/T_1)
+    p = 1 - math.exp(-t/T_1)
 
     return p
 
