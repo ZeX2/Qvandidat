@@ -1,0 +1,56 @@
+{
+    "expected_value": 1.011969739272183,
+    "optimal_gammas": [
+        2.6911848278808024,
+        4.034827835796985
+    ],
+    "optimal_betas": [
+        2.0293895318231105,
+        2.745689992803923
+    ],
+    "problem_identifier": "{'W': [1], 'W_max': 1, 'A': 12, 'B': 4, 'C': 24}",
+    "now": "2021-05-12 06:12:18",
+    "execution_time": "0:54:44.995286",
+    "nfev": 3205,
+    "message": "Maximum number of iterations has been exceeded.",
+    "success": false,
+    "nit": 50,
+    "problem": {
+        "W": [
+            1
+        ],
+        "W_max": 1,
+        "A": 12,
+        "B": 4,
+        "C": 24
+    },
+    "optimal_cost": 1.0,
+    "probability_distribution": {
+        "6.0": 0.0004823764901658976,
+        "3.0": 0.002024835921957292,
+        "10.0": 0.0006120205530487475,
+        "1.0": 0.9968807670348281
+    },
+    "probability_distribution_items": [
+        [
+            6.0,
+            0.0004823764901658976
+        ],
+        [
+            3.0,
+            0.002024835921957292
+        ],
+        [
+            10.0,
+            0.0006120205530487475
+        ],
+        [
+            1.0,
+            0.9968807670348281
+        ]
+    ],
+    "approximation_ratio": 1.011969739272183,
+    "approximation_ratio_offset": 0.9986700289697574,
+    "noise": false,
+    "p": 2
+}
