@@ -1,0 +1,20 @@
+{
+    "expected_value": 160.75024370273314,
+    "optimal_gammas": [
+        4.875982525851998,
+        2.7964826581468416,
+        3.3788738997919787
+    ],
+    "optimal_betas": [
+        1.8008223193211164,
+        0.6309537215891419,
+        2.594268141607414
+    ],
+    "problem_identifier": "{'W': [1, 1], 'W_max': 2, 'A': 36, 'B': 4, 'C': 684}",
+    "now": "2021-05-14 04:39:12",
+    "execution_time": "0:59:37.218166",
+    "nfev": 5059,
+    "message": "Maximum number of iterations has been exceeded.",
+    "success": false,
+    "nit": 50
+}
