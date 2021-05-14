@@ -39,20 +39,19 @@ def _calculate_circuit_stats(W,W_max,p):
     print('Depth ', ling_circ.depth())
     print()
 
-    if n in [2**k for k in range(0, 10)]:
-        print('Swap network:')
-        net_circ = swap_network_chalmers_circuit(gamma, beta, J, h)
-        net_circ2 = swap_network_chalmers_circuit2(gamma, beta, J, h)
-        print('Operations ', net_circ.count_ops())
-        print('Depth ', net_circ.depth())
-        print()
-        if n == 4:
-            circ = qaoa_ising_circuit(J, h, gamma, beta)
-            print(circ)
-            print(net_circ2)
-            print(net_circ)
-            #circuit_drawer(net_circ2, output='latex_source', filename=str(n)+'four_qubit_after.png')
-            #circuit_drawer(circ, output='latex_source', filename=str(n)+'four_qubit_before.png')
+    print('Swap network:')
+    net_circ = swap_network_chalmers_circuit(gamma, beta, J, h)
+    net_circ2 = swap_network_chalmers_circuit2(gamma, beta, J, h)
+    print('Operations ', net_circ.count_ops())
+    print('Depth ', net_circ.depth())
+    print()
+    if n == 4:
+        circ = qaoa_ising_circuit(J, h, gamma, beta)
+        print(circ)
+        print(net_circ2)
+        print(net_circ)
+        #circuit_drawer(net_circ2, output='latex_source', filename=str(n)+'four_qubit_after.png')
+        #circuit_drawer(circ, output='latex_source', filename=str(n)+'four_qubit_before.png')
 
     if n < 6:
         print('Star swap:')
