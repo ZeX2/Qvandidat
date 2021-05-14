@@ -39,7 +39,7 @@ def _run_landscape_routing(W,W_max,p,routing):
     end_time = time.monotonic()
 
     file_name = 'landscape' + file_suffix
-    save_results(gammas, betas, -1, str(S), end_time-start_time, file_name, {'landscape':exp_costs})
+    save_results(gammas, betas, -1, str(S), end_time-start_time, file_name, {'landscape':exp_costs, 'routing': routing})
 
 
 def _run_landscape_simul(W,W_max,p,A = None,B = None, C = None):
